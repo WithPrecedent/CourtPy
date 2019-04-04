@@ -1,0 +1,2 @@
+values,DOTALL,IGNORECASE,keys
+nums,y,y,(\d+\-\d+)

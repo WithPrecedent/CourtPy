@@ -1,0 +1,3 @@
+values,DOTALL,IGNORECASE,keys
+crim,y,y,(\W|\d)cr
+civ,y,y,(\W|\d)ci?v

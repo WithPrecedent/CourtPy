@@ -1,0 +1,7 @@
+﻿values,DOTALL,IGNORECASE,keys
+prosecutor,y,y,U(\.|NITED) *S(\.|TATES) ATTORNEY|DISTRICT|PROSECUTOR|ATTORNEY GENERAL
+public_def,y,y,PUBLIC DEFENDER
+clerk,y,y,LAW CLERK
+scotus_clerk,y,y,SUPREME COURT OF THE UNITED STATES
+sg_office,y,y,SOLICITOR GENERAL
+law_prof,y,y,PROFESSOR

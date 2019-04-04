@@ -1,0 +1,8 @@
+values,DOTALL,IGNORECASE,keys
+cong_rec,n,y,\d*? CONG\. REC\. \d*?\b\(\d\d*.?\)
+const,n,y,U\.S\. CONST\. (?:Amend[s]?|Art)\.? \w\w*?(?=\W?)
+legis_list_h,n,y,H\. REP\. NO\. \d\d*-\d\d*.?(?=\W?)
+legis_hist_s,n,y,S\. REP\. NO\. \d\d*-\d\d*.?(?=\W?)
+mcpc,n,y,MODEL CODE OF PROF'L CONDUCT R\. §§* \d\d*.?(?=\W?)
+mcprc,n,y,MODEL CODE OF PROF'L RESPONSIBILITY CANON §§* \d\d*.?(?=\W?)
+mpc,n,y,MODEL PENAL CODE §§* \d\d*.?(?=\W?)

@@ -1,0 +1,3 @@
+values,DOTALL,IGNORECASE,keys
+us_atty,y,y,U(\.|NITED) ?S(\.|TATES) Attorney
+fed_pub_def,y,y,Federal Public Defender

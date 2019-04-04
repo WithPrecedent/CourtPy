@@ -1,0 +1,5 @@
+values,DOTALL,IGNORECASE,keys
+f3d,y,y,\d+ F\. ?3d \d+
+f2d,y,y,\d+ F\. ?2d \d+
+lexis,y,y,\d+ U\.S\. APP\. LEXIS \d+
+fappx,y,y,\d+ Fed\. Appx\. \d+

@@ -1,0 +1,21 @@
+values,DOTALL,IGNORECASE,keys
+op_div,n,n,\nOPINION(?=\n\n)
+party_div,y,n,\w.*?(?=\n\n)
+court_div,y,y,\n(IN )?(THE )?(UNITED STATES COURTS? OF APPEALS FOR THE|UNITED STATES BANKRUPTCY APPELLATE|TEMPORARY EMERGENCY COURT OF APPEALS|JUDICIAL COUNCIL (OF|FOR) THE).*?(?=\n\n)
+docket_div,y,y,(?=\n\n)?(C\.?A\.?|Case)? ?(DOCKET )? ?(NOS?\. )? ?(NO\:)? ?\d\d*\-\d\d*.*?(?=\n\n)
+history_div,y,y,\nPRIOR HISTORY\:.*?(?=\n\n)
+future_div,y,y,\nSUBSEQUENT HISTORY\:.*?(?=\n\n)
+counsel_div,y,y,"\nCOUNSEL\:.*?(?=(\nNOTICE\:|\nSUBSEQUENT HISTORY\:|\nPRIOR HISTORY\:|\n\n(DOCKET )?(NOS?\. )?\d\d*\-\d\d|\n(?:\d\d*)? ?(?:JAN(?:\.|UARY)|FEB(?:\.|RUARY)|MAR(?:\.|CH)|APR(?:\.|IL)|MAY |JUN(?:\.|E)|JUL(?:\.|Y)|AUG(?:\.|UST)|SEP(?:\.|T\.|TEMBER)|OCT(?:\.|OBER)|NOV(?:\.|EMBER)|DEC(?:\.|EMBER)).*? (?:\d\d*\, )?\d\d\d\d|\nDISPOSITION\:.|\n\d* (?:F\.[23]?d|U\.S\.|S\. Ct\.|U\.S\. APP\. LEXIS|Fed\. Appx\.) \d\d|\nJUDGES\:|\nOPINION BY\:|BEFORE\:|\nOPINION))"
+notice_div,y,y,\nNOTICE\:.*?(?=\n\n)
+date_div,n,y,"(?<=\n)(?:\d\d*)? ?(?:JAN(?:\.|UARY)|FEB(?:\.|RUARY)|MAR(?:\.|CH)|APR(?:\.|IL)|MAY |JUN(?:\.|E)|JUL(?:\.|Y)|AUG(?:\.|UST)|SEP(?:\.|T\.|TEMBER)|OCT(?:\.|OBER)|NOV(?:\.|EMBER)|DEC(?:\.|EMBER)).*? (?:\d\d*\, )?\d\d\d\d.*?(?=\n)"
+disposition_div,n,y,\nDISPOSITION\:.*?(?=\n\n)
+cite_div,y,y,(?<=\n)\d* (?:F\.[23]?d|U\.S\.|S\. Ct\.|U\.S\. APP\. LEXIS|Fed\. Appx\.) \d\d*.*?(?=\n)
+panel_judges_div,y,y,\nJUDGES\:.*?(?=(\n\n|\nOPINION))
+author_div,n,n,\nOPINION BY\:.*?(\n|$)
+concur_div,y,y,CONCUR
+mixed_div,y,y,IN PART
+dissent_div,y,y,DISSENT
+lex_pat,n,n,\d* of \d* DOCUMENTS\n
+party1_div,y,n,\Wversus\W|\Wv\.\W|\Wvs\.\W|\Wv ?\-\W|\W\-?[Aa]gainst ?\-?\W|\W\-?GAINST ?\-?\W|\W\-?VERSUS\-?\W|\W\-?VS\.\-?\W
+date_pat,n,y,"(?:\d\d*)? ?(?:JAN(?:\.|UARY)|FEB(?:\.|RUARY)|MAR(?:\.|CH)|APR(?:\.|IL)|MAY |JUN(?:\.|E)|JUL(?:\.|Y)|AUG(?:\.|UST)|SEP(?:\.|T\.|TEMBER)|OCT(?:\.|OBER)|NOV(?:\.|EMBER)|DEC(?:\.|EMBER)).*? (?:\d\d*\, )?\d\d\d\d"
+separate_div,n,n,(?<=\n)CONCUR.*?(?=\n)|(?<=\n)DISSENT.*?(?=\n)|concurring\:.*?(?=\n)|dissenting\:.*?(?=\n)|(?<=\n)Concur By\: .*?(?=\n)|(?<=\n)Dissent By\: .*?(?=\n)
