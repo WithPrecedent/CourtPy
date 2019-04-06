@@ -1,24 +1,27 @@
+"""
+Parent class for CourtParser, CourtWrangler, CourtMerger, CourtEngineer,
+and CourtAnalyzer.
+Contains shared methods that can be accessed by all child classes.
+"""
 
 from dataclasses import dataclass
 from  more_itertools import unique_everseen
 import numpy as np
 import os
-import pandas as pd
 import re
 
+from library.cases import Cases
 from library.combiners import Combiner
 from library.dividers import Divider
 from library.externals import External
 from library.mungers import Munger
+from ml_funnel.data import Data
 from utilities.rematch import ReMatch
 from utilities.strings import no_breaks
 
 @dataclass
 class CaseTools(object):
-    """
-    Parent class for CourtParser, CourtWrangler, CourtMerger, and 
-    CourtEngineer, containing shared methods.
-    """  
+    
     paths : object
     settings : object
     source : str = ''
@@ -112,7 +115,9 @@ class CaseTools(object):
     def divide(self, df = None, bundle = None):
         for tool in self.dividers:
             df, bundle = (
-                    tool.section_divider(df, bundle, self.dividers_table))
+                    tool.section_divider(df = df, 
+                                         bundle = bundle, 
+                                         dividers_table = self.dividers_table))
         return df, bundle
     
     def create_munger_list(self, cases = None):
@@ -137,11 +142,34 @@ class CaseTools(object):
                                        source_col = row['munge_source']))                       
         return self  
     
+    def quick_start(self):
+        self.paths.stage = self.stage
+        self.paths.conform(stage = self.stage, 
+                           source = self.source)
+        self.cases = Cases(paths = self.paths, 
+                           settings = self.settings, 
+                           source = self.source, 
+                           stage = self.stage)
+        self.data = Data(settings = self.settings,
+                         quick_start = True,
+                         import_path = self.paths.import_path)
+        self.data.column_types(bool_prefixes = self.cases.bool_prefixes,
+                               list_prefixes = self.cases.list_prefixes,
+                               float_prefixes = self.cases.float_prefixes,
+                               int_prefixes = self.cases.int_prefixes,
+                               str_prefixes = self.cases.str_prefixes)
+        self.smart_fill_na()
+        return self
+    
+    def loop_cleanup(self):
+        del(self.data)
+        del(self.cases)
+        return self
+        
     def create_section_list(self, cases = None):
         if self.source:
             self.prefix_secs = (
-                cases.rules.loc[cases.rules[self.source]]['key']
-                    .tolist())
+                cases.rules.loc[cases.rules[self.source]]['key'].tolist())
         else:
             self.prefix_secs = cases.rules['key'].tolist() 
         self.section_list = self.create_column_list(self.prefix_secs) 
@@ -162,10 +190,12 @@ class CaseTools(object):
                     else:
                         df = tool.section_munger.match(df = df)
                 elif tool.munge_type == 'specific':
-                    df = tool.section_munger(df = df, bundle = bundle)
+                    df = tool.section_munger(df = df, 
+                                             bundle = bundle)
             elif self.stage == 'wrangle':
                 if tool.section in ['panel_judges', 'author', 'separate']:
-                    df = tool.section_munger(df = df, judges = self.judges)
+                    df = tool.section_munger(df = df, 
+                                             judges = self.judges)
                 elif tool.munge_type == 'general':
                     df = tool.section_munger.match(df = df)
                 else:
@@ -207,33 +237,45 @@ class CaseTools(object):
                                            settings = self.settings)) 
         for tool in self.externals:
             if tool.section == 'judge_exp':
-                    df = tool.section_adder(df = df, judges = self.judges)
+                    df = tool.section_adder(df = df, 
+                                            judges = self.judges)
             else:
                 df = tool.section_adder(df)                     
         return df     
-        
+    
+    def merge_dataframes(self, df1, cases1, df2, cases2):
+        df = df1
+        return df
+    
     def cull_data(self, data = None, drop_prefixes = []):
         if self.settings['drops']['no_judge']:
-            data.df.query('panel_size != 0', inplace = True)
+            data.df.query('panel_size != 0', 
+                          inplace = True)
         if self.settings['drops']['en_banc']:
-            data.df.query('panel_size < 4', inplace = True)  
+            data.df.query('panel_size < 4', 
+                          inplace = True)  
         if self.settings['drops']['small_panels']:
-            data.df.query('panel_size > 2', inplace = True) 
+            data.df.query('panel_size > 2', 
+                          inplace = True) 
         drop_prefixes.extend(['panel_ideo_pres_num'])
         extra_outcomes = [i for i in data.df if i.startswith('outcome_')]
         extra_outcomes.remove(self.settings['engineer']['label'])
         drop_list = data.create_column_list(data.df, drop_prefixes, 
                                             extra_outcomes)
-        data.df.query('court_num < 14', inplace = True)
+        data.df.query('court_num < 14', 
+                      inplace = True)
         if self.settings['drops']['crim']:
-            data.df.query('type_criminal != 0', inplace = True)
+            data.df.query('type_criminal != 0', 
+                          inplace = True)
             drop_list.extend(['type_criminal', 'type_crim_d_appeal'])
         elif self.settings['drops']['civ']:
-            data.df.query('type_criminal != 1', inplace = True) 
+            data.df.query('type_criminal != 1', 
+                          inplace = True) 
             drop_list.extend(['type_criminal', 'type_civ_d_appeal'])
         if self.settings['drops']['jcs_unqual']:
             pass
-        data.df.drop(drop_list, axis = 'columns', inplace = True)
+        data.df.drop(drop_list, axis = 'columns', 
+                     inplace = True)
         return data
     
     def _judge_stubs(self, df):
@@ -258,7 +300,8 @@ class CaseTools(object):
                 data.df[col] = data.df[col] - data.df[corr_judge_col] 
                 data.df[col] = data.df[col] / (data.df['panel_size'] - 1)
             data.df['panel_judges_list'] = data.df.apply(
-                    self.remove_judge_name, axis = 'columns')
+                    self.remove_judge_name, 
+                    axis = 'columns')
             data.df = data.df[data.df['judge_name'].str.len() > 1]
             label = self.settings['funnel']['label']
             if self.settings['engineer']['iso_votes']:
@@ -269,12 +312,16 @@ class CaseTools(object):
                                             False, True)
         elif self.settings['engineer']['shape'] == 'wide':
             stubs.remove('judge_name')
-            wide_drop_list = data.create_column_list(data.df, prefixes = stubs)
-        drop_list = data.create_column_list(data.df, prefixes = ['judge_vote'])
+            wide_drop_list = data.create_column_list(df = data.df, 
+                                                     prefixes = stubs)
+        drop_list = data.create_column_list(df = data.df, 
+                                            prefixes = ['judge_vote'])
         drop_list.append('panel_size')
         if wide_drop_list:
             drop_list.extend(wide_drop_list)
-        data.df.drop(drop_list, axis = 'columns', inplace = True)
+        data.df.drop(drop_list, 
+                     axis = 'columns', 
+                     inplace = True)
         return data
     
     def remove_judge_name(self, row):
@@ -292,20 +339,29 @@ class CaseTools(object):
     def engineer_loose_ends(self, df = None):
         df.rename({'judge_demo_party' : 'judge_ideo_party',
                    'panel_demo_party' : 'panel_ideo_party'},
-                   axis = 'columns', inplace = True)
+                   axis = 'columns', 
+                   inplace = True)
         if self.settings['drops']['en_banc']:
             for i in range(4, 30):
                 if 'judge_name' + str(i) in df.columns:
-                    df.drop('judge_name' + str(i), axis = 'columns', 
+                    df.drop('judge_name' + str(i), 
+                            axis = 'columns', 
                             inplace = True)
         return df
     
     def create_splices(self, data):
-        data.add_splice('panels', prefixes = ['panel_judges'])
-        data.add_splice('jcs', prefixes = ['panel_ideo_jcs'])
-        data.add_splice('presidents', prefixes = ['panel_ideo_party'])
-        data.add_splice('demographics', prefixes = ['panel_demo_'])
-        data.add_splice('experience', prefixes = ['panel_exp_'])
-        data.add_splice('politics', prefixes = ['pol_'])
-        data.add_splice('judges', prefixes = ['judge_']) 
+        data.add_splice(group_name = 'panels', 
+                        prefixes = ['panel_judges'])
+        data.add_splice(group_name = 'jcs', 
+                        prefixes = ['panel_ideo_jcs'])
+        data.add_splice(group_name = 'presidents', 
+                        prefixes = ['panel_ideo_party'])
+        data.add_splice(group_name = 'demographics', 
+                        prefixes = ['panel_demo_'])
+        data.add_splice(group_name = 'experience', 
+                        prefixes = ['panel_exp_'])
+        data.add_splice(group_name = 'politics', 
+                        prefixes = ['pol_'])
+        data.add_splice(group_name = 'judges', 
+                        prefixes = ['judge_']) 
         return data

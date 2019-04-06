@@ -9,6 +9,21 @@ from library.paths import Paths
 from ml_funnel.settings import Settings
 from utilities.timer import timer
 
+
+@timer('Total preparation')
+@dataclass
+class CourtPrepper(object):
+ 
+    paths : object
+    settings : object
+     
+    def __post_init__ (self):   
+        ExternalData(paths = self.paths,
+                     settings = self.settings)
+        LexisSplitter(paths = self.paths,
+                     settings = self.settings)
+        return self
+
 @timer('Preparation of external data')
 @dataclass
 class ExternalData(object):

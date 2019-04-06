@@ -76,11 +76,12 @@ class Results(object):
         self.pred_probs = pipe.model.method.predict_proba(pipe.x_test)
         self._set_metrics(pipe.x_test, pipe.y_test)
         new_row = pd.Series(index = self.columns)
+        new_row['predictors'] = self._check_none(pipe.splicer)
         new_row['scaler'] = self._check_none(pipe.scaler)
         new_row['splitter'] = self._check_none(pipe.splitter)
         new_row['encoder'] = self._check_none(pipe.encoder)
         new_row['interactor'] = self._check_none(pipe.interactor)
-        new_row['splicer'] = pipe.splicer.name
+        new_row['splicer'] = self._check_none(pipe.splicer)
         new_row['sampler'] = self._check_none(pipe.sampler)
         new_row['selector'] = self._check_none(pipe.selector)
         new_row['estimator'] = self._check_none(pipe.model)
@@ -101,18 +102,4 @@ class Results(object):
             print('Testing', pipe.model.name, 'predictors')
             print('Confusion Matrix:', self.c_matrix)
             print('Classification Report:', self.class_report)
-        return self
-    
-    def load(self, import_path, file_format = 'csv', encoding = 'windows-1252'):
-        """
-        Method to import pandas dataframes from different file formats.
-        """   
-        if self.verbose:
-            print('Importing results')
-        if file_format == 'csv':
-            self.table = pd.read_csv(import_path, encoding = encoding)
-        elif file_format == 'h5':
-            self.table = pd.read_hdf(import_path)
-        elif file_format == 'feather':
-            self.table = pd.read_feather(import_path)
         return self

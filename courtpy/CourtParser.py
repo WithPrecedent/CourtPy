@@ -46,22 +46,24 @@ class CourtParser(CaseTools):
                           stage = self.stage) 
             data = Data(settings = self.settings)
             bundle = CaseBundle()
-            self.create_divider_list(df = data.df, cases = cases)
+            self.create_divider_list(df = data.df, 
+                                     cases = cases)
             self.create_munger_list(cases = cases)
-            self.create_column_dicts(df = data.df, cases = cases)   
-            data.df = pd.Series(index = self.column_dict) 
+            self.create_column_dicts(df = data.df, 
+                                     cases = cases)   
+            data.df = pd.Series(index = self.column_dict)
+            encoding = self.settings['files']['encoding']
             with open(self.paths.export_path, mode = 'w', newline = '',
-                encoding = self.settings['files']['encoding']) as output_file:
-                writer = csv.writer(output_file, dialect = 'excel')
+                      encoding = encoding) as output_file:
+                writer = csv.writer(output_file, 
+                                    dialect = 'excel')
                 column_list = self.column_dict.keys()
                 writer.writerow(column_list)
-                for c, bundle.a_path in enumerate(
-                        self.paths.import_paths):
+                for c, bundle.a_path in enumerate(self.paths.import_paths):
                     with open(bundle.a_path, 
                               mode = 'r', 
                               errors = 'ignore',
-                              encoding = (
-                                self.settings['files']['encoding'])) as a_file:
+                              encoding = encoding) as a_file:
                         cases_text = a_file.read()
                         data.initialize_series(column_dict = self.column_dict)
                         data.df[cases.index_col] = c + 1

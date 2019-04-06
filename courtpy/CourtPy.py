@@ -54,9 +54,9 @@ class CourtPy(object):
             individual .txt files. If lexis_split = False, the files will
             not be split.
             """
-            from CourtPrepper import ExternalData, LexisSplitter
-            ExternalData(self.paths, self.settings)
-            LexisSplitter(self.paths, self.settings)
+            from CourtPrepper import CourtPrepper
+            CourtPrepper(paths = self.paths, 
+                         settings = self.settings)
             if self.settings['general']['verbose']:
                 print('Preparation complete')
             
@@ -66,7 +66,8 @@ class CourtPy(object):
             upon the source format.
             """
             from CourtParser import CourtParser  
-            CourtParser(self.paths, self.settings)
+            CourtParser(paths = self.paths, 
+                        settings = self.settings)
             if self.settings['general']['verbose']:
                 print('Data collection and parsing complete')
             
@@ -76,7 +77,8 @@ class CourtPy(object):
             created by CourtParser.
             """
             from CourtWrangler import CourtWrangler  
-            CourtWrangler(self.paths, self.settings)
+            CourtWrangler(paths = self.paths, 
+                          settings = self.settings)
             if self.settings['general']['verbose']:
                 print('Deep parsing and data wrangling complete')
         
@@ -86,7 +88,8 @@ class CourtPy(object):
             preexisting third-party databases.
             """
             from CourtMerger import CourtMerger
-            CourtMerger(self.paths, self.settings)
+            CourtMerger(paths = self.paths, 
+                        settings = self.settings)
             if self.settings['general']['verbose']:
                 print('Data merging complete')
           
@@ -96,7 +99,8 @@ class CourtPy(object):
             learning packages.
             """
             from CourtEngineer import CourtEngineer
-            CourtEngineer(self.paths, self.settings)
+            CourtEngineer(paths = self.paths, 
+                          settings = self.settings)
             if self.settings['general']['verbose']:
                 print('Feature engineering complete')
    
@@ -106,7 +110,8 @@ class CourtPy(object):
             data.
             """
             from CourtAnalyzer import CourtAnalyzer 
-            CourtAnalyzer (self.paths, self.settings)
+            CourtAnalyzer(paths = self.paths, 
+                          settings = self.settings)
             if self.settings['general']['verbose']:
                 print('Data analysis complete')
         
@@ -116,7 +121,8 @@ class CourtPy(object):
             by CourtAnalyzer.
             """
             from CourtPlotter import CourtPlotter
-            CourtPlotter(self.paths, self.settings)
+            CourtPlotter(paths = self.paths, 
+                         settings = self.settings)
             if self.settings['general']['verbose']:
                 print('Plotting complete')
         return  

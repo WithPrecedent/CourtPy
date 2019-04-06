@@ -364,7 +364,8 @@ class Grid(Methods):
     def search(self, x, y):
         self.method.fit(x, y)
         self.best = self.method.best_estimator_
-        print('The score of the best estimator for the ' + self.model.name
-              + ' model is ' + str(self.method.best_score_))
+        print('The', self.params['scoring'][0], 
+              'score of the best estimator for the', self.model.name,
+              'model is', str(self.method.best_score_))
         return self
     

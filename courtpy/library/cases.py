@@ -9,11 +9,10 @@ the functionality of methods and functions throughout the CourtPy package.
 """
 from dataclasses import dataclass
 import os
-
-from utilities.pandas_tools import PandasTools
+import pandas as pd
 
 @dataclass
-class Cases(PandasTools):
+class Cases(object):
     
     paths : object
     settings : object
@@ -32,9 +31,11 @@ class Cases(PandasTools):
                            'munge_file' : str, 'munge_source' : str, 
                            'combiner' : bool, 'external' : bool,
                            'scale' : bool, 'drop' : bool, 'encoder' : str}
-        self.rules = self.df_import(self.paths.case_rules,
-                                    usecols = self.rules_cols,
-                                    file_format = 'csv')
+        
+        self.rules = pd.read_csv(self.paths.case_rules, 
+                                 usecols = self.rules_cols,
+                                 encoding = self.settings['files']['encoding'],
+                                 file_format = 'csv')
         if self.source == 'lexis_nexis':
             self.index_col = 'index_lexis'  
             self.meta_cols = {'file_name' : str, 'word_count' : int} 
@@ -82,47 +83,4 @@ class Cases(PandasTools):
             self.drop_prefixes = (
                     self.rules.loc[self.rules['drop']]['key'].tolist())
         return self
-    
-    def check_list(self, variable):
-        if isinstance(variable, list):
-            return variable
-        else:
-            return [variable]  
-        
-#    def import_data(self):
-#        if self.settings['general']['verbose']:
-#            print('Importing data file(s)')
-#        if self.settings['files']['test_data']:
-#            nrows = self.settings['files']['test_chunk']
-#        else:
-#            nrows = None
-#        if self.stage in ['wrangle', 'merge', 'engineer', 'analyze']:
-#            self.df = self.df_import(self.paths.import_path, nrows = nrows) 
-#        elif self.stage == 'plot':
-#            self.bunch = {}
-#            file_list = ['x', 'y', 'x_train', 'y_train']
-#            if self.settings['analyzer']['val_size'] > 0:
-#                file_list.extend(['x_val', 'y_val'])
-#            for file in file_list:
-#                file_name = file + '.' + self.file_format_in
-#                import_path = os.path.join(self.paths.output, file_name)
-#                self.bunch.update({file : self.df_import(import_path,
-#                                                         nrows = nrows)})
-#        return self
-#    
-#    def export_data(self):
-#        if self.settings['general']['verbose']:
-#            print('Exporting data file(s)')
-#        if self.stage in ['wrangle', 'merge', 'engineer']:
-#            self.df_export(self.df, export_path = self.paths.export_path)     
-#        elif self.stage in ['analyze', 'plot']:
-#            file_dict = {'x' : self.x, 'y' : self.y, 'x_train' : self.x_train, 
-#                         'y_train' : self.y_train}
-#            if self.settings['analyzer']['val_size'] > 0:
-#                file_dict.update({'x_val' : self.x_val, 'y_val' : self.y_val})
-#            for key, value in file_dict.items():
-#                file_name = key + '.' + self.file_format_out
-#                export_path = os.path.join(self.paths.output, file_name)
-#                self.df_export(value, export_path = export_path)
-#        return self   
   

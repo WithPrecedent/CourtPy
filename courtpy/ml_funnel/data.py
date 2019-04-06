@@ -55,18 +55,27 @@ class Data(object):
                      str_cols = [], str_prefixes = []):
         if not isinstance(df, pd.DataFrame):
             df = self.df
-        self.bool_cols = self.create_column_list(df, bool_prefixes, 
-                                                 bool_cols) 
-        self.cat_cols = self.create_column_list(df, cat_prefixes, 
-                                                cat_cols) 
-        self.float_cols = self.create_column_list(df, float_prefixes, 
-                                                  float_cols) 
-        self.int_cols = self.create_column_list(df, int_prefixes, 
-                                                int_cols) 
-        self.interact_cols = self.create_column_list(df, interact_prefixes, 
-                                                     interact_cols)
-        self.list_cols = self.create_column_list(df, list_prefixes, list_cols)
-        self.str_cols = self.create_column_list(df, str_prefixes, str_cols)
+        self.bool_cols = self.create_column_list(df = df, 
+                                                 prefixes = bool_prefixes, 
+                                                 cols = bool_cols) 
+        self.cat_cols = self.create_column_list(df = df, 
+                                                prefixes = cat_prefixes, 
+                                                cols = cat_cols) 
+        self.float_cols = self.create_column_list(df = df, 
+                                                  prefixes = float_prefixes, 
+                                                  cols = float_cols) 
+        self.int_cols = self.create_column_list(df = df, 
+                                                prefixes = int_prefixes, 
+                                                cols = int_cols) 
+        self.interact_cols = self.create_column_list(df = df, 
+                                                     prefixes = interact_prefixes, 
+                                                     cols = interact_cols)
+        self.list_cols = self.create_column_list(df = df, 
+                                                 prefixes = list_prefixes, 
+                                                 cols = list_cols)
+        self.str_cols = self.create_column_list(df = df, 
+                                                prefixes = str_prefixes, 
+                                                cols = str_cols)
         self.num_cols = self.float_cols + self.int_cols
         self.all_cols = df.columns
         self.column_dict = dict.fromkeys(self.bool_cols, bool)
@@ -204,7 +213,9 @@ class Data(object):
         for col in cats:
             df['value_freq'] = df[col].value_counts() / len(df[col])
             df[col] = np.where(df['value_freq'] <= threshold, '', df[col]) 
-        df.drop('value_freq', axis = 'columns', inplace = True)
+        df.drop('value_freq', 
+                axis = 'columns', 
+                inplace = True)
         if not_df:
             self.df = df
             return self
@@ -220,7 +231,9 @@ class Data(object):
             print('Removing boolean variables with low variability')
         for col in bools:
             if df[col].mean() > threshold:
-                df.drop(col, axis = 'columns', inplace = True)
+                df.drop(col, 
+                        axis = 'columns', 
+                        inplace = True)
         if not_df:
             self.df = df
             return self
@@ -249,9 +262,11 @@ class Data(object):
             not_df = True
         if self.verbose:
             print('Reshaping data to long format')
-        df = (pd.wide_to_long(df, stubnames = stubs, i = id_col, j = new_col, 
-                              sep = sep)
-                     .reset_index())
+        df = (pd.wide_to_long(df, 
+                              stubnames = stubs, 
+                              i = id_col, 
+                              j = new_col, 
+                              sep = sep).reset_index())
         if not_df:
             self.df = df
             return self
@@ -265,8 +280,9 @@ class Data(object):
             not_df = True
         if self.verbose:
             print('Reshaping data to wide format')
-        df = (df.pivot(index = df_index, columns = cols, values = values)
-                          .reset_index())
+        df = (df.pivot(index = df_index, 
+                       columns = cols, 
+                       values = values).reset_index())
         if not_df:
             self.df = df
             return self
@@ -330,12 +346,12 @@ class Data(object):
                 
     def load(self, import_path, file_format = 'csv', usecols = None, 
              index = False, encoding = 'windows-1252', test_data = False, 
-             test_rows = 500, return_df = False):
+             test_rows = 500, return_df = False, message = 'Importing data'):
         """
         Method to import pandas dataframes from different file formats.
         """   
         if self.verbose:
-            print('Importing data')
+            print(message)
         if test_data:
             nrows = test_rows
         else:
@@ -363,7 +379,7 @@ class Data(object):
     
     def save(self, df = None, export_path = '', file_format = 'csv', 
              index = False, encoding = 'windows-1252', float_format = '%.4f',
-             boolean_out = True):
+             boolean_out = True, message = 'Exporting data'):
         """
         Method to export pandas dataframes to different file formats and 
         encoding of boolean variables as True/False or 1/0
@@ -371,7 +387,7 @@ class Data(object):
         if not isinstance(df, pd.DataFrame):
             df = self.df
         if self.verbose:
-            print('Exporting data')
+            print(message)
         if not boolean_out:
             df.replace({True : 1, False : 0}, inplace = True)
         if file_format == 'csv':

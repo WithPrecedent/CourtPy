@@ -3,47 +3,50 @@ Primary class for merging court opinion data from different sources.
 """
 
 from dataclasses import dataclass
+import os
 import warnings
 
+from library.cases import Cases
+from library.case_tools import CaseTools
 from library.paths import Paths
-from library.settings import Settings
+from ml_funnel.data import Data
+from ml_funnel.settings import Settings
 from utilities.timer import timer
 
 @timer('Data merging')
 @dataclass
-class CourtMerger(object):
+class CourtMerger(CaseTools):
     
     paths : object
     settings : object
     stage : str = 'merge'
     
     def __post_init__(self):
-        self.paths.stage = self.stage
-        self.paths.conform()
-        """
-        Creates list of source formats.
-        """
-        self.sources = []     
-        if self.settings.lexis_cases: 
-            self.sources.append('lexis')
-        if self.settings.court_listener_cases:
-            self.sources.append('cl')
-        if self.settings.caselaw_access_cases: 
-            self.sources.append('ca')
-        self.paths.conform('merge', self.source) 
-        self.merge_dataframes()
+        sources = self.check_sources()
+        self.source = sources[0]
+        self.quick_start()
+        for i in range(1, len(sources)):
+            source2 = sources[i]
+            paths2 = Paths(settings)
+            paths2.stage = self.stage
+            paths2.conform(stage = self.stage, 
+                           source = source2)
+            cases2 = Cases(paths = paths2, 
+                           settings = self.settings, 
+                           source = source2, 
+                           stage = self.stage)
+            data2 = Data(settings = self.settings,
+                         quick_start = True,
+                         import_path = paths2.import_path)
+            self.data.df = self.merge_dataframes(df1 = self.data.df,
+                                                 cases1 = self.cases,
+                                                 df2 = data2.df,
+                                                 cases2 = cases2)
+        self.data.save(export_path = self.paths.export_path,
+                       file_format = self.settings['files']['data_out'],
+                       encoding = self.settings['files']['encoding'],
+                       boolean_out = self.settings['files']['boolean_out'])
         return
-    
-    def merge_dataframes(self):
-        self.df = self.df_import(self.paths.import_path, 
-                                 nrows = None,
-                                 encoding = self.settings.encoding)
-        self.df_export(self.df, 
-                       export_path = self.paths.export_path, 
-                       index = False,
-                       boolean = self.settings.boolean_out,
-                       encoding = self.settings.encoding)
-        return self
     
 if __name__ == '__main__':
     settings = Settings()

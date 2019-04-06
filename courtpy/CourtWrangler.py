@@ -6,59 +6,42 @@ from dataclasses import dataclass
 import os
 import warnings
 
-from library.cases import Cases
 from library.paths import Paths
 from library.case_tools import CaseTools
-from ml_funnel.data import Data
 from ml_funnel.settings import Settings
 from utilities.timer import timer
 
 @timer('Deep parsing and data wrangling')
 @dataclass
-class CourtWrangler(object):
+class CourtWrangler(CaseTools):
     
     paths : object
     settings : object
     stage : str = 'wrangle'
     
     def __post_init__(self):
-        sources = []
-        if self.settings['parser']['lexis_cases']:
-            sources.append('lexis_nexis')
-        if self.settings['parser']['court_listener_cases']:
-            sources.append('court_listener')
-        if self.settings['parser']['caselaw_access_cases']:
-            sources.append('caselaw_access')
+        if self.settings['general']['verbose']:
+            print('Beginning vectorized data wrangling')
+        sources = self.check_sources()
         for source in sources:
             self.source = source
-            self.paths.stage = self.stage
-            self.paths.conform(stage = self.stage, 
-                               source = self.source)
-            cases = Cases(paths = self.paths, 
-                          settings = self.settings, 
-                          source = self.source, 
-                          stage = self.stage)
-            tools = CaseTools(paths = self.paths,
-                              settings = self.settings,
-                              source = self.source,
-                              stage = self.stage)
-            data = Data(settings = self.settings,
-                        quick_start = True,
-                        import_path = self.paths.import_path)
-            data.column_types(bool_prefixes = cases.bool_prefixes,
-                              list_prefixes = cases.list_prefixes,
-                              float_prefixes = cases.float_prefixes,
-                              int_prefixes = cases.int_prefixes,
-                              str_prefixes = cases.str_prefixes)
-            data.smart_fill_na()
-            tools.initialize_judges(cases = cases)
-            tools.create_munger_list(cases = cases)
-            data.df = tools.munge(df = data.df)
-            data.df = tools.combine(df = data.df, cases = cases)
-            data.df = tools.add_externals(df = data.df, cases = cases)
-            data.df = data.df.loc[:, ~data.df.columns.str.startswith('temp_')]
-            data.df = data.df.loc[:, ~data.df.columns.str.startswith('sec_')]
-            data.save(export_path = self.paths.export_path)
+            self.quick_start()
+            self.initialize_judges(cases = self.cases)
+            self.create_munger_list(cases = self.cases)
+            self.data.df = self.munge(df = self.data.df)
+            self.data.df = self.combine(df = self.data.df, 
+                                        cases = self.cases)
+            self.data.df = self.add_externals(df = self.data.df, 
+                                              cases = self.cases)
+            self.data.df = (
+                self.df.loc[:, ~self.data.df.columns.str.startswith('temp_')])
+            self.data.df = (
+                self.df.loc[:, ~self.data.df.columns.str.startswith('sec_')])
+            self.data.save(export_path = self.paths.export_path,
+                           file_format = self.settings['files']['data_out'],
+                           encoding = self.settings['files']['encoding'],
+                           boolean_out = self.settings['files']['boolean_out'])
+            self.loop_cleanup()
         return self
     
 if __name__ == '__main__':
