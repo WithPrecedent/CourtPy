@@ -1,0 +1,7 @@
+*__pycache__*
+.vscode/*
+.spyproject/*/*
+.spyproject/workspace.ini
+scratch.py
+data/*/*
+\.spyproject/
