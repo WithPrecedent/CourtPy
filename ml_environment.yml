@@ -1,0 +1,34 @@
+name: mlearn
+channels:
+- conda-forge
+dependencies:
+- python
+- category_encoders
+- configparser
+- cudatoolkit
+- cudnn
+- cython
+- dataclasses
+- git
+- imbalanced-learn 
+- ipykernel
+- ipython
+- jupyter
+- lime
+- matplotlib
+- more-itertools
+- numpy
+- pandas
+- pip
+- prince
+- py-xgboost
+- python-docx
+- scikit-learn
+- scipy
+- seaborn
+- shap
+- spyder
+- statsmodels
+- sympy
+- xlrd
+- yaml
