@@ -153,12 +153,20 @@ class CaseTools(object):
         self.data = Data(settings = self.settings,
                          quick_start = True,
                          import_path = self.paths.import_path)
-        self.data.column_types(bool_prefixes = self.cases.bool_prefixes,
-                               list_prefixes = self.cases.list_prefixes,
-                               float_prefixes = self.cases.float_prefixes,
-                               int_prefixes = self.cases.int_prefixes,
-                               str_prefixes = self.cases.str_prefixes)
-        self.smart_fill_na()
+        if self.stage in ['parse', 'wrangle', 'merge']:
+            self.data.column_types(bool_prefixes = self.cases.bool_prefixes,
+                                   list_prefixes = self.cases.list_prefixes,
+                                   float_prefixes = self.cases.float_prefixes,
+                                   int_prefixes = self.cases.int_prefixes,
+                                   str_prefixes = self.cases.str_prefixes)
+        elif self.stage in ['engineer', 'analyze', 'plot']:
+            self.data.column_types(bool_prefixes = self.cases.bool_prefixes,
+                                   cat_prefixes = self.cases.cat_prefixes,
+                                   float_prefixes = self.cases.float_prefixes,
+                                   int_prefixes = self.cases.int_prefixes,
+                                   interact_prefixes = (
+                                           self.cases.interact_prefixes))
+        self.data.smart_fill_na()
         return self
     
     def loop_cleanup(self):

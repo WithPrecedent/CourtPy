@@ -34,8 +34,7 @@ class Cases(object):
         
         self.rules = pd.read_csv(self.paths.case_rules, 
                                  usecols = self.rules_cols,
-                                 encoding = self.settings['files']['encoding'],
-                                 file_format = 'csv')
+                                 encoding = self.settings['files']['encoding'])
         if self.source == 'lexis_nexis':
             self.index_col = 'index_lexis'  
             self.meta_cols = {'file_name' : str, 'word_count' : int} 
