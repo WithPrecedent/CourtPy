@@ -167,6 +167,7 @@ class CaseTools(object):
                                    interact_prefixes = (
                                            self.cases.interact_prefixes))
         self.data.smart_fill_na()
+        self.data.downcast()
         return self
     
     def loop_cleanup(self):
