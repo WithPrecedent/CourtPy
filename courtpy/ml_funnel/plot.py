@@ -57,7 +57,6 @@ class Plotter(Methods):
 @dataclass        
 class ClassifierPlotter(Plotter):
     
-    export_path : str
     plots : object = None
     use_results : object = False
     

@@ -27,7 +27,9 @@ class CourtAnalyzer(CaseTools):
                           axis = 'columns', 
                           inplace = True)        
         self.data = self.create_splices(self.data)
-        funnel = Funnel(data = self.data)
+        funnel = Funnel(data = self.data, 
+                        import_path = self.paths.input,
+                        export_path = self.paths.output)
         funnel.create()
         funnel.iterate()
         if funnel.settings['results']['export']:  

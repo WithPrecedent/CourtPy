@@ -17,6 +17,8 @@ from ml_funnel.settings import Settings
 class Funnel(object):
     
     data : object
+    import_path : str = ''
+    export_path : str = ''
     use_settings_file : bool = True
     settings : object = None
     col_groups : object = None 
@@ -26,7 +28,16 @@ class Funnel(object):
     def __post_init__(self):    
         if self.use_settings_file:
             self.load_settings()
-        Methods.settings = self.settings 
+        if self.output_folder:
+            self.export_path = os.path.join(self.export_path, 
+                                            self.output_folder)
+            if not os.path.exists(self.export_path):
+                os.makedirs(self.export_path)
+        if self.input_folder:
+            self.import_path = os.path.join(self.import_path, 
+                                            self.input_folder)
+        Methods.settings = self.settings
+        Methods.export_path = self.export_path
         Methods.seed = self.seed
         self.data.seed = self.seed 
         if not self.pandas_warnings:
@@ -58,12 +69,10 @@ class Funnel(object):
             self.plotter = None
         return self
         
-    def load_settings(self, import_path = ''):
-        if import_path:
-            self.settings = Settings(import_path)
-        else:
-            self.settings = Settings(os.path.join('ml_funnel', 
-                                                  'ml_settings.ini'))
+    def load_settings(self, settings_path = ''):
+        if not settings_path:
+            settings_path = os.path.join('ml_funnel', 'ml_settings.ini')
+        self.settings = Settings(settings_path)
         self.verbose = self.settings['defaults']['verbose']
         self.pandas_warnings = self.settings['defaults']['warnings']
         self.gpu = self.settings['defaults']['gpu']
@@ -72,9 +81,8 @@ class Funnel(object):
         self.boolean_out = self.settings['files']['boolean_out']
         self.file_format_in = self.settings['files']['data_in']
         self.file_format_out = self.settings['files']['data_out']
+        self.input_folder = self.settings['files']['input_folder']
         self.output_folder = self.settings['files']['output_folder']
-        if not os.path.exists(self.output_folder):
-                os.makedirs(self.output_folder)
         self.scalers = self.settings['funnel']['scaler']
         self.scaler_params = self.settings['scaler_params']
         self.splitter = self.settings['funnel']['splitter']
@@ -154,8 +162,6 @@ class Funnel(object):
                                                      model,
                                                      self.grid_params),
                                                 self.plotter(
-                                                        export_path = ( 
-                                                          self.output_folder),
                                                         plots = self.plots))                          
                                     self.tubes.append(tube)
         return self
@@ -221,14 +227,18 @@ class Funnel(object):
     def _file_name_join(i_path, file_name, file_format):
         return ''.join(os.path.join(i_path, file_name), '.csv')
     
-    def save_everything(self, export_path):
+    def save_everything(self, export_path = None):
+        if not export_path:
+            export_path = self.export_path
         self.save_funnel(export_path)
         self.save_results(export_path)
         if self.best:
             self.save_tube(export_path, self.best)
         return self
     
-    def load_funnel(self, import_path, return_funnel = False):
+    def load_funnel(self, import_path = None, return_funnel = False):
+        if not import_path:
+            import_path = self.import_path
         tubes = pickle.load(open(import_path, 'rb'))
         if return_funnel:
             return tubes
@@ -236,22 +246,30 @@ class Funnel(object):
             self.tubes = tubes
             return self
     
-    def save_funnel(self, export_path):
+    def save_funnel(self, export_path = None):
+        if not export_path:
+            export_path = self.export_path
         pickle.dump(self.tubes, open(export_path, 'wb'))
         return self
     
-    def load_tube(self, import_path):
+    def load_tube(self, import_path = None):
+        if not import_path:
+            import_path = self.import_path
         tube = pickle.load(open(import_path, 'rb'))
         return tube
     
-    def save_tube(self, export_path, tube):
+    def save_tube(self, tube, export_path = None):
+        if not export_path:
+            export_path = self.export_path
         pickle.dump(tube, open(export_path, 'wb'))
         return self
     
-    def load_results(self, import_path, file_name = 'results_table',
+    def load_results(self, import_path = None, file_name = 'results_table',
                      file_format = 'csv', encoding = 'windows-1252', 
                      float_format = '%.4f', message = 'Exporting results',
                      return_results = False):
+        if not import_path:
+            import_path = self.import_path
         results_path = self._file_name_join(import_path,
                                             file_name,
                                             file_format)
@@ -265,9 +283,11 @@ class Funnel(object):
             self.results = results
             return self
     
-    def save_results(self, export_path, file_name = 'results_table',
+    def save_results(self, export_path = None, file_name = 'results_table',
                      file_format = 'csv', encoding = 'windows-1252', 
                      float_format = '%.4f', message = 'Exporting results'):
+        if not export_path:
+            export_path = self.export_path
         results_path = self._file_name_join(export_path,
                                             file_name,
                                             file_format)
