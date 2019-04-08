@@ -7,8 +7,10 @@ from dataclasses import dataclass
 import pandas as pd
 import sklearn.metrics as met
 
+from ml_funnel.methods import Methods
+
 @dataclass  
-class Results(object):
+class Results(Methods):
     
     data : object
     settings : object
@@ -71,10 +73,10 @@ class Results(object):
         self.metric_dict.update({name : metric})
         return self
         
-    def add_result(self, pipe, use_val_set = False):                 
-        self.predictions = pipe.model.method.predict(pipe.x_test)
-        self.pred_probs = pipe.model.method.predict_proba(pipe.x_test)
-        self._set_metrics(pipe.x_test, pipe.y_test)
+    def add_result(self, pipe, use_val_set = False):               
+        self.predictions = pipe.model.method.predict(pipe.data.x_test)
+        self.pred_probs = pipe.model.method.predict_proba(pipe.data.x_test)
+        self._set_metrics(pipe.data.x_test, pipe.data.y_test)
         new_row = pd.Series(index = self.columns)
         new_row['predictors'] = self._check_none(pipe.splicer)
         new_row['scaler'] = self._check_none(pipe.scaler)
@@ -90,10 +92,11 @@ class Results(object):
         for key, value in self.metrics_dict.items():
             if key in self.settings['metrics']:
                 new_row[key] = value
-        self.c_matrix = met.confusion_matrix(pipe.y_test, self.predictions)
-        self.class_report = met.classification_report(pipe.y_test, 
+        self.c_matrix = met.confusion_matrix(pipe.data.y_test, 
+                                             self.predictions)
+        self.class_report = met.classification_report(pipe.data.y_test, 
                                                       self.predictions)
-        self.feature_list = list(pipe.x_test.columns)
+        self.feature_list = list(pipe.data.x_test.columns)
         self.feature_import = pipe.model.method.feature_importances_ 
         self.table.loc[len(self.table)] = new_row
         if self.verbose:

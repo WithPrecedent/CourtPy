@@ -22,7 +22,6 @@ class CourtAnalyzer(CaseTools):
     def __post_init__(self):
         if self.settings['general']['verbose']:
             print('Importing data for analysis')
-        self.paths.conform(stage = self.stage)
         self.quick_start()
         self.data.df.drop(self.data.create_column_list(prefixes = 'index_'), 
                           axis = 'columns', 

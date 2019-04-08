@@ -50,6 +50,23 @@ class Methods(object):
             self.params = self.defaults
         return self
     
+    def _get_data(self, data, data_to_use = 'train', train_test = False):
+        if train_test:
+            options = {'full' : [data.x, data.y, data.x, data.y],
+                       'test' : [data.x_train, data.y_train, data.x_test, 
+                                 data.y_test],
+                       'val' : [data.x_train, data.y_train, data.x_val, 
+                                data.y_val]}
+        else:
+            options = {'full' : [data.x, data.y],
+                       'train' : [data.x_train, data.y_train],
+                       'test' : [data.x_test, data.y_test],
+                       'val' : [data.x_val, data.y_val]}
+        return options[data_to_use]
+    
+    def _no_method(self, data):
+        return data
+    
     def initialize(self):
         self._check_params()
         if self.runtime_params:
@@ -130,7 +147,7 @@ class Splitter(Methods):
         self.options = {'train_test' : self._split_data,
                         'train_test_val' : self._split_data,
                         'cv' : self._cv_split,
-                        'none' : self._no_split}
+                        'none' : self._no_method}
         self.defaults = {'test_size' : 0.33,
                          'val_size' : 0,
                          'kfolds' : 5,
@@ -146,9 +163,6 @@ class Splitter(Methods):
 #                                         data.x.iloc[test_index])
 #            data.y_train, data.y_test = (data.y.iloc[train_index], 
 #                                         data.y.iloc[test_index])
-        return data
-    
-    def _no_split(self, data):
         return data
         
     def _split_data(self, data):
@@ -286,7 +300,7 @@ class Selector(Methods):
 class Model(Methods):
     
     name : str
-    algorithm_type : bool
+    algorithm_type : str
     params : object
     use_gpu : bool = False
     scale_pos_weight : int = 1

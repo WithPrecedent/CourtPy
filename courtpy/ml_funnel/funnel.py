@@ -9,7 +9,7 @@ import warnings
 
 from ml_funnel.methods import Encoder, Grid, Interactor, Methods, Model
 from ml_funnel.methods import Sampler, Scaler, Selector, Splicer, Splitter
-from ml_funnel.plot import Plotter
+from ml_funnel.plot import ClassifierPlotter, GrouperPlotter, LinearPlotter   
 from ml_funnel.results import Results
 from ml_funnel.settings import Settings
 
@@ -21,12 +21,14 @@ class Funnel(object):
     settings : object = None
     col_groups : object = None 
     new_methods : object = None
+    best : object = None
         
     def __post_init__(self):    
         if self.use_settings_file:
             self.load_settings()
-        self.data.seed = self.seed
+        Methods.settings = self.settings 
         Methods.seed = self.seed
+        self.data.seed = self.seed 
         if not self.pandas_warnings:
             warnings.filterwarnings('ignore')
         if self.new_methods:
@@ -41,9 +43,19 @@ class Funnel(object):
                                settings = self.settings['results'],
                                model_type = self.algorithm_type,
                                verbose = self.verbose)
-        self.data.split_xy(label = self.settings['funnel']['label'])
-        Model.scale_pos_weight = (len(self.data.y.index) / 
-                                  ((self.data.y == 1).sum())) - 1
+        self.data.split_xy(label = self.label)
+        if self.compute_scale_pos_weight:
+            Model.scale_pos_weight = (len(self.data.y.index) / 
+                                      ((self.data.y == 1).sum())) - 1
+        if self.plots:
+            if self.algorithm_type == 'classifier':
+                self.plotter = ClassifierPlotter
+            elif self.algorithm_type == 'regressor':
+                self.plotter = LinearPlotter    
+            elif self.algorithm_type == 'grouper':
+                self.plotter = GrouperPlotter
+        else:
+            self.plotter = None
         return self
         
     def load_settings(self, import_path = ''):
@@ -63,7 +75,6 @@ class Funnel(object):
         self.output_folder = self.settings['files']['output_folder']
         if not os.path.exists(self.output_folder):
                 os.makedirs(self.output_folder)
-        self.tubeline = self.settings['funnel']['tubeline']
         self.scalers = self.settings['funnel']['scaler']
         self.scaler_params = self.settings['scaler_params']
         self.splitter = self.settings['funnel']['splitter']
@@ -85,23 +96,17 @@ class Funnel(object):
         self.algorithm_type = self.settings['funnel']['algorithm_type']
         self.algorithms = self.settings['funnel']['algorithms']
         self.label = self.settings['funnel']['label']
+        self.plots = self.settings['funnel']['plots']
+        self.compute_scale_pos_weight = (
+                self.settings['funnel']['compute_scale_pos_weight'])
         self.export_results = self.settings['results']['export']
+        self.model_data_to_use = self.settings['funnel']['data_to_use']
         self.metrics = self.settings['results']['metrics']
         self.key_metric = self._check_list(self.metrics)[0]
         self.join_predictions = self.settings['results']['join_predictions']
         self.join_pred_probs = self.settings['results']['join_pred_probs']
-        self.plot_all_tubes = self.settings['plot']['all_tubes']
-        self.plot_best_tube = self.settings['plot']['best_tube']
-        self.visuals = self.settings['plot']['visuals']
-        self.autoplot = self.settings['plot']['autoplot']
         self.plot_folder = self.settings['plot']['subfolder']
-        self.data_to_use = self.settings['plot']['data_to_use']
-        if self.plot_folder:
-            self.plot_path = os.path.join(self.output_folder, self.plot_folder)
-            if not os.path.exists(self.plot_path):
-                os.makedirs(self.plot_path)
-        else:
-            self.plot_path = self.output_folder
+        self.plot_data_to_use = self.settings['plot']['data_to_use']
         return self
 
     def add_method(self, step, name, method):
@@ -147,9 +152,12 @@ class Funnel(object):
                                                 model,
                                                 Grid(self.search_method,
                                                      model,
-                                                     self.grid_params))                           
+                                                     self.grid_params),
+                                                self.plotter(
+                                                        export_path = ( 
+                                                            self.output),
+                                                        plots = self.plots))                          
                                     self.tubes.append(tube)
-        self.plotter = Plotter._pick_plotter(self.algorithm_type)
         return self
         
     def _check_list(self, variable):
@@ -165,9 +173,9 @@ class Funnel(object):
         self._one_loop()
         if self.splitter_params['val_size'] > 0:
             self._one_loop(use_val_set = True)
-        self.plotter(settings = self.settings,
+        self.plotter(data = self.data,
+                     settings = self.settings,
                      export_path = self.plot_path,
-                     data = self.data,
                      data_to_use = self.data_to_use)
         return self
     
@@ -213,6 +221,13 @@ class Funnel(object):
     def _file_name_join(i_path, file_name, file_format):
         return ''.join(os.path.join(i_path, file_name), '.csv')
     
+    def save_everything(self, export_path):
+        self.save_funnel(export_path)
+        self.save_results(export_path)
+        if self.best:
+            self.save_tube(export_path, self.best)
+        return self
+    
     def load_funnel(self, import_path, return_funnel = False):
         tubes = pickle.load(open(import_path, 'rb'))
         if return_funnel:
@@ -237,7 +252,7 @@ class Funnel(object):
                      file_format = 'csv', encoding = 'windows-1252', 
                      float_format = '%.4f', message = 'Exporting results',
                      return_results = False):
-        results_path = self._file_name_join(export_path,
+        results_path = self._file_name_join(import_path,
                                             file_name,
                                             file_format)
         results = self.data.load(import_path = results_path,
@@ -264,7 +279,7 @@ class Funnel(object):
         return self
 
 @dataclass 
-class Tube(object):
+class Tube(Methods):
     
     scaler : object = None
     splitter : object = None
@@ -275,52 +290,71 @@ class Tube(object):
     selector : object = None
     model : object = None
     grid : object = None
+    plotter : object = None
+    settings : object = None
     
     def apply(self, data, use_full_set = False, use_val_set = False):
+        self.data = data
         if self.scaler.name != 'none':
-            data.x[data.num_cols] = (
-                    self.scaler.apply(data.x[data.num_cols]))
+            self.data.x[self.data.num_cols] = (
+                    self.scaler.apply(self.data.x[self.data.num_cols]))
         if self.splitter.name != 'none':
-            data = self.splitter.apply(data)  
+            self.data = self.splitter.apply(self.data)  
         if use_val_set:
-            x_train = data.x_train
-            y_train = data.y_train
-            self.x_test = data.x_val
-            self.y_test = data.y_val
+            (self.data.x_train, self.data.y_train, self.data.x_test, 
+             self.data.y_test) = (
+                    self._get_data(data = data, data_to_use = 'val', 
+                                   train_test = True))
         elif use_full_set:
-            x_train = data.x_train
-            y_train = data.y_train
-            self.x_test = data.x_train
-            self.y_test = data.y_train
+            (self.data.x_train, self.data.y_train, self.data.x_test, 
+             self.data.y_test) = (
+                    self._get_data(data = data, data_to_use = 'full', 
+                                   train_test = True))
         else:
-            x_train = data.x_train
-            y_train = data.y_train
-            self.x_test = data.x_test
-            self.y_test = data.y_test
+            (self.data.x_train, self.data.y_train, self.data.x_test, 
+             self.data.y_test) = (
+                    self._get_data(data = data, data_to_use = 'test', 
+                                   train_test = True))
         if self.encoder.name != 'none':
-            self.encoder.fit(x_train, y_train)
-            x_train = self.encoder.transform(x_train.reset_index(drop = True))
-            self.x_test = self.encoder.transform(self.x_test.reset_index(
-                    drop = True))
+            self.encoder.fit(self.data.x_train, self.data.y_train)
+            self.data.x_train = (
+                    self.encoder.transform(self.data.x_train.reset_index(
+                    drop = True)))
+            self.data.x_test = (
+                    self.encoder.transform(self.data.x_test.reset_index(
+                    drop = True)))
+            self.data.x = (self.encoder.transform(self.data.x.reset_index(
+                    drop = True)))
         if self.interactor.name != 'none':
-            self.interactor.fit(x_train, y_train)
-            x_train = self.interactor.transform(x_train.reset_index(
-                    drop = True))
-            self.x_test = self.interactor.transform(self.x_test.reset_index(
-                    drop = True))
+            self.interactor.fit(self.data.x_train, self.data.y_train)
+            self.data.x_train = (
+                    self.interactor.transform(self.data.x_train.reset_index(
+                    drop = True)))
+            self.data.x_test = (
+                    self.interactor.transform(self.data.x_test.reset_index(
+                    drop = True)))
+            self.data.x = (
+                    self.interactor.transform(self.data.x.reset_index(
+                    drop = True)))
         if self.splicer.name != 'none':
-            x_train = self.splicer.transform(x_train)
-            self.x_test = self.splicer.transform(self.x_test)
+            self.data.x_train = self.splicer.transform(self.data.x_train)
+            self.data.x_test = self.splicer.transform(self.data.x_test)
         if self.sampler.name != 'none':
-            self.sampler.fit(x_train, y_train)
-            x_train = self.sampler.transform(x_train, y_train)
+            self.sampler.fit(self.data.x_train, self.data.y_train)
+            self.data.x_train = (
+                    self.sampler.transform(
+                            self.data.x_train, self.data.y_train))
         if self.selector.name != 'none':
-            self.selector.fit(x_train, y_train)
-            x_train = self.selector.transform(x_train, y_train)
+            self.selector.fit(self.data.x_train, self.data.y_train)
+            self.data.x_train = (
+                    self.selector.transform(
+                            self.data.x_train, self.data.y_train))
         if self.model.name != 'none':
             if self.model.use_grid and self.grid.name != 'none':
-                self.grid.search(x_train, y_train)
+                self.grid.search(self.data.x_train, self.data.y_train)
                 self.model.method = self.grid.best
-            self.model.method.fit(x_train, y_train)  
+            self.model.method.fit(self.data.x_train, self.data.y_train)  
+        if self.plotter:
+            self.plotter.apply(data = self.data, model = self.model)
         return self
         

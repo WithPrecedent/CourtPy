@@ -14,6 +14,8 @@ class Data(object):
     y : object = None
     x_train : object = None
     y_train : object = None
+    x_test : object = None
+    y_test : object = None
     x_val : object = None
     y_val : object = None
     quick_start : bool = False
@@ -30,9 +32,16 @@ class Data(object):
                       file_format = self.settings['files']['data_in'],
                       test_data = self.settings['files']['test_data'],
                       test_rows = self.settings['files']['test_chunk'],
-                      encoding = self.settings['files']['encoding'])      
+                      encoding = self.settings['files']['encoding']) 
         return self
-        
+             
+    def _get_xy(self, data_to_use):
+        options = {'full' : [self.x, self.y],
+                   'train' : [self.x_train, self.y_train],
+                   'test' : [self.x_test, self.y_test],
+                   'val' : [self.x_val, self.y_val]}
+        return options[data_to_use]
+    
     def apply(self, df = None, func = None, **kwargs):
         not_df = False
         if not isinstance(df, pd.DataFrame):

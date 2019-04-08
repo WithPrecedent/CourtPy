@@ -33,7 +33,6 @@ class CaseTools(object):
     
     def check_sources(self):
         sources = []
-        self.paths.stage = self.stage
         if self.settings['parser']['lexis_cases']:
             sources.append('lexis_nexis')
         if self.settings['parser']['court_listener_cases']:
@@ -271,8 +270,9 @@ class CaseTools(object):
         extra_outcomes.remove(self.settings['engineer']['label'])
         drop_list = data.create_column_list(data.df, drop_prefixes, 
                                             extra_outcomes)
-        data.df.query('court_num < 14', 
-                      inplace = True)
+        data.df['court_num'] = data.df['court_num'].astype(int)
+        data.df.query('court_num < 14', inplace = True)
+        data.df['court_num'] = data.df['court_num'].astype('category')
         if self.settings['drops']['crim']:
             data.df.query('type_criminal != 0', 
                           inplace = True)
@@ -361,8 +361,8 @@ class CaseTools(object):
     def create_splices(self, data):
         data.add_splice(group_name = 'panels', 
                         prefixes = ['panel_judges'])
-        data.add_splice(group_name = 'jcs', 
-                        prefixes = ['panel_ideo_jcs'])
+#        data.add_splice(group_name = 'jcs', 
+#                        prefixes = ['panel_ideo_jcs'])
         data.add_splice(group_name = 'presidents', 
                         prefixes = ['panel_ideo_party'])
         data.add_splice(group_name = 'demographics', 
@@ -371,6 +371,6 @@ class CaseTools(object):
                         prefixes = ['panel_exp_'])
         data.add_splice(group_name = 'politics', 
                         prefixes = ['pol_'])
-        data.add_splice(group_name = 'judges', 
-                        prefixes = ['judge_']) 
+#        data.add_splice(group_name = 'judges', 
+#                        prefixes = ['judge_']) 
         return data
