@@ -155,7 +155,7 @@ class Funnel(object):
                                                      self.grid_params),
                                                 self.plotter(
                                                         export_path = ( 
-                                                            self.output),
+                                                          self.output_folder),
                                                         plots = self.plots))                          
                                     self.tubes.append(tube)
         return self
