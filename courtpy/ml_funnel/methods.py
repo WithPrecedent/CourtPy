@@ -95,26 +95,29 @@ class Methods(object):
         self.fit(x, y)
         return self.transform(x)
     
-    def load(self, import_path, name, prefix = ''):
+    def load(self, import_folder, name, prefix = '', suffix = ''):
+        if not import_folder:
+            import_folder = self.filer.import_folder
+        import_path = self.filer.path_join(folder = import_folder,
+                                           prefix = prefix,
+                                           file_name = name,
+                                           suffix = suffix,
+                                           file_type = 'pickle')
         if self.verbose:
             print('Importing', name)
-        if prefix:
-            import_file = prefix + '_' + name + '.pkl' 
-        else:
-            import_file = name + '.pkl' 
-        self.name = name
-        import_path = os.path.join(self.import_path, import_file)
         self.method = pickle.load(open(import_path, 'rb'))
         return self
     
-    def save(self, export_path, name, prefix = ''):
+    def save(self, export_folder, name, prefix = '', suffix = ''):
         if self.verbose:
             print('Exporting', name)
-        if prefix:
-            export_file = prefix + '_' + name + '.pkl' 
-        else:
-            export_file = name + '.pkl' 
-        export_path = os.path.join(self.export_path, export_file)
+        if not export_folder:
+            export_folder = self.filer.export_folder
+        export_path = self.filer.path_join(folder = export_folder,
+                                           prefix = prefix,
+                                           file_name = name,
+                                           suffix = suffix,
+                                           file_type = 'pickle')
         pickle.dump(self.method, open(export_path, 'wb'))
         return self
 

@@ -19,7 +19,7 @@ class Data(object):
     x_val : object = None
     y_val : object = None
     quick_start : bool = False
-    import_path : str = ''
+    filer : object = None
     
     def __post_init__(self):
         self.verbose = self.settings['general']['verbose']
@@ -28,7 +28,7 @@ class Data(object):
             print('Building data container')
         self.splice_options = {}
         if self.quick_start:
-            self.load(import_path = self.import_path,
+            self.load(import_path = self.filer.data_file_in,
                       file_format = self.settings['files']['data_in'],
                       test_data = self.settings['files']['test_data'],
                       test_rows = self.settings['files']['test_chunk'],
@@ -248,20 +248,20 @@ class Data(object):
             return self
         else: 
             return df
-    
-    def lists_to_strings(self, df = None):
-        not_df = False
-        if not isinstance(df, pd.DataFrame):
-            df = self.df
-            not_df = True
-        for col in df.columns:
-            if isinstance(df.loc[1, col], list):
-                df[col].apply(', '.join)
-        if not_df:
-            self.df = df
-            return self
-        else: 
-            return df
+#    
+#    def lists_to_strings(self, df = None):
+#        not_df = False
+#        if not isinstance(df, pd.DataFrame):
+#            df = self.df
+#            not_df = True
+#        for col in df.columns:
+#            if isinstance(df.loc[1, col], list):
+#                df[col].apply(', '.join)
+#        if not_df:
+#            self.df = df
+#            return self
+#        else: 
+#            return df
     
     def reshape_long(self, df = None, stubs = [], id_col = '', new_col = '', 
                      sep = ''):
@@ -336,8 +336,6 @@ class Data(object):
         if not isinstance(df, pd.DataFrame):
             df = self.df
             not_df = True
-        if self.verbose:
-            print('Splitting data into features and label')
         x = df.drop(label, axis = 'columns')
         y = df[label] 
         if not_df:
@@ -353,12 +351,19 @@ class Data(object):
         self.splice_options.update({group_name : temp_list})
         return self
                 
-    def load(self, import_path, file_format = 'csv', usecols = None, 
-             index = False, encoding = 'windows-1252', test_data = False, 
-             test_rows = 500, return_df = False, message = 'Importing data'):
+    def load(self, import_folder = '', file_name = 'data', import_path = '',
+             file_format = 'csv', usecols = None, index = False, 
+             encoding = 'windows-1252', test_data = False, test_rows = 500, 
+             return_df = False, message = 'Importing data'):
         """
         Method to import pandas dataframes from different file formats.
-        """   
+        """
+        if not import_path:
+            if not import_folder:
+                import_folder = self.filer.import_folder
+            import_path = self.filer.make_path(folder = import_folder,
+                                               file_name = file_name,
+                                               file_type = file_format)
         if self.verbose:
             print(message)
         if test_data:
@@ -377,22 +382,31 @@ class Data(object):
             """
             df.replace('Â', '', inplace = True)
         elif file_format == 'h5':
-            df = pd.read_hdf(import_path, chunksize = nrows)
+            df = pd.read_hdf(import_path, 
+                             chunksize = nrows)
         elif file_format == 'feather':
-            df = pd.read_feather(import_path, nthreads = -1)
+            df = pd.read_feather(import_path, 
+                                 nthreads = -1)
         if not return_df:
             self.df = df
             return self
         else: 
             return df
     
-    def save(self, df = None, export_path = '', file_format = 'csv', 
-             index = False, encoding = 'windows-1252', float_format = '%.4f',
+    def save(self, df = None, export_folder = '', file_name = 'data', 
+             export_path = '', file_format = 'csv', index = False, 
+             encoding = 'windows-1252', float_format = '%.4f', 
              boolean_out = True, message = 'Exporting data'):
         """
         Method to export pandas dataframes to different file formats and 
         encoding of boolean variables as True/False or 1/0
         """
+        if not export_path:
+            if not export_folder:
+                export_folder = self.filer.export_folder    
+            export_path = self.filer.make_path(folder = export_folder,
+                                               file_name = file_name,
+                                               file_type = file_format)
         if not isinstance(df, pd.DataFrame):
             df = self.df
         if self.verbose:
@@ -406,7 +420,7 @@ class Data(object):
                       header = True,
                       float_format = float_format)
         elif file_format == 'h5':
-            df.to_hdf(export_path, encoding = encoding)
+            df.to_hdf(export_path)
         elif file_format == 'feather':
             if isinstance(df, pd.DataFrame):
                 df.reset_index(inplace = True)

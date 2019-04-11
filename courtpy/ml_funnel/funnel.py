@@ -7,6 +7,7 @@ import os
 import pickle
 import warnings
 
+from ml_funnel.filer import Filer
 from ml_funnel.methods import Encoder, Grid, Interactor, Methods, Model
 from ml_funnel.methods import Sampler, Scaler, Selector, Splicer, Splitter
 from ml_funnel.plot import ClassifierPlotter, GrouperPlotter, LinearPlotter   
@@ -17,8 +18,8 @@ from ml_funnel.settings import Settings
 class Funnel(object):
     
     data : object
-    import_path : str = ''
-    export_path : str = ''
+    import_folder : str = ''
+    export_folder : str = ''
     use_settings_file : bool = True
     settings : object = None
     col_groups : object = None 
@@ -28,45 +29,20 @@ class Funnel(object):
     def __post_init__(self):    
         if self.use_settings_file:
             self.load_settings()
-        if self.output_folder:
-            self.export_path = os.path.join(self.export_path, 
-                                            self.output_folder)
-            if not os.path.exists(self.export_path):
-                os.makedirs(self.export_path)
-        if self.input_folder:
-            self.import_path = os.path.join(self.import_path, 
-                                            self.input_folder)
-        Methods.settings = self.settings
-        Methods.export_path = self.export_path
-        Methods.seed = self.seed
-        self.data.seed = self.seed 
         if not self.pandas_warnings:
             warnings.filterwarnings('ignore')
-        if self.new_methods:
-            for step, method_dict in self.new_methods.items():
-                for key, value in method_dict.items():
-                    self.add_method(step, key, value)
-        if self.data.splice_options:
-            self.splicers = list(self.data.splice_options.keys())
-        else:
-            self.splicers = []
-        self.results = Results(data = self.data, 
-                               settings = self.settings['results'],
-                               model_type = self.algorithm_type,
+        self.filer = Filer(root_import = self.import_folder,
+                           root_export = self.export_folder,
+                           settings = self.settings)
+        self.results = Results(settings = self.settings['results'],
+                               algorithm_type = self.algorithm_type,
                                verbose = self.verbose)
+        self._inject()
+        self._add_new_methods()
+        self._set_splicers()
         self.data.split_xy(label = self.label)
-        if self.compute_scale_pos_weight:
-            Model.scale_pos_weight = (len(self.data.y.index) / 
-                                      ((self.data.y == 1).sum())) - 1
-        if self.plots:
-            if self.algorithm_type == 'classifier':
-                self.plotter = ClassifierPlotter
-            elif self.algorithm_type == 'regressor':
-                self.plotter = LinearPlotter    
-            elif self.algorithm_type == 'grouper':
-                self.plotter = GrouperPlotter
-        else:
-            self.plotter = None
+        self._compute_values()
+        self._set_plotter()
         return self
         
     def load_settings(self, settings_path = ''):
@@ -107,23 +83,61 @@ class Funnel(object):
         self.plots = self.settings['funnel']['plots']
         self.compute_scale_pos_weight = (
                 self.settings['funnel']['compute_scale_pos_weight'])
-        self.export_results = self.settings['results']['export']
         self.model_data_to_use = self.settings['funnel']['data_to_use']
         self.metrics = self.settings['results']['metrics']
         self.key_metric = self._check_list(self.metrics)[0]
         self.join_predictions = self.settings['results']['join_predictions']
         self.join_pred_probs = self.settings['results']['join_pred_probs']
-        self.plot_folder = self.settings['plot']['subfolder']
         self.plot_data_to_use = self.settings['plot']['data_to_use']
         return self
 
+    def _inject(self):
+        Methods.filer = self.filer
+        Methods.seed = self.seed
+        Methods.settings = self.settings
+        self.data.filer = self.filer
+        self.data.seed = self.seed
+        return self
+    
+    def _add_new_methods(self):
+        if self.new_methods:
+            for step, method_dict in self.new_methods.items():
+                for key, value in method_dict.items():
+                    self.add_method(step, key, value)
+        return self
+    
+    def _set_splicers(self):
+        if self.data.splice_options:
+            self.splicers = list(self.data.splice_options.keys())
+        else:
+            self.splicers = []  
+        return self
+        
+    def _compute_values(self):
+        if self.compute_scale_pos_weight:
+            Model.scale_pos_weight = (len(self.data.y.index) / 
+                                      ((self.data.y == 1).sum())) - 1
+        return self
+    
+    def _set_plotter(self):
+        if self.plots:
+            if self.algorithm_type == 'classifier':
+                self.plotter = ClassifierPlotter
+            elif self.algorithm_type == 'regressor':
+                self.plotter = LinearPlotter    
+            elif self.algorithm_type == 'grouper':
+                self.plotter = GrouperPlotter
+        else:
+            self.plotter = None
+        return self
+    
     def add_method(self, step, name, method):
         self.steps[step].options.update({name : method})
         return self
     
     def create(self):
         if self.verbose:
-            print('Creating all possible preprocessing tubelines')
+            print('Creating all possible preprocessing test tubes')
         self.tubes = []
         if self.include_all:
             self.splicers.append('all')
@@ -179,27 +193,37 @@ class Funnel(object):
         self._one_loop()
         if self.splitter_params['val_size'] > 0:
             self._one_loop(use_val_set = True)
-        self.plotter(data = self.data,
-                     settings = self.settings,
-                     export_path = self.plot_path,
-                     data_to_use = self.data_to_use)
         return self
     
     def _one_loop(self, use_val_set = False):
-        for tube in self.tubes:
-            self.data.split_xy(label = self.settings['funnel']['label'])
-            tube.apply(self.data, use_val_set)
-            self.results.add_result(tube, use_val_set)
-            if not self.best:
-                self.best = tube
-                self.best_score = self.results.table.loc[
-                        self.results.table.index[-1], self.key_metric]
-            elif (self.results.table.loc[self.results.table.index[-1], 
-                                         self.key_metric] > self.best_score):
-                self.best = tube
-                self.best_score = self.results.table.loc[
-                        self.results.table.index[-1], self.key_metric]
+        for i, tube in enumerate(self.tubes):
+            self.data.split_xy(label = self.label)
+            tube.apply(tube_num = str(i),
+                       data = self.data, 
+                       use_val_set = use_val_set)
+            self.results.add_result(tube = tube, 
+                                    use_val_set = use_val_set)
+            self._check_best(tube)
+            file_name = 'tube' + tube.tube_num + '_' + tube.model.name
+            export_path = self.filer._iter_path(model = tube.model, 
+                                                tube_num = tube.tube_num, 
+                                                splicer = tube.splicer,
+                                                file_name = file_name,
+                                                file_type = 'pickle')
+            self.save_tube(tube, export_path = export_path)
             del(tube)
+        return self
+    
+    def _check_best(self, tube):
+        if not self.best:
+            self.best = tube
+            self.best_score = self.results.table.loc[
+                    self.results.table.index[-1], self.key_metric]
+        elif (self.results.table.loc[self.results.table.index[-1], 
+                                     self.key_metric] > self.best_score):
+            self.best = tube
+            self.best_score = self.results.table.loc[
+                    self.results.table.index[-1], self.key_metric]
         return self
     
     def add_plot(self, name, method):
@@ -223,22 +247,22 @@ class Funnel(object):
                                 model = tube.model)
         return self
     
-    @staticmethod
-    def _file_name_join(i_path, file_name, file_format):
-        return ''.join(os.path.join(i_path, file_name), '.csv')
-    
     def save_everything(self, export_path = None):
         if not export_path:
-            export_path = self.export_path
-        self.save_funnel(export_path)
-        self.save_results(export_path)
+            export_folder = self.filer.export_folder
+        self.save_funnel(export_path = os.path.join(export_folder, 
+                                                    'funnel.pkl'))
+        self.save_results(export_path = os.path.join(export_folder,
+                                                     'results_table.csv'))
         if self.best:
-            self.save_tube(export_path, self.best)
+            self.save_tube(export_path = os.path.join(export_folder,
+                                                      'best_tube.pkl'), 
+                           tube = self.best)
         return self
     
     def load_funnel(self, import_path = None, return_funnel = False):
         if not import_path:
-            import_path = self.import_path
+            import_path = self.filer.import_folder
         tubes = pickle.load(open(import_path, 'rb'))
         if return_funnel:
             return tubes
@@ -248,35 +272,35 @@ class Funnel(object):
     
     def save_funnel(self, export_path = None):
         if not export_path:
-            export_path = self.export_path
+            export_path = self.filer.export_folder
         pickle.dump(self.tubes, open(export_path, 'wb'))
         return self
     
     def load_tube(self, import_path = None):
         if not import_path:
-            import_path = self.import_path
+            import_path = self.filer.import_folder
         tube = pickle.load(open(import_path, 'rb'))
         return tube
     
     def save_tube(self, tube, export_path = None):
         if not export_path:
-            export_path = self.export_path
+            export_path = self.filer.export_folder
         pickle.dump(tube, open(export_path, 'wb'))
         return self
     
     def load_results(self, import_path = None, file_name = 'results_table',
                      file_format = 'csv', encoding = 'windows-1252', 
-                     float_format = '%.4f', message = 'Exporting results',
+                     float_format = '%.4f', message = 'Importing results',
                      return_results = False):
         if not import_path:
-            import_path = self.import_path
-        results_path = self._file_name_join(import_path,
-                                            file_name,
-                                            file_format)
+            import_path = self.filer.import_folder
+        results_path = self.filer.path_join(folder = import_path,
+                                            file_name = file_name,
+                                            file_type = file_format)
         results = self.data.load(import_path = results_path,
                                  encoding = encoding,
                                  float_format = float_format,
-                                 message = 'Importing results')      
+                                 message = message)      
         if return_results:
             return results
         else:
@@ -287,15 +311,15 @@ class Funnel(object):
                      file_format = 'csv', encoding = 'windows-1252', 
                      float_format = '%.4f', message = 'Exporting results'):
         if not export_path:
-            export_path = self.export_path
-        results_path = self._file_name_join(export_path,
-                                            file_name,
-                                            file_format)
+            export_path = self.filer.export_folder
+            export_path = self.filer.make_path(folder = export_path,
+                                               name = file_name,
+                                               file_type = file_format)
         self.data.save(df = self.results.table, 
-                       export_path = results_path,
+                       export_path = export_path,
                        encoding = encoding,
                        float_format = float_format,
-                       message = 'Exporting results')
+                       message = message)
         return self
 
 @dataclass 
@@ -313,8 +337,10 @@ class Tube(Methods):
     plotter : object = None
     settings : object = None
     
-    def apply(self, data, use_full_set = False, use_val_set = False):
+    def apply(self, data, tube_num = 1, use_full_set = False, 
+              use_val_set = False):
         self.data = data
+        self.tube_num = tube_num
         if self.scaler.name != 'none':
             self.data.x[self.data.num_cols] = (
                     self.scaler.apply(self.data.x[self.data.num_cols]))
@@ -375,6 +401,9 @@ class Tube(Methods):
                 self.model.method = self.grid.best
             self.model.method.fit(self.data.x_train, self.data.y_train)  
         if self.plotter:
-            self.plotter.apply(data = self.data, model = self.model)
+            self.plotter.apply(data = self.data, 
+                               model = self.model,
+                               tube_num = self.tube_num,
+                               splicer = self.splicer)
         return self
         

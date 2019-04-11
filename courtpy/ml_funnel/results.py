@@ -12,9 +12,9 @@ from ml_funnel.methods import Methods
 @dataclass  
 class Results(Methods):
     
-    data : object
-    settings : object
-    model_type : str = 'classifier'
+    data : object = None
+    settings : object = None
+    algorithm_type : str = 'classifier'
     verbose : bool = True
     
     def __post_init__(self):
@@ -34,7 +34,7 @@ class Results(Methods):
             return step.method
         
     def _set_metrics(self, x, y):
-        if self.model_type == 'classifier':
+        if self.algorithm_type == 'classifier':
             self.metrics_dict = {
                      'accuracy' : met.accuracy_score(y, self.predictions),
                      'balanced_accuracy' : met.balanced_accuracy_score(y,
@@ -63,9 +63,9 @@ class Results(Methods):
                                                          average = 'weighted'),
                      'roc_auc' :  met.roc_auc_score(y, self.predictions),
                      'zero_one' : met.zero_one_loss(y, self.predictions)}
-        elif self.model_type == 'regressor':
+        elif self.algorithm_type == 'regressor':
             self.metrics_dict = {}
-        elif self.model_type == 'grouper':
+        elif self.algorithm_type == 'grouper':
             self.metrics_dict = {}
         return self
    
@@ -73,36 +73,36 @@ class Results(Methods):
         self.metric_dict.update({name : metric})
         return self
         
-    def add_result(self, pipe, use_val_set = False):               
-        self.predictions = pipe.model.method.predict(pipe.data.x_test)
-        self.pred_probs = pipe.model.method.predict_proba(pipe.data.x_test)
-        self._set_metrics(pipe.data.x_test, pipe.data.y_test)
+    def add_result(self, tube, use_val_set = False):               
+        self.predictions = tube.model.method.predict(tube.data.x_test)
+        self.pred_probs = tube.model.method.predict_proba(tube.data.x_test)
+        self._set_metrics(tube.data.x_test, tube.data.y_test)
         new_row = pd.Series(index = self.columns)
-        new_row['predictors'] = self._check_none(pipe.splicer)
-        new_row['scaler'] = self._check_none(pipe.scaler)
-        new_row['splitter'] = self._check_none(pipe.splitter)
-        new_row['encoder'] = self._check_none(pipe.encoder)
-        new_row['interactor'] = self._check_none(pipe.interactor)
-        new_row['splicer'] = self._check_none(pipe.splicer)
-        new_row['sampler'] = self._check_none(pipe.sampler)
-        new_row['selector'] = self._check_none(pipe.selector)
-        new_row['estimator'] = self._check_none(pipe.model)
-        new_row['seed'] = pipe.model.seed
+        new_row['predictors'] = self._check_none(tube.splicer)
+        new_row['scaler'] = self._check_none(tube.scaler)
+        new_row['splitter'] = self._check_none(tube.splitter)
+        new_row['encoder'] = self._check_none(tube.encoder)
+        new_row['interactor'] = self._check_none(tube.interactor)
+        new_row['splicer'] = self._check_none(tube.splicer)
+        new_row['sampler'] = self._check_none(tube.sampler)
+        new_row['selector'] = self._check_none(tube.selector)
+        new_row['estimator'] = self._check_none(tube.model)
+        new_row['seed'] = tube.model.seed
         new_row['validation_set'] = use_val_set
         for key, value in self.metrics_dict.items():
             if key in self.settings['metrics']:
                 new_row[key] = value
-        self.c_matrix = met.confusion_matrix(pipe.data.y_test, 
+        self.c_matrix = met.confusion_matrix(tube.data.y_test, 
                                              self.predictions)
-        self.class_report = met.classification_report(pipe.data.y_test, 
+        self.class_report = met.classification_report(tube.data.y_test, 
                                                       self.predictions)
-        self.feature_list = list(pipe.data.x_test.columns)
-        self.feature_import = pipe.model.method.feature_importances_ 
+        self.feature_list = list(tube.data.x_test.columns)
+        self.feature_import = tube.model.method.feature_importances_ 
         self.table.loc[len(self.table)] = new_row
         if self.verbose:
-            print('These are the results using the', pipe.model.name, 
+            print('These are the results using the', tube.model.name, 
                   'model')
-            print('Testing', pipe.model.name, 'predictors')
+            print('Testing', tube.model.name, 'predictors')
             print('Confusion Matrix:', self.c_matrix)
             print('Classification Report:', self.class_report)
         return self

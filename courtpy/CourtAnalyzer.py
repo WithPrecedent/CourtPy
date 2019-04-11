@@ -28,32 +28,21 @@ class CourtAnalyzer(CaseTools):
                           inplace = True)        
         self.data = self.create_splices(self.data)
         funnel = Funnel(data = self.data, 
-                        import_path = self.paths.input,
-                        export_path = self.paths.output)
+                        import_folder = self.paths.input,
+                        export_folder = self.paths.output)
         funnel.create()
         funnel.iterate()
-        if funnel.settings['results']['export']:  
-            funnel.save_results(export_path = self.paths.output)
-            funnel.save_tube(export_path = os.path.join(self.paths.output,
-                                                        'best_tube.pkl'),
-                             tube = funnel.best)
-            funnel.save_funnel(export_path = os.path.join(self.paths.output,
-                                                          'funnel.pkl'))
+        funnel.save_everything()
         if self.settings['general']['verbose']:
             print('The best test tube, based upon the', funnel.key_metric,
                   'metric with a score of', funnel.best_score, 'is:')
             print(funnel.best)
         self.data.save(df = self.data.df,
-                       export_path = self.paths.export_path,
+                       export_folder = self.funnel.filer.export_folder,
+                       file_name = self.paths.export_file,
                        file_format = self.settings['files']['data_out'],
                        boolean_out = self.settings['files']['boolean_out'],
-                       encoding = self.settings['files']['encoding'])
-        if 'plot' in self.settings['general']['stages']:
-            from CourtPlotter import CourtPlotter
-            CourtPlotter(funnel = funnel,
-                         paths = self.paths,
-                         settings = self.settings,
-                         cases = self.cases)            
+                       encoding = self.settings['files']['encoding'])          
         return self 
       
 if __name__ == '__main__':

@@ -15,8 +15,7 @@ class Paths(object):
     def __post_init__(self): 
         self.data = os.path.join('..', '..', '..', 'data', 'courtpy')
         self.input = os.path.join(self.data, 'input')
-        self.output = os.path.join(self.data, 'output', 
-                                   self.settings['files']['output_folder'])
+        self.output = os.path.join(self.data, 'output')
         self.opinions = os.path.join(self.input, 'court_opinions',
                                      self.settings['cases']['jurisdiction'],
                                      self.settings['cases']['case_type'])
@@ -32,10 +31,30 @@ class Paths(object):
         """
         self.dicts = 'dictionaries'
         self.case_rules = os.path.join(self.dicts, 'case_rules.csv')
-        self.make_io_paths()
+        self.data_in = self.settings['files']['data_in']
+        self.data_out = self.settings['files']['data_out']
+        self._make_io_paths()
+        self._make_file_dicts()
+        return self
+
+    def _make_file_dicts(self):
+        self.import_files = {'wrangle' : 'parsed',
+                             'merge' : 'wrangled',
+                             'analyze' : 'engineered',
+                             'plot' : 'analyzed'} 
+        if 'merge' in self.settings['general']['stages']:
+            self.import_files.update({'engineer' : 'merged'})
+        else:
+            self.import_files.update({'engineer' : 'wrangled'})
+        self.export_files = {'parse' : 'parsed',
+                             'wrangle' : 'wrangled',
+                             'merge' : 'merged',
+                             'engineer' : 'engineered',
+                             'analyze' : 'analyzed',
+                             'plot' : 'plotted'}    
         return
     
-    def make_io_paths(self):
+    def _make_io_paths(self):
         """
         Makes needed paths that do not include files within the package in case 
         they do not already exist.
@@ -70,7 +89,10 @@ class Paths(object):
                                                            '**', '*.txt'),
                                                            recursive = True)            
         elif self.stage in ['parse']:
-            self.export_path = self.path_constructor(False, new_format = 'csv')  
+            self.export_file = self._file_name(
+                    source = self.source,
+                    name = self.export_files[self.stage], 
+                    extension = self.data_out)     
             if source == 'lexis_nexis':
                 self.import_folder = self.lexis_input
                 self.import_paths = glob.glob(os.path.join(self.import_folder, 
@@ -93,46 +115,18 @@ class Paths(object):
                         self.import_paths, 
                         self.settings['files']['test_chunk'])
         elif self.stage in ['wrangle']:
-            self.import_path = self.path_constructor(True, new_format = 'csv')
-            self.export_path = self.path_constructor(False)
-        elif self.stage in ['engineer', 'analyze', 'plot']:
-            self.import_path = self.path_constructor(True)
-            self.export_path = self.path_constructor(False)
-        return self
-    
-    def path_constructor(self, get_import, new_format = None):
-        if new_format:
-            file_format = new_format
-        elif get_import:
-            file_format = self.settings['files']['data_in']
-        else:
-            file_format = self.settings['files']['data_out']
-        if get_import:
-            file_dict = {'wrangle' : 'parsed',
-                         'merge' : 'wrangled',
-                         'analyze' : 'engineered',
-                         'plot' : 'analyzed'} 
+            self.import_file = self.import_file = (
+                    self.source + '_' + self.import_files[self.stage]) 
+            self.export_file = self.export_file = (
+                    self.source + '_' + self.export_files[self.stage])      
+        elif self.stage in ['engineer']:
             if 'merge' in self.settings['general']['stages']:
-                file_dict.update({'engineer' : 'merged'})
+                self.import_file = self.import_files[self.stage]
             else:
-                file_dict.update({'engineer' : 'wrangled'})
-        else:
-            file_dict = {'parse' : 'parsed',
-                         'wrangle' : 'wrangled',
-                         'merge' : 'merged',
-                         'engineer' : 'engineered',
-                         'analyze' : 'analyzed',
-                         'plot' : 'plotted'}            
-        stage_string = file_dict.get(self.stage)
-        if self.stage in ['parse', 'wrangle']:
-            new_path = ''.join([os.path.join(self.output, self.source + '_' 
-                                             + stage_string), '.', 
-                                             file_format])
-        elif self.stage in ['engineer'] and get_import:
-            new_path = ''.join([os.path.join(self.output, self.source + '_' 
-                                             + stage_string), '.', 
-                                             file_format])    
-        elif self.stage in ['engineer', 'analyze', 'plot']:
-            new_path = ''.join([os.path.join(self.output, stage_string), '.', 
-                                file_format])
-        return new_path
+                self.import_file = (
+                        self.source + '_' + self.import_files[self.stage]) 
+            self.export_file = self.export_files[self.stage]
+        elif self.stage in ['analyze', 'plot']:
+            self.import_file = self.import_files[self.stage]
+            self.export_file = self.export_files[self.stage]
+        return self

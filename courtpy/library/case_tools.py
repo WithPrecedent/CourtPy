@@ -16,6 +16,7 @@ from library.dividers import Divider
 from library.externals import External
 from library.mungers import Munger
 from ml_funnel.data import Data
+from ml_funnel.filer import Filer
 from utilities.rematch import ReMatch
 from utilities.strings import no_breaks
 
@@ -145,13 +146,18 @@ class CaseTools(object):
         self.paths.stage = self.stage
         self.paths.conform(stage = self.stage, 
                            source = self.source)
+        self.filer = Filer(root_import = self.paths.output,
+                           root_export = self.paths.output,
+                           data_import = self.paths.import_file,
+                           data_export = self.paths.export_file,
+                           settings = self.settings)
         self.cases = Cases(paths = self.paths, 
                            settings = self.settings, 
                            source = self.source, 
                            stage = self.stage)
         self.data = Data(settings = self.settings,
                          quick_start = True,
-                         import_path = self.paths.import_path)
+                         filer = self.filer)
         if self.stage in ['parse', 'wrangle', 'merge']:
             self.data.column_types(bool_prefixes = self.cases.bool_prefixes,
                                    list_prefixes = self.cases.list_prefixes,
@@ -365,12 +371,12 @@ class CaseTools(object):
 #                        prefixes = ['panel_ideo_jcs'])
         data.add_splice(group_name = 'presidents', 
                         prefixes = ['panel_ideo_party'])
-        data.add_splice(group_name = 'demographics', 
-                        prefixes = ['panel_demo_'])
+#        data.add_splice(group_name = 'demographics', 
+#                        prefixes = ['panel_demo_'])
         data.add_splice(group_name = 'experience', 
                         prefixes = ['panel_exp_'])
-        data.add_splice(group_name = 'politics', 
-                        prefixes = ['pol_'])
+#        data.add_splice(group_name = 'politics', 
+#                        prefixes = ['pol_'])
 #        data.add_splice(group_name = 'judges', 
 #                        prefixes = ['judge_']) 
         return data

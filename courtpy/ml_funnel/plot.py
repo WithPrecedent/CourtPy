@@ -18,11 +18,6 @@ class Plotter(Methods):
     
     def __post_init__(self):
         super().__post_init__()
-        if self.settings['plot']['subfolder']:
-            self.export_path = os.path.join(self.export_path, 
-                                            self.settings['plot']['subfolder'])
-            if not os.path.exists(self.export_path):
-                os.makedirs(self.export_path)
         return self
     
     def _check_plots(self):
@@ -30,12 +25,14 @@ class Plotter(Methods):
             self.plots = self.defaults
         return self
     
-    def apply(self, data, model):
+    def apply(self, data, model, tube_num, splicer = ''):
         self.x, self.y = self._get_data(
                 data = data, 
                 data_to_use = self.settings['plot']['data_to_use'],
                 train_test = False)
         self.model = model
+        self.tube_num = tube_num
+        self.splicer = splicer
         self._iter_plots()
         return self
     
@@ -45,12 +42,17 @@ class Plotter(Methods):
         for plot in self.plots:
             self.options[plot]()     
         return self
-    
-    def save(self, file_name, export_path = None):
-        if not export_path:
-            export_path = self.export_path
-        plt.savefig(os.path.join(export_path, file_name), 
-                    bbox_inches = 'tight')
+        
+    def save(self, file_name, export_folder = None):
+        if export_folder:
+            export_path = os.path.join(export_folder, file_name)
+        else:
+            export_path = self.filer._iter_path(model = self.model, 
+                                                tube_num = self.tube_num, 
+                                                splicer = self.splicer,
+                                                file_name = file_name,
+                                                file_type = 'png')
+        plt.savefig(export_path, bbox_inches = 'tight')
         plt.close()
         return self
     
