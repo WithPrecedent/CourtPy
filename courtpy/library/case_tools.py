@@ -262,6 +262,33 @@ class CaseTools(object):
         return df
     
     def cull_data(self, data = None, drop_prefixes = []):
+        if not data:
+            data = self.data
+        drop_cols = []
+        data = self._drop_extra_labels(data = data)
+        data = self._drop_nonconforming_panels(data = data)
+        data = self._drop_nonconforming_courts(data = data)
+        data = self._drop_crim_or_civ(data = data)
+        data = self._drop_nonqual_jcs(data = data)
+        drop_prefixes.extend(['panel_ideo_pres_num'])
+        drop_cols = data.create_column_list(df = data.df, 
+                                            prefixes = drop_prefixes)
+        data.df.drop(drop_cols, 
+                     axis = 'columns', 
+                     inplace = True)
+        return data
+    
+    def _drop_extra_labels(self, data):
+        extra_outcomes = [i for i in data.df if i.startswith('outcome_')]
+        extra_outcomes.remove(self.settings['funnel']['label'])
+        drop_cols = data.create_column_list(df = data.df, 
+                                            cols = extra_outcomes)
+        data.df.drop(drop_cols, 
+                     axis = 'columns', 
+                     inplace = True)
+        return data
+    
+    def _drop_nonconforming_panels(self, data):
         if self.settings['drops']['no_judge']:
             data.df.query('panel_size != 0', 
                           inplace = True)
@@ -270,27 +297,33 @@ class CaseTools(object):
                           inplace = True)  
         if self.settings['drops']['small_panels']:
             data.df.query('panel_size > 2', 
-                          inplace = True) 
-        drop_prefixes.extend(['panel_ideo_pres_num'])
-        extra_outcomes = [i for i in data.df if i.startswith('outcome_')]
-        extra_outcomes.remove(self.settings['engineer']['label'])
-        drop_list = data.create_column_list(data.df, drop_prefixes, 
-                                            extra_outcomes)
+                          inplace = True)
+        return data
+        
+    def _drop_nonconforming_courts(self, data):
         data.df['court_num'] = data.df['court_num'].astype(int)
         data.df.query('court_num < 14', inplace = True)
-        data.df['court_num'] = data.df['court_num'].astype('category')
+        data.df['court_num'] = data.df['court_num'].astype('category')        
+        return data
+    
+    def _drop_crim_or_civ(self, data):
+        drop_cols = []
         if self.settings['drops']['crim']:
             data.df.query('type_criminal != 0', 
                           inplace = True)
-            drop_list.extend(['type_criminal', 'type_crim_d_appeal'])
+            drop_cols.extend(['type_criminal', 'type_crim_d_appeal'])
         elif self.settings['drops']['civ']:
             data.df.query('type_criminal != 1', 
                           inplace = True) 
-            drop_list.extend(['type_criminal', 'type_civ_d_appeal'])
+            drop_cols.extend(['type_criminal', 'type_civ_d_appeal'])
+        data.df.drop(drop_cols, 
+                     axis = 'columns', 
+                     inplace = True)
+        return data
+    
+    def _drop_nonqual_jcs(self, data):
         if self.settings['drops']['jcs_unqual']:
             pass
-        data.df.drop(drop_list, axis = 'columns', 
-                     inplace = True)
         return data
     
     def _judge_stubs(self, df):
@@ -306,7 +339,9 @@ class CaseTools(object):
             data.reshape_long(stubs = stubs, 
                               id_col = 'index_universal', 
                               new_col = 'panel_position')
-            data.df.drop('panel_position', axis = 'columns', inplace = True)
+            data.df.drop('panel_position', 
+                         axis = 'columns', 
+                         inplace = True)
             panel_cols = [i for i in data.df if i.startswith('panel_')]
             panel_drop_cols = ['panel_judges_list', 'panel_size']
             panel_cols = [i for i in panel_cols if i not in panel_drop_cols]

@@ -239,7 +239,7 @@ class Data(object):
         if self.verbose:
             print('Removing boolean variables with low variability')
         for col in bools:
-            if df[col].mean() > threshold:
+            if df[col].mean() < threshold:
                 df.drop(col, 
                         axis = 'columns', 
                         inplace = True)
@@ -248,20 +248,6 @@ class Data(object):
             return self
         else: 
             return df
-#    
-#    def lists_to_strings(self, df = None):
-#        not_df = False
-#        if not isinstance(df, pd.DataFrame):
-#            df = self.df
-#            not_df = True
-#        for col in df.columns:
-#            if isinstance(df.loc[1, col], list):
-#                df[col].apply(', '.join)
-#        if not_df:
-#            self.df = df
-#            return self
-#        else: 
-#            return df
     
     def reshape_long(self, df = None, stubs = [], id_col = '', new_col = '', 
                      sep = ''):

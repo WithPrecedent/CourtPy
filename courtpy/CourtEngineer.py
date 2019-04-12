@@ -27,18 +27,19 @@ class CourtEngineer(CaseTools):
             self.quick_start()
             self.data.df['index_universal'] = (
                     range(1, len(self.data.df.index) + 1))
-            self.data = self.cull_data(data = self.data,
+            self.data = self.cull_data(
+                    data = self.data,
                     drop_prefixes = self.cases.drop_prefixes)
             self.data = self.shape_df(self.data)
             self.data.summarize(export_path = os.path.join(
                     self.paths.output, 'summary_data.csv'))
             self.data.convert_rare_categories(
                     cats = self.data.create_column_list(
-                    prefixes = self.cases.cat_prefixes),
+                            prefixes = self.cases.cat_prefixes),
                     threshold = self.settings['drops']['cat_threshold'])
             self.data.remove_infrequent_cols(
                     bools = self.data.create_column_list(
-                    prefixes = self.cases.bool_prefixes),
+                            prefixes = self.cases.bool_prefixes),
                     threshold = self.settings['drops']['drop_threshold'])
             self.engineer_loose_ends(self.data.df)
             self.data.save(export_folder = self.filer.export_folder,
