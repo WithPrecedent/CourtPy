@@ -35,6 +35,7 @@ class Funnel(object):
         if not self.filer:
             self.filer = Filer(root_import = self.import_folder,
                                root_export = self.export_folder,
+                               experiment_folder = self.experiment_folder,
                                settings = self.settings)
         self.results = Results(settings = self.settings['results'],
                                algorithm_type = self.algorithm_type,
@@ -59,8 +60,7 @@ class Funnel(object):
         self.boolean_out = self.settings['files']['boolean_out']
         self.file_format_in = self.settings['files']['data_in']
         self.file_format_out = self.settings['files']['data_out']
-        self.input_folder = self.settings['files']['input_folder']
-        self.output_folder = self.settings['files']['output_folder']
+        self.experiment_folder = self.settings['files']['experiment_folder']
         self.scalers = self.settings['funnel']['scaler']
         self.scaler_params = self.settings['scaler_params']
         self.splitter = self.settings['funnel']['splitter']
@@ -155,7 +155,8 @@ class Funnel(object):
                                         self.settings[algorithm + '_params'])
                                     model = Model(algorithm,
                                                   self.algorithm_type,
-                                                  model_params)
+                                                  model_params,
+                                                  self.gpu)
                                     tube = Tube(Scaler(scaler, 
                                                        self.scaler_params),
                                                 Splitter(self.splitter,
@@ -191,6 +192,8 @@ class Funnel(object):
             return [variable]         
  
     def iterate(self):
+        if self.verbose:
+            print('Testing tubes')        
         self.best = None
         self._one_loop()
         if self.splitter_params['val_size'] > 0:
@@ -199,8 +202,10 @@ class Funnel(object):
     
     def _one_loop(self, use_val_set = False):
         for i, tube in enumerate(self.tubes):
+            if self.verbose:
+                print('Testing tube ' + str(i + 1))  
             self.data.split_xy(label = self.label)
-            tube.apply(tube_num = str(i),
+            tube.apply(tube_num = str(i + 1),
                        data = self.data, 
                        use_val_set = use_val_set)
             self.results.add_result(tube = tube, 
@@ -249,15 +254,13 @@ class Funnel(object):
                                 model = tube.model)
         return self
     
-    def save_everything(self, export_path = None):
-        if not export_path:
-            export_folder = self.filer.export_folder
-        self.save_funnel(export_path = os.path.join(export_folder, 
+    def save_everything(self):
+        self.save_funnel(export_path = os.path.join(self.filer.results_folder, 
                                                     'funnel.pkl'))
-        self.save_results(export_path = os.path.join(export_folder,
+        self.save_results(export_path = os.path.join(self.filer.results_folder,
                                                      'results_table.csv'))
         if self.best:
-            self.save_tube(export_path = os.path.join(export_folder,
+            self.save_tube(export_path = os.path.join(self.filer.results_folder,
                                                       'best_tube.pkl'), 
                            tube = self.best)
         return self
@@ -274,7 +277,7 @@ class Funnel(object):
     
     def save_funnel(self, export_path = None):
         if not export_path:
-            export_path = self.filer.export_folder
+            export_path = self.filer.results_folder
         pickle.dump(self.tubes, open(export_path, 'wb'))
         return self
     
@@ -286,7 +289,7 @@ class Funnel(object):
     
     def save_tube(self, tube, export_path = None):
         if not export_path:
-            export_path = self.filer.export_folder
+            export_path = self.filer.results_folder
         pickle.dump(tube, open(export_path, 'wb'))
         return self
     
@@ -313,7 +316,7 @@ class Funnel(object):
                      file_format = 'csv', encoding = 'windows-1252', 
                      float_format = '%.4f', message = 'Exporting results'):
         if not export_path:
-            export_path = self.filer.export_folder
+            export_path = self.filer.results_folder
             export_path = self.filer.make_path(folder = export_path,
                                                name = file_name,
                                                file_type = file_format)
@@ -401,7 +404,7 @@ class Tube(Methods):
             if self.model.use_grid and self.grid.name != 'none':
                 self.grid.search(self.data.x_train, self.data.y_train)
                 self.model.method = self.grid.best
-            self.model.method.fit(self.data.x_train, self.data.y_train)  
+            self.model.method.fit(self.data.x_train, self.data.y_train)
         if self.plotter:
             self.plotter.apply(data = self.data, 
                                model = self.model,

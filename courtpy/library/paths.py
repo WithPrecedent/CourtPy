@@ -13,10 +13,12 @@ class Paths(object):
     settings : object
     
     def __post_init__(self): 
-        self.data = os.path.join('..', '..', '..', 'data', 'courtpy')
-        self.input = os.path.join(self.data, 'input')
-        self.output = os.path.join(self.data, 'output')
-        self.opinions = os.path.join(self.input, 'court_opinions',
+        self.files = os.path.join('..', '..', '..', 'data', 'courtpy')
+        self.external = os.path.join(self.files, 'input')
+        self.data = os.path.join(self.files, 'data')
+        self.results = os.path.join(self.files, 'results')
+        self.experiment_folder = self.settings['files']['experiment_folder']
+        self.opinions = os.path.join(self.external, 'court_opinions',
                                      self.settings['cases']['jurisdiction'],
                                      self.settings['cases']['case_type'])
         self.raw_lexis_input = os.path.join(self.opinions, 'lexis_raw')
@@ -61,10 +63,10 @@ class Paths(object):
         """
         if not os.path.exists(self.data):
              os.makedirs(self.data)
-        if not os.path.exists(self.input):
-             os.makedirs(self.input)
-        if not os.path.exists(self.output):
-             os.makedirs(self.output)
+        if not os.path.exists(self.external):
+             os.makedirs(self.external)
+        if not os.path.exists(self.results):
+             os.makedirs(self.results)
         if not os.path.exists(self.lexis_input):
              os.makedirs(self.lexis_input)
         if not os.path.exists(self.cl_input):

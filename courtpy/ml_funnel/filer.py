@@ -2,37 +2,39 @@
 Class for dynamically creating file paths.
 """
 from dataclasses import dataclass
+import datetime
 import os
 
 @dataclass
 class Filer(object):
     
-    root_import : str
-    root_export : str
-    data_import : str = ''
-    data_export : str = ''
+    data_folder : str
+    results_folder : str
+    experiment_folder : str = ''
+    import_file_name : str = ''
+    export_file_name : str = ''
     settings : object = None
     
     def __post_init__(self):
-        self.import_folder = self.make_path(
-                folder = self.root_import,
-                subfolder = self.settings['files']['input_folder'])
-        self.export_folder = self.make_path(
-                folder = self.root_export,
-                subfolder = self.settings['files']['output_folder'])
-        self._make_folder(self.import_folder)
-        self._make_folder(self.export_folder)
-        if self.data_import:
+        if self.experiment_folder == 'dynamic':
+            subfolder = ('experiment_' 
+                         + datetime.datetime.now().strftime('%Y-%m-%d_%H-%M'))
+            self.results_folder = os.path.join(self.results_folder, subfolder)
+        self.test_tubes_folder = self.make_path(
+                    folder = self.results_folder,
+                    subfolder = 'test_tubes')
+        self._make_folder(self.data_folder)
+        self._make_folder(self.results_folder)
+        self._make_folder(self.test_tubes_folder)
+        if self.import_file_name:
             self.data_file_in = self.make_path(
-                    folder = self.root_import,
-                    subfolder = self.settings['files']['input_folder'],
-                    name = self.data_import,
+                    folder = self.data_folder,
+                    name = self.import_file_name,
                     file_type = self.settings['files']['data_in'])
-        if self.data_export:
+        if self.export_file_name:
             self.data_file_out = self.make_path(
-                    folder = self.root_export,
-                    subfolder = self.settings['files']['output_folder'],
-                    name = self.data_export,
+                    folder = self.data_folder,
+                    name = self.export_file_name,
                     file_type = self.settings['files']['data_out'])
         return self
     
@@ -71,9 +73,10 @@ class Filer(object):
             subfolder = model.name + '_' + splicer.name + tube_num
         else:
             subfolder = model.name + tube_num
-        self._make_folder(folder = self.make_path(folder = self.export_folder,
-                                                  subfolder = subfolder))
-        return self.make_path(folder = self.export_folder,
+        self._make_folder(folder = self.make_path(
+                folder = self.test_tubes_folder,
+                subfolder = subfolder))
+        return self.make_path(folder = self.test_tubes_folder,
                               subfolder = subfolder,
                               name = file_name,
                               file_type = file_type)

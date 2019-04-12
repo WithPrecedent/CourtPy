@@ -146,10 +146,11 @@ class CaseTools(object):
         self.paths.stage = self.stage
         self.paths.conform(stage = self.stage, 
                            source = self.source)
-        self.filer = Filer(root_import = self.paths.output,
-                           root_export = self.paths.output,
-                           data_import = self.paths.import_file,
-                           data_export = self.paths.export_file,
+        self.filer = Filer(data_folder = self.paths.data,
+                           results_folder = self.paths.results,
+                           experiment_folder = self.paths.experiment_folder,
+                           import_file_name = self.paths.import_file,
+                           export_file_name = self.paths.export_file,
                            settings = self.settings)
         self.cases = Cases(paths = self.paths, 
                            settings = self.settings, 
@@ -400,18 +401,19 @@ class CaseTools(object):
         return df
     
     def create_splices(self, data):
-        data.add_splice(group_name = 'panels', 
-                        prefixes = ['panel_judges'])
-#        data.add_splice(group_name = 'jcs', 
-#                        prefixes = ['panel_ideo_jcs'])
-        data.add_splice(group_name = 'presidents', 
-                        prefixes = ['panel_ideo_party'])
-#        data.add_splice(group_name = 'demographics', 
-#                        prefixes = ['panel_demo_'])
-        data.add_splice(group_name = 'experience', 
-                        prefixes = ['panel_exp_'])
-#        data.add_splice(group_name = 'politics', 
-#                        prefixes = ['pol_'])
-#        data.add_splice(group_name = 'judges', 
-#                        prefixes = ['judge_']) 
+        if self.settings['funnel']['splicer']:            
+            data.add_splice(group_name = 'panels', 
+                            prefixes = ['panel_judges'])
+            data.add_splice(group_name = 'jcs', 
+                            prefixes = ['panel_ideo_jcs'])
+            data.add_splice(group_name = 'presidents', 
+                            prefixes = ['panel_ideo_party'])
+            data.add_splice(group_name = 'demographics', 
+                            prefixes = ['panel_demo_'])
+            data.add_splice(group_name = 'experience', 
+                            prefixes = ['panel_exp_'])
+            data.add_splice(group_name = 'politics', 
+                            prefixes = ['pol_'])
+            data.add_splice(group_name = 'judges', 
+                            prefixes = ['judge_'])
         return data

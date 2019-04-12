@@ -43,15 +43,12 @@ class Plotter(Methods):
             self.options[plot]()     
         return self
         
-    def save(self, file_name, export_folder = None):
-        if export_folder:
-            export_path = os.path.join(export_folder, file_name)
-        else:
-            export_path = self.filer._iter_path(model = self.model, 
-                                                tube_num = self.tube_num, 
-                                                splicer = self.splicer,
-                                                file_name = file_name,
-                                                file_type = 'png')
+    def save(self, file_name):
+        export_path = self.filer._iter_path(model = self.model, 
+                                            tube_num = self.tube_num, 
+                                            splicer = self.splicer,
+                                            file_name = file_name,
+                                            file_type = 'png')
         plt.savefig(export_path, bbox_inches = 'tight')
         plt.close()
         return self

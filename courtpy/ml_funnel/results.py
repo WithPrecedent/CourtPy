@@ -28,8 +28,8 @@ class Results(Methods):
     
     @staticmethod
     def _check_none(step):
-        if step.name == 'none':
-            return 'none'
+        if step.name in ['none', 'all']:
+            return step.name
         else:
             return step.method
         

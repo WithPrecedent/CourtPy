@@ -36,7 +36,7 @@ class CourtAnalyzer(CaseTools):
             print('The best test tube, based upon the', funnel.key_metric,
                   'metric with a score of', funnel.best_score, 'is:')
             print(funnel.best)
-        self.data.save(export_folder = self.filer.export_folder,
+        self.data.save(export_folder = self.filer.data_folder,
                        file_name = self.paths.export_file,
                        file_format = self.settings['files']['data_out'],
                        boolean_out = self.settings['files']['boolean_out'],
@@ -44,10 +44,10 @@ class CourtAnalyzer(CaseTools):
         return self 
       
 if __name__ == '__main__':
-    settings = Settings(os.path.join('..', 'settings.ini'))
+    settings = Settings(os.path.join('ml_funnel', 'ml_settings.ini'))
+    cp_settings = Settings(os.path.join('..', 'settings.ini'))
+    settings.config.update(cp_settings.config) 
     paths = Paths(settings)
-    ml_settings = Settings(os.path.join('ml_funnel', 'ml_settings.ini'))
-    settings.config.update(ml_settings.config)  
     if not settings['general']['warnings']:
         warnings.filterwarnings('ignore')
     CourtAnalyzer(paths, settings) 

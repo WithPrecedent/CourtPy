@@ -322,7 +322,6 @@ class Data(object):
         if not isinstance(df, pd.DataFrame):
             df = self.df
             not_df = True
-        print(df.columns)
         x = df.drop(label, axis = 'columns')
         y = df[label] 
         if not_df:

@@ -3,7 +3,6 @@ Parent and child clases for implementing the different steps in the
 ml_funnel pipeline.
 """
 from dataclasses import dataclass
-import os
 import pickle
 from scipy.stats import randint, uniform
 from sklearn.cluster import AffinityPropagation, Birch, KMeans
@@ -96,8 +95,6 @@ class Methods(object):
         return self.transform(x)
     
     def load(self, import_folder, name, prefix = '', suffix = ''):
-        if not import_folder:
-            import_folder = self.filer.import_folder
         import_path = self.filer.path_join(folder = import_folder,
                                            prefix = prefix,
                                            file_name = name,
@@ -111,8 +108,6 @@ class Methods(object):
     def save(self, export_folder, name, prefix = '', suffix = ''):
         if self.verbose:
             print('Exporting', name)
-        if not export_folder:
-            export_folder = self.filer.export_folder
         export_path = self.filer.path_join(folder = export_folder,
                                            prefix = prefix,
                                            file_name = name,
@@ -306,8 +301,6 @@ class Model(Methods):
     algorithm_type : str
     params : object
     use_gpu : bool = False
-    scale_pos_weight : int = 1
-    use_grid : bool = False
     
     def __post_init__(self):
         if self.algorithm_type == 'classifier':
@@ -329,15 +322,13 @@ class Model(Methods):
         elif self.algorithm_type == 'grouper':
             self.options = {'affinity' : AffinityPropagation,
                             'birch' : Birch,
-                            'kmeans' : KMeans}
+                            'kmeans' : KMeans}     
         self._parse_params()
-        self.runtime_params = {'random_state' : self.seed}
-        if self.name == 'xgb' and self.use_gpu:     
-            self.runtime_params.update({'tree_method' : 'gpu_exact'})
         self.initialize()
         return self
     
     def _parse_params(self):
+        self.use_grid = False
         self.grid = {}
         new_params = {}
         for param, values in self.params.items():
@@ -350,12 +341,19 @@ class Model(Methods):
             else:
                 new_params.update({param : values})
         self.params = new_params
-        if self.use_grid and self.name == 'xgb':  
-            self.grid.update({'scale_pos_weight' : 
-                              uniform(self.scale_pos_weight / 1.5, 
-                              self.scale_pos_weight * 1.5)})
-        elif self.name == 'xgb':
-            self.params.update({'scale_pos_weight' : self.scale_pos_weight})
+        self.runtime_params = {'random_state' : self.seed}
+        if self.name == 'xgb':  
+            if not hasattr(self, 'scale_pos_weight'):
+                self.scale_pos_weight = 1
+            if self.use_gpu:     
+                self.runtime_params.update({'tree_method' : 'gpu_exact'})
+            if self.use_grid: 
+                self.grid.update({'scale_pos_weight' : 
+                                  uniform(self.scale_pos_weight / 1.5, 
+                                  self.scale_pos_weight * 1.5)})
+            else:
+                self.params.update(
+                        {'scale_pos_weight' : self.scale_pos_weight})
         return self
 
 @dataclass    
@@ -375,7 +373,8 @@ class Grid(Methods):
                                'refit' : self.params['scoring'][0],
                                'random_state' : self.seed}
         self.params.update(self.runtime_params)
-        self.method = self.options[self.name](**self.params)
+        self.initialize()
+#        self.method = self.options[self.name](**self.params)
         return self  
     
     def search(self, x, y):
