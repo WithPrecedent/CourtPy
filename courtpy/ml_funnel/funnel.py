@@ -18,6 +18,7 @@ from ml_funnel.settings import Settings
 class Funnel(object):
     
     data : object
+    filer : object = None
     import_folder : str = ''
     export_folder : str = ''
     use_settings_file : bool = True
@@ -31,9 +32,10 @@ class Funnel(object):
             self.load_settings()
         if not self.pandas_warnings:
             warnings.filterwarnings('ignore')
-        self.filer = Filer(root_import = self.import_folder,
-                           root_export = self.export_folder,
-                           settings = self.settings)
+        if not self.filer:
+            self.filer = Filer(root_import = self.import_folder,
+                               root_export = self.export_folder,
+                               settings = self.settings)
         self.results = Results(settings = self.settings['results'],
                                algorithm_type = self.algorithm_type,
                                verbose = self.verbose)

@@ -28,8 +28,7 @@ class CourtAnalyzer(CaseTools):
                           inplace = True)        
         self.data = self.create_splices(self.data)
         funnel = Funnel(data = self.data, 
-                        import_folder = self.paths.input,
-                        export_folder = self.paths.output)
+                        filer = self.filer)
         funnel.create()
         funnel.iterate()
         funnel.save_everything()
@@ -37,8 +36,7 @@ class CourtAnalyzer(CaseTools):
             print('The best test tube, based upon the', funnel.key_metric,
                   'metric with a score of', funnel.best_score, 'is:')
             print(funnel.best)
-        self.data.save(df = self.data.df,
-                       export_folder = self.funnel.filer.export_folder,
+        self.data.save(export_folder = self.filer.export_folder,
                        file_name = self.paths.export_file,
                        file_format = self.settings['files']['data_out'],
                        boolean_out = self.settings['files']['boolean_out'],

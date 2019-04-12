@@ -41,10 +41,11 @@ class CourtEngineer(CaseTools):
                     prefixes = self.cases.bool_prefixes),
                     threshold = self.settings['drops']['drop_threshold'])
             self.engineer_loose_ends(self.data.df)
-            self.data.save(export_path = self.paths.export_path,
+            self.data.save(export_folder = self.filer.export_folder,
+                           file_name = self.paths.export_file,
                            file_format = self.settings['files']['data_out'],
-                           encoding = self.settings['files']['encoding'],
-                           boolean_out = self.settings['files']['boolean_out'])
+                           boolean_out = self.settings['files']['boolean_out'],
+                           encoding = self.settings['files']['encoding'])
             self.loop_cleanup()
         return   
 

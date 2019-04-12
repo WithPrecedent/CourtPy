@@ -336,6 +336,7 @@ class Data(object):
         if not isinstance(df, pd.DataFrame):
             df = self.df
             not_df = True
+        print(df.columns)
         x = df.drop(label, axis = 'columns')
         y = df[label] 
         if not_df:
@@ -405,7 +406,7 @@ class Data(object):
             if not export_folder:
                 export_folder = self.filer.export_folder    
             export_path = self.filer.make_path(folder = export_folder,
-                                               file_name = file_name,
+                                               name = file_name,
                                                file_type = file_format)
         if not isinstance(df, pd.DataFrame):
             df = self.df
