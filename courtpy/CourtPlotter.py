@@ -32,17 +32,18 @@ class CourtPlotter(CaseTools):
             self.quick_start()
             self.data = self.create_splices(self.data)
         if not self.funnel:
-            self.funnel = Funnel(data = self.data)
-            self.funnel.load_funnnel(
-                import_path = os.path.join(self.paths.output, 'funnel.pkl'))
-        self.funnel.visualize(model = self.funnel.best)
+            self.funnel = Funnel(data = self.data,
+                                 filer = self.filer)
+            self.funnel.load_funnel(
+                import_path = os.path.join(self.paths.results, 'funnel.pkl'))
+        self.funnel.visualize(funnel = self.funnel)
         return
 
 if __name__ == '__main__':
-    settings = Settings(os.path.join('..', 'settings.ini'))
+    settings = Settings(os.path.join('ml_funnel', 'ml_settings.ini'))
+    cp_settings = Settings(os.path.join('..', 'settings.ini'))
+    settings.config.update(cp_settings.config) 
     paths = Paths(settings)
-    ml_settings = Settings(os.path.join('ml_funnel', 'ml_settings.ini'))
-    settings.config.update(ml_settings.config)  
     if not settings['general']['warnings']:
         warnings.filterwarnings('ignore')
     CourtPlotter(paths, settings)  

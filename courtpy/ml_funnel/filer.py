@@ -1,13 +1,15 @@
 """
-Class for dynamically creating file paths.
+Class and methods used by ml_funnel to store data and results in consistent
+path structure based upon user options.
 """
 from dataclasses import dataclass
-import datetime
 import os
 
 @dataclass
 class Filer(object):
-    
+    """
+    Class for dynamically creating file paths.
+    """   
     data_folder : str
     results_folder : str
     experiment_folder : str = ''
@@ -16,16 +18,8 @@ class Filer(object):
     settings : object = None
     
     def __post_init__(self):
-        if self.experiment_folder == 'dynamic':
-            subfolder = ('experiment_' 
-                         + datetime.datetime.now().strftime('%Y-%m-%d_%H-%M'))
-            self.results_folder = os.path.join(self.results_folder, subfolder)
-        self.test_tubes_folder = self.make_path(
-                    folder = self.results_folder,
-                    subfolder = 'test_tubes')
         self._make_folder(self.data_folder)
         self._make_folder(self.results_folder)
-        self._make_folder(self.test_tubes_folder)
         if self.import_file_name:
             self.data_file_in = self.make_path(
                     folder = self.data_folder,

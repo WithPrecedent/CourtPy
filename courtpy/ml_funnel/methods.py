@@ -374,7 +374,6 @@ class Grid(Methods):
                                'random_state' : self.seed}
         self.params.update(self.runtime_params)
         self.initialize()
-#        self.method = self.options[self.name](**self.params)
         return self  
     
     def search(self, x, y):

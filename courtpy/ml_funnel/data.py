@@ -231,7 +231,7 @@ class Data(object):
         else: 
             return df
     
-    def remove_infrequent_cols(self, df = None, bools = [], threshold = 0):
+    def drop_infrequent_cols(self, df = None, bools = [], threshold = 0):
         not_df = False
         if not isinstance(df, pd.DataFrame):
             df = self.df
@@ -249,6 +249,25 @@ class Data(object):
         else: 
             return df
     
+    def drop_highly_correlated_cols(self, df = None, cols = [], 
+                                    threshold = 0.95):
+        not_df = False
+        if not isinstance(df, pd.DataFrame):
+            df = self.df
+            not_df = True
+        if self.verbose:
+            print('Removing highly correlated columns')
+        for col in bools:
+            if df[col].mean() < threshold:
+                df.drop(col, 
+                        axis = 'columns', 
+                        inplace = True)
+        if not_df:
+            self.df = df
+            return self
+        else: 
+            return df
+        
     def reshape_long(self, df = None, stubs = [], id_col = '', new_col = '', 
                      sep = ''):
         not_df = False
