@@ -1,0 +1,8 @@
+---
+exclude_paths:
+  - 'courtpy/_version.py'
+  - 'tests/**/*'
+  - 'tests/*'
+  - 'benchmarks/**/*'
+  - 'setup.py'
+  - 'versioneer.py'
