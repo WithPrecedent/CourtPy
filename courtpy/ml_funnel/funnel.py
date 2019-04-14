@@ -528,15 +528,12 @@ class Tube(Methods):
             self.data.x_train = self.splicer.transform(self.data.x_train)
             self.data.x_test = self.splicer.transform(self.data.x_test)
         if self.sampler.name != 'none':
-            self.sampler.fit(self.data.x_train, self.data.y_train)
-            self.data.x_train = (
-                    self.sampler.transform(
-                            self.data.x_train, self.data.y_train))
+            self.data.x_train, self.data.y_train = (
+                    self.sampler.fit_resample(self.data.x_train, 
+                                              self.data.y_train))
         if self.selector.name != 'none':
             self.selector.fit(self.data.x_train, self.data.y_train)
-            self.data.x_train = (
-                    self.selector.transform(
-                            self.data.x_train, self.data.y_train))
+            self.data.x_train = self.selector.fit(self.data.x_train)
         if self.model.name != 'none':
             if self.model.use_grid and self.grid.name != 'none':
                 self.grid.search(self.data.x_train, self.data.y_train)

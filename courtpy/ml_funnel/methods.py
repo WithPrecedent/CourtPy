@@ -8,6 +8,9 @@ from scipy.stats import randint, uniform
 from sklearn.cluster import AffinityPropagation, Birch, KMeans
 from sklearn.ensemble import AdaBoostClassifier, AdaBoostRegressor
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+from sklearn.feature_selection import chi2, f_classif, mutual_info_classif
+from sklearn.feature_selection import mutual_info_regression, RFE, SelectKBest
+from sklearn.feature_selection import SelectFdr, SelectFpr, SelectFromModel
 from sklearn.linear_model import BayesianRidge, Lasso, LassoLars
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.linear_model import Ridge
@@ -25,7 +28,6 @@ from category_encoders import OrdinalEncoder, SumEncoder, TargetEncoder
 from category_encoders import PolynomialEncoder
 from imblearn.combine import SMOTEENN, SMOTETomek
 from imblearn.over_sampling import ADASYN, SMOTE
-from prince import CA, FAMD, MCA, MFA, PCA
 from xgboost import XGBClassifier, XGBRegressor
 
 #from ml_funnel.logit_encode import LogitEncoder
@@ -66,6 +68,15 @@ class Methods(object):
     def _no_method(self, data):
         return data
     
+    def _select_params(self, params_to_use = []):
+        new_params = {}
+        if self.params:
+            for key, value in self.params.items():
+                if key in params_to_use:
+                    new_params.update({key : value})
+            self.params = new_params
+        return self            
+            
     def initialize(self):
         self._check_params()
         if self.runtime_params:
@@ -223,12 +234,27 @@ class Interactor(Methods):
     columns : object = None
     
     def __post_init__(self):
-        self.options = {'polynomial' : PolynomialEncoder}
+        self.options = {'polynomial' : PolynomialEncoder,
+                        'quotient' : self.quotient_features,
+                        'sum' : self.sum_features,
+                        'difference' : self.difference_features}
         self.defaults = {}
         self.runtime_params = {'cols' : self.columns}
         self.initialize()
         return self
+    
+    def quotient_features(self):
+        pass
+        return self
 
+    def sum_features(self):
+        pass
+        return self
+
+    def difference_features(self):
+        pass
+        return self
+    
 @dataclass
 class Splicer(Methods):
     
@@ -277,29 +303,56 @@ class Sampler(Methods):
 class Selector(Methods):
     
     name : str = ''
+    model : object = None
     params : object = None
     
     def __post_init__(self):
-        self.options = {'famd' : FAMD, 
-                        'mca' : MCA, 
-                        'mfa' : MFA, 
-                        'pca' : PCA,
-                        'ca' : CA}
-        self.defaults = {'n_components' : 10,
-                         'n_iter' : 10,
-                         'copy' : False,
-                         'check_input' : True,
-                         'engine' : 'auto'}
-        self.runtime_params = {'random_state' : self.seed}
+        self.options = {'kbest' : SelectKBest, 
+                        'fdr' : SelectFdr, 
+                        'fpr' : SelectFpr,
+                        'custom' : SelectFromModel,
+                        'rfe' : RFE}
+        self.defaults = {}
+        self.scorers = {'f_classif' : f_classif,
+                        'chi2' : chi2,
+                        'mutual_class' : mutual_info_classif,
+                        'mutual_regress' : mutual_info_regression}
+        self.runtime_params = {} 
+        self._set_param_groups()       
         self.initialize()
         return self
+    
+    def _set_param_groups(self):
+        if self.name == 'rfe':
+            self.defaults = {'n_features_to_select' : 30,
+                             'step' : 1}
+            self.runtime_params = {'estimator' : self.model.method}
+        elif self.name == 'kbest':
+            self.defaults = {'k' : 30,
+                             'score_func' : f_classif}
+            self.runtime_params = {}   
+        elif self.name in ['fdr', 'fpr']:
+            self.defaults = {'alpha' : 0.05,
+                             'score_func' : f_classif}
+            self.runtime_params = {}  
+        elif self.name == 'custom':
+            self.defaults = {'threshold' : 'mean'}
+            self.runtime_params = {'estimator' : self.model.method}
+        self._select_params(params_to_use = self.defaults.keys())
+        return self
+    
+    def transform(self, x):
+        if len(x.columns) > self.params['n_features_to_select']:
+            return self.method.transform(x)
+        else:
+            return x
     
 @dataclass
 class Model(Methods):
     
-    name : str
-    algorithm_type : str
-    params : object
+    name : str = ''
+    algorithm_type : str = ''
+    params : object = None
     use_gpu : bool = False
     
     def __post_init__(self):
@@ -359,9 +412,9 @@ class Model(Methods):
 @dataclass    
 class Grid(Methods):
     
-    name : str
-    model : object
-    params : object
+    name : str = ''
+    model : object = None
+    params : object = None
     
     def __post_init__(self):
         self.options = {'random' : RandomizedSearchCV,

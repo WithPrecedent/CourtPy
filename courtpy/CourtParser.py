@@ -82,8 +82,10 @@ class CourtParser(CaseTools):
         return self 
     
 if __name__ == '__main__':
-    settings = Settings(os.path.join('..', 'settings.ini'))
-    paths = Paths(settings)  
+    settings = Settings(os.path.join('ml_funnel', 'ml_settings.ini'))
+    cp_settings = Settings(os.path.join('..', 'settings.ini'))
+    settings.config.update(cp_settings.config) 
+    paths = Paths(settings) 
     if not settings['general']['warnings']:
         warnings.filterwarnings('ignore')
     CourtParser(paths, settings)  
