@@ -55,10 +55,12 @@ class CourtPy(object):
             not be split.
             """
             from CourtPrepper import CourtPrepper
-            CourtPrepper(paths = self.paths, 
-                         settings = self.settings)
+            self.prepper = CourtPrepper(paths = self.paths, 
+                                        settings = self.settings)
             if self.settings['general']['verbose']:
                 print('Preparation complete')
+            if self.settings['defaults']['conserve_memory']:
+                del(self.prepper)
             
         if 'parse' in self.settings['general']['stages']:
             """
@@ -66,10 +68,12 @@ class CourtPy(object):
             upon the source format.
             """
             from CourtParser import CourtParser  
-            CourtParser(paths = self.paths, 
-                        settings = self.settings)
+            self.parser = CourtParser(paths = self.paths, 
+                                      settings = self.settings)
             if self.settings['general']['verbose']:
                 print('Data collection and parsing complete')
+            if self.settings['defaults']['conserve_memory']:
+                del(self.parser)
             
         if 'wrangle' in self.settings['general']['stages']:
             """
@@ -77,10 +81,12 @@ class CourtPy(object):
             created by CourtParser.
             """
             from CourtWrangler import CourtWrangler  
-            CourtWrangler(paths = self.paths, 
-                          settings = self.settings)
+            self.wrangler = CourtWrangler(paths = self.paths, 
+                                          settings = self.settings)
             if self.settings['general']['verbose']:
                 print('Deep parsing and data wrangling complete')
+            if self.settings['defaults']['conserve_memory']:
+                del(self.wrangler)
         
         if 'merge' in self.settings['general']['stages']:
             """
@@ -88,10 +94,12 @@ class CourtPy(object):
             preexisting third-party databases.
             """
             from CourtMerger import CourtMerger
-            CourtMerger(paths = self.paths, 
-                        settings = self.settings)
+            self.merger = CourtMerger(paths = self.paths, 
+                                      settings = self.settings)
             if self.settings['general']['verbose']:
                 print('Data merging complete')
+            if self.settings['defaults']['conserve_memory']:
+                del(self.merger)
           
         if 'engineer' in self.settings['general']['stages']:
             """
@@ -99,10 +107,12 @@ class CourtPy(object):
             learning packages.
             """
             from CourtEngineer import CourtEngineer
-            CourtEngineer(paths = self.paths, 
-                          settings = self.settings)
+            self.engineer = CourtEngineer(paths = self.paths, 
+                                          settings = self.settings)
             if self.settings['general']['verbose']:
                 print('Feature engineering complete')
+            if self.settings['defaults']['conserve_memory']:
+                del(self.engineer)                   
    
         if 'analyze' in self.settings['general']['stages']:
             """
@@ -110,10 +120,12 @@ class CourtPy(object):
             data.
             """
             from CourtAnalyzer import CourtAnalyzer 
-            CourtAnalyzer(paths = self.paths, 
-                          settings = self.settings)
+            self.analyzer = CourtAnalyzer(paths = self.paths, 
+                                          settings = self.settings)
             if self.settings['general']['verbose']:
                 print('Data analysis complete')
+            if self.settings['defaults']['conserve_memory']:
+                del(self.analyzer)
         
         if 'plot' in self.settings['general']['stages']:
             """
@@ -121,10 +133,12 @@ class CourtPy(object):
             by CourtAnalyzer.
             """
             from CourtPlotter import CourtPlotter
-            CourtPlotter(paths = self.paths, 
-                         settings = self.settings)
+            self.plotter = CourtPlotter(paths = self.paths, 
+                                        settings = self.settings)
             if self.settings['general']['verbose']:
                 print('Plotting complete')
+            if self.settings['defaults']['conserve_memory']:
+                del(self.plotter)
         return  
 
 if __name__ == '__main__':

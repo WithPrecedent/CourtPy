@@ -173,7 +173,8 @@ class CaseTools(object):
                                    interact_prefixes = (
                                            self.cases.interact_prefixes))
         self.data.smart_fill_na()
-        self.data.downcast()
+        if self.settings['defaults']['conserve_memory']:
+            self.data.downcast()
         return self
     
     def loop_cleanup(self):

@@ -40,18 +40,18 @@ class CourtParser(CaseTools):
             self.paths.stage = self.stage
             self.paths.conform(stage = self.stage, 
                                source = self.source)
-            cases = Cases(paths = self.paths, 
-                          settings = self.settings,
-                          source = self.source,
-                          stage = self.stage) 
-            data = Data(settings = self.settings)
+            self.cases = Cases(paths = self.paths, 
+                               settings = self.settings,
+                               source = self.source,
+                               stage = self.stage) 
+            self.data = Data(settings = self.settings)
             bundle = CaseBundle()
-            self.create_divider_list(df = data.df, 
-                                     cases = cases)
-            self.create_munger_list(cases = cases)
-            self.create_column_dicts(df = data.df, 
-                                     cases = cases)   
-            data.df = pd.Series(index = self.column_dict)
+            self.create_divider_list(df = self.data.df, 
+                                     cases = self.cases)
+            self.create_munger_list(cases = self.cases)
+            self.create_column_dicts(df = self.data.df, 
+                                     cases = self.cases)   
+            self.data.df = pd.Series(index = self.column_dict)
             encoding = self.settings['files']['encoding']
             with open(self.paths.export_path, mode = 'w', newline = '',
                       encoding = encoding) as output_file:
@@ -65,17 +65,20 @@ class CourtParser(CaseTools):
                               errors = 'ignore',
                               encoding = encoding) as a_file:
                         cases_text = a_file.read()
-                        data.initialize_series(column_dict = self.column_dict)
-                        data.df[cases.index_col] = c + 1
-                        data.df, bundle = self.separate_header(
-                                df = data.df, 
+                        self.data.initialize_series(
+                                column_dict = self.column_dict)
+                        self.data.df[self.cases.index_col] = c + 1
+                        self.data.df, bundle = self.separate_header(
+                                df = self.data.df, 
                                 cases_text = cases_text,
                                 bundle = bundle)
-                        data.df, bundle = self.divide(df = data.df, 
-                                                      bundle = bundle)
-                        data.df, bundle = self.munge(df = data.df, 
-                                                     bundle = bundle)
-                        writer.writerow(data.df)
+                        self.data.df, bundle = self.divide(
+                                df = self.data.df,  
+                                bundle = bundle)
+                        self.data.df, bundle = self.munge(
+                                df = self.data.df, 
+                                bundle = bundle)
+                        writer.writerow(self.data.df)
                         if ((c + 1) % 100 == 0 
                             and self.settings['general']['verbose']):
                             print(c + 1, 'cases parsed')               

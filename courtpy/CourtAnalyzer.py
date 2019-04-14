@@ -27,15 +27,15 @@ class CourtAnalyzer(CaseTools):
                           axis = 'columns', 
                           inplace = True)        
         self.data = self.create_splices(self.data)
-        funnel = Funnel(data = self.data, 
+        self.funnel = Funnel(data = self.data, 
                         filer = self.filer)
-        funnel.create()
-        funnel.iterate()
-        funnel.save_everything()
+        self.funnel.create()
+        self.funnel.iterate()
+        self.funnel.save_everything()
         if self.settings['general']['verbose']:
-            print('The best test tube, based upon the', funnel.key_metric,
-                  'metric with a score of', funnel.best_score, 'is:')
-            print(funnel.best)
+            print('The best test tube, based upon the', self.funnel.key_metric,
+                  'metric with a score of', self.funnel.best_score, 'is:')
+            print(self.funnel.best)
         self.data.save(export_folder = self.filer.data_folder,
                        file_name = self.paths.export_file,
                        file_format = self.settings['files']['data_out'],

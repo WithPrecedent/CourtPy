@@ -33,6 +33,7 @@ class Data(object):
                       test_data = self.settings['files']['test_data'],
                       test_rows = self.settings['files']['test_chunk'],
                       encoding = self.settings['files']['encoding']) 
+        self.dropped_columns = []
         return self
              
     def _get_xy(self, data_to_use):
@@ -251,17 +252,23 @@ class Data(object):
     
     def drop_highly_correlated_cols(self, df = None, cols = [], 
                                     threshold = 0.95):
+        """
+        Drops all but one column from highly correlated groups of columns.
+        """
         not_df = False
         if not isinstance(df, pd.DataFrame):
             df = self.df
             not_df = True
         if self.verbose:
             print('Removing highly correlated columns')
-        for col in bools:
-            if df[col].mean() < threshold:
-                df.drop(col, 
-                        axis = 'columns', 
-                        inplace = True)
+        for col in cols:
+            corr_matrix = df.corr().abs()
+            upper = corr_matrix.where(np.triu(np.ones(
+                    corr_matrix.shape), k = 1).astype(np.bool))
+        drop_cols = [c for c in upper.columns if any(upper[c] > threshold)]
+        df.drop(drop_cols,
+                axis = 'columns', 
+                inplace = True)
         if not_df:
             self.df = df
             return self
