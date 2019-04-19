@@ -9,6 +9,7 @@ dependencies:
 - cudnn
 - cython
 - dataclasses
+- eli5
 - git
 - imbalanced-learn 
 - ipykernel
@@ -20,7 +21,6 @@ dependencies:
 - numpy
 - pandas
 - pip
-- prince
 - py-xgboost
 - python-docx
 - scikit-learn

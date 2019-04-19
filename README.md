@@ -1,5 +1,8 @@
 # CourtPy
 
+![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)
+[![Build Status](https://img.shields.io/travis/with_precedent/courtpy.svg)](https://travis-ci.org/with_precedent/courtpy) 
+
 CourtPy is a python package which allows a user to prepare, parse, wrangle, merge, engineer, analyze, and graph data derived from court opinions. It can download and integrate data from other sources including NOMINATE, Martin-Quinn, the FJC Integrated Database, and FJC Judicial Biography Database.
 
 The package is presently in alpha and is nearly feature complete.
