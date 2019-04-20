@@ -49,8 +49,8 @@ class CourtMerger(CaseTools):
         return
     
 if __name__ == '__main__':
-    settings = Settings(os.path.join('ml_funnel', 'ml_settings.ini'))
-    cp_settings = Settings(os.path.join('..', 'settings.ini'))
+    settings = Settings(os.path.join('..', 'ml_settings.ini'))
+    cp_settings = Settings(os.path.join('..', 'cp_settings.ini'))
     settings.config.update(cp_settings.config) 
     paths = Paths(settings)
     if not settings['general']['warnings']:

@@ -31,7 +31,7 @@ class Paths(object):
         Folder containing .csv files which can be edited to change the strings 
         and regular expressions used by CourtPy.
         """
-        self.dicts = 'dictionaries'
+        self.dicts = os.path.join('..', 'dictionaries')
         self.case_rules = os.path.join(self.dicts, 'case_rules.csv')
         self.data_in = self.settings['files']['data_in']
         self.data_out = self.settings['files']['data_out']
