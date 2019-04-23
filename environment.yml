@@ -20,8 +20,8 @@ dependencies:
 - more-itertools
 - numpy
 - pandas
-- pip
-- py-xgboost
+- pip:
+    - xgboost
 - python-docx
 - scikit-learn
 - scipy

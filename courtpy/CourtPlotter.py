@@ -1,5 +1,5 @@
-""" 
-CourtPlotter includes some basic charts and graphs for interpreting the 
+"""
+CourtPlotter includes some basic charts and graphs for interpreting the
 results of the CourtAnalyzer.
 """
 from dataclasses import dataclass
@@ -15,14 +15,14 @@ from utilities.timer import timer
 @timer('Graphing and plotting')
 @dataclass
 class CourtPlotter(CaseTools):
-    
+
     data : object = None
     funnel : object = None
     paths : object = None
     settings : object = None
     cases : object = None
     stage : str = 'plot'
-   
+
     def __post_init__(self):
         if self.settings['general']['verbose']:
             print('Plotting results')
@@ -40,10 +40,10 @@ class CourtPlotter(CaseTools):
         return
 
 if __name__ == '__main__':
-    settings = Settings(os.path.join('..', 'ml_settings.ini'))
-    cp_settings = Settings(os.path.join('..', 'cp_settings.ini'))
-    settings.config.update(cp_settings.config) 
+    settings = Settings(os.path.join('..', 'settings', 'ml_settings.ini'))
+    cp_settings = Settings(os.path.join('..', 'settings', 'cp_settings.ini'))
+    settings.config.update(cp_settings.config)
     paths = Paths(settings)
-    if not settings['general']['warnings']:
+    if not settings['general']['pandas_warnings']:
         warnings.filterwarnings('ignore')
-    CourtPlotter(paths, settings)  
+    CourtPlotter(paths, settings)

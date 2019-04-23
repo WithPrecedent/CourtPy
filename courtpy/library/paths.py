@@ -9,12 +9,12 @@ import glob
 
 @dataclass
 class Paths(object):
-    
+
     settings : object
-    
-    def __post_init__(self): 
+
+    def __post_init__(self):
         self.files = os.path.join('..', '..', '..', 'data', 'courtpy')
-        self.external = os.path.join(self.files, 'input')
+        self.external = os.path.join(self.files, 'external')
         self.data = os.path.join(self.files, 'data')
         self.results = os.path.join(self.files, 'results')
         self.experiment_folder = self.settings['files']['experiment_folder']
@@ -28,7 +28,7 @@ class Paths(object):
         self.raw_ca_input = os.path.join(self.opinions, 'caselaw_access_raw')
         self.ca_input = os.path.join(self.opinions, 'caselaw_access')
         """
-        Folder containing .csv files which can be edited to change the strings 
+        Folder containing .csv files which can be edited to change the strings
         and regular expressions used by CourtPy.
         """
         self.dicts = os.path.join('..', 'dictionaries')
@@ -43,8 +43,8 @@ class Paths(object):
         self.import_files = {'wrangle' : 'parsed',
                              'merge' : 'wrangled',
                              'analyze' : 'engineered',
-                             'plot' : 'analyzed'} 
-        if 'merge' in self.settings['general']['stages']:
+                             'plot' : 'analyzed'}
+        if 'merge' in self.settings['cases']['stages']:
             self.import_files.update({'engineer' : 'merged'})
         else:
             self.import_files.update({'engineer' : 'wrangled'})
@@ -53,12 +53,12 @@ class Paths(object):
                              'merge' : 'merged',
                              'engineer' : 'engineered',
                              'analyze' : 'analyzed',
-                             'plot' : 'plotted'}    
+                             'plot' : 'plotted'}
         return
-    
+
     def _make_io_paths(self):
         """
-        Makes needed paths that do not include files within the package in case 
+        Makes needed paths that do not include files within the package in case
         they do not already exist.
         """
         if not os.path.exists(self.data):
@@ -72,61 +72,61 @@ class Paths(object):
         if not os.path.exists(self.cl_input):
              os.makedirs(self.cl_input)
         if not os.path.exists(self.ca_input):
-             os.makedirs(self.ca_input)      
+             os.makedirs(self.ca_input)
         return
-    
-    def conform(self, stage = None, source = None):     
+
+    def conform(self, stage = None, source = None):
         self.stage = stage
         self.source = source
         if self.settings['general']['verbose']:
             if self.settings['files']['test_data']:
                 print('Using test data')
             else:
-                print('Using full data')            
+                print('Using full data')
         if self.stage in ['prep']:
             if self.source == 'lexis_nexis':
                 self.import_folder = self.lexis_raw_input
                 self.export_path = self.lexis_input
-                self.import_paths = glob.glob(os.path.join(self.import_folder, 
+                self.import_paths = glob.glob(os.path.join(self.import_folder,
                                                            '**', '*.txt'),
-                                                           recursive = True)            
+                                                           recursive = True)
         elif self.stage in ['parse']:
             self.export_file = self._file_name(
                     source = self.source,
-                    name = self.export_files[self.stage], 
-                    extension = self.data_out)     
+                    name = self.export_files[self.stage],
+                    extension = self.data_out)
             if source == 'lexis_nexis':
                 self.import_folder = self.lexis_input
-                self.import_paths = glob.glob(os.path.join(self.import_folder, 
+                self.import_paths = glob.glob(os.path.join(self.import_folder,
                                                             '**', '*.txt'),
                                                             recursive = True)
             elif source == 'court_listener':
                 self.import_folder = self.cl_input
-                self.import_paths = glob.glob(os.path.join(self.import_folder, 
+                self.import_paths = glob.glob(os.path.join(self.import_folder,
                                                             '**', '*.json'),
                                                             recursive = True)
             elif source == 'caselaw_access':
                 self.import_folder = self.ca_input
-                self.import_paths = glob.glob(os.path.join(self.import_folder, 
+                self.import_paths = glob.glob(os.path.join(self.import_folder,
                                                             '**', '*.json'),
                                                             recursive = True)
             if self.settings['files']['test_data']:
                 if self.settings['files']['use_seed_test_chunk']:
                     random.seed(self.settings['general']['seed'])
                 self.import_paths = random.sample(
-                        self.import_paths, 
+                        self.import_paths,
                         self.settings['files']['test_chunk'])
         elif self.stage in ['wrangle']:
             self.import_file = self.import_file = (
-                    self.source + '_' + self.import_files[self.stage]) 
+                    self.source + '_' + self.import_files[self.stage])
             self.export_file = self.export_file = (
-                    self.source + '_' + self.export_files[self.stage])      
+                    self.source + '_' + self.export_files[self.stage])
         elif self.stage in ['engineer']:
-            if 'merge' in self.settings['general']['stages']:
+            if 'merge' in self.settings['cases']['stages']:
                 self.import_file = self.import_files[self.stage]
             else:
                 self.import_file = (
-                        self.source + '_' + self.import_files[self.stage]) 
+                        self.source + '_' + self.import_files[self.stage])
             self.export_file = self.export_files[self.stage]
         elif self.stage in ['analyze', 'plot']:
             self.import_file = self.import_files[self.stage]

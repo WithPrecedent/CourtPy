@@ -1,5 +1,6 @@
 """
-CourtAnalyzer module for applying various machine learning algorithms.
+CourtAnalyzer module for applying various machine learning algorithms as part
+of the CourtPy package.
 """
 from dataclasses import dataclass
 import os
@@ -14,21 +15,23 @@ from utilities.timer import timer
 @timer('Data and model analysis')
 @dataclass
 class CourtAnalyzer(CaseTools):
-    
+
     paths : object
     settings : object
     stage : str = 'analyze'
-    
+
     def __post_init__(self):
         if self.settings['general']['verbose']:
             print('Importing data for analysis')
         self.quick_start()
-        self.data.df.drop(self.data.create_column_list(prefixes = 'index_'), 
-                          axis = 'columns', 
-                          inplace = True)        
+        self.data.df.drop(self.data.create_column_list(prefixes = 'index_'),
+                          axis = 'columns',
+                          inplace = True)
         self.data = self.create_splices(self.data)
-        self.funnel = Funnel(data = self.data, 
-                        filer = self.filer)
+        self.funnel = Funnel(data = self.data,
+                             filer = self.filer,
+                             use_settings_file = False,
+                             settings = self.settings)
         self.funnel.create()
         self.funnel.iterate()
         self.funnel.save_everything()
@@ -40,14 +43,14 @@ class CourtAnalyzer(CaseTools):
                        file_name = self.paths.export_file,
                        file_format = self.settings['files']['data_out'],
                        boolean_out = self.settings['files']['boolean_out'],
-                       encoding = self.settings['files']['encoding'])          
-        return self 
-      
+                       encoding = self.settings['files']['encoding'])
+        return self
+
 if __name__ == '__main__':
-    settings = Settings(os.path.join('..', 'ml_settings.ini'))
-    cp_settings = Settings(os.path.join('..', 'cp_settings.ini'))
-    settings.config.update(cp_settings.config) 
+    settings = Settings(os.path.join('..', 'settings', 'ml_settings.ini'))
+    cp_settings = Settings(os.path.join('..', 'settings', 'cp_settings.ini'))
+    settings.config.update(cp_settings.config)
     paths = Paths(settings)
-    if not settings['general']['warnings']:
+    if not settings['general']['pandas_warnings']:
         warnings.filterwarnings('ignore')
-    CourtAnalyzer(paths, settings) 
+    CourtAnalyzer(paths, settings)

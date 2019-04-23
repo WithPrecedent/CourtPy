@@ -16,11 +16,11 @@ from utilities.timer import timer
 @timer('Data merging')
 @dataclass
 class CourtMerger(CaseTools):
-    
+
     paths : object
     settings : object
     stage : str = 'merge'
-    
+
     def __post_init__(self):
         sources = self.check_sources()
         self.source = sources[0]
@@ -29,11 +29,11 @@ class CourtMerger(CaseTools):
             source2 = sources[i]
             paths2 = Paths(settings)
             paths2.stage = self.stage
-            paths2.conform(stage = self.stage, 
+            paths2.conform(stage = self.stage,
                            source = source2)
-            cases2 = Cases(paths = paths2, 
-                           settings = self.settings, 
-                           source = source2, 
+            cases2 = Cases(paths = paths2,
+                           settings = self.settings,
+                           source = source2,
                            stage = self.stage)
             data2 = Data(settings = self.settings,
                          quick_start = True,
@@ -47,12 +47,12 @@ class CourtMerger(CaseTools):
                        encoding = self.settings['files']['encoding'],
                        boolean_out = self.settings['files']['boolean_out'])
         return
-    
+
 if __name__ == '__main__':
-    settings = Settings(os.path.join('..', 'ml_settings.ini'))
-    cp_settings = Settings(os.path.join('..', 'cp_settings.ini'))
-    settings.config.update(cp_settings.config) 
+    settings = Settings(os.path.join('..', 'settings', 'ml_settings.ini'))
+    cp_settings = Settings(os.path.join('..', 'settings', 'cp_settings.ini'))
+    settings.config.update(cp_settings.config)
     paths = Paths(settings)
-    if not settings['general']['warnings']:
+    if not settings['general']['pandas_warnings']:
         warnings.filterwarnings('ignore')
-    CourtMerger(paths, settings)  
+    CourtMerger(paths, settings)

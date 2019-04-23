@@ -13,11 +13,11 @@ from utilities.timer import timer
 @timer('Total preparation')
 @dataclass
 class CourtPrepper(object):
- 
+
     paths : object
     settings : object
-     
-    def __post_init__ (self):   
+
+    def __post_init__ (self):
         ExternalData(paths = self.paths,
                      settings = self.settings)
         LexisSplitter(paths = self.paths,
@@ -30,7 +30,7 @@ class ExternalData(object):
 
     paths : object
     settings : object
-     
+
     def __post_init__ (self):
         if self.settings['prepper']['bios']:
             if self.settings['cases']['jurisdiction'] == 'federal':
@@ -40,7 +40,7 @@ class ExternalData(object):
                 judges.make_files()
                 if self.settings['general']['verbose']:
                     print('Judicial biography dataset created')
-        
+
         if self.settings['prepper']['judicial']:
             if self.settings['cases']['jurisdiction'] == 'federal':
                 from library.judiciary import SCOTUS
@@ -49,7 +49,7 @@ class ExternalData(object):
                 scotus.make_file()
             if self.settings['general']['verbose']:
                 print('High court variables created')
-            
+
         if self.settings['prepper']['legis']:
             if self.settings['cases']['jurisdiction'] == 'federal':
                 from library.legislature import Congress
@@ -58,7 +58,7 @@ class ExternalData(object):
                 congress.make_file()
             if self.settings['general']['verbose']:
                 print('Legislative variables created')
-            
+
         if self.settings['prepper']['executive']:
             if self.settings['cases']['jurisdiction'] == 'federal':
                 from library.executive import President
@@ -67,7 +67,7 @@ class ExternalData(object):
                 president.make_file()
             if self.settings['general']['verbose']:
                 print('Executive variables created')
-        return  
+        return
 
 @timer('Lexis case splitter')
 @dataclass
@@ -75,7 +75,7 @@ class LexisSplitter(object):
 
     paths : object
     settings : object
-     
+
     def __post_init__ (self):
         if self.settings['prepper']['lexis_split']:
             from library.lexis_splitter import lexis_splitter
@@ -83,12 +83,13 @@ class LexisSplitter(object):
             if self.settings['general']['verbose']:
                 print('Lexis cases split into individual files')
         return
-    
+
 if __name__ == '__main__':
-    settings = Settings(os.path.join('..', 'settings.ini'))
-    paths = Paths(settings)  
-    if not settings['general']['warnings']:
+    settings = Settings(os.path.join('..', 'settings', 'ml_settings.ini'))
+    cp_settings = Settings(os.path.join('..', 'settings', 'cp_settings.ini'))
+    settings.config.update(cp_settings.config)
+    paths = Paths(settings)
+    if not settings['general']['pandas_warnings']:
         warnings.filterwarnings('ignore')
     ExternalData(paths, settings)
     LexisSplitter(paths, settings)
-    

@@ -13,12 +13,12 @@ from utilities.timer import timer
 @timer('Feature engineering')
 @dataclass
 class CourtEngineer(CaseTools):
-    
+
     paths : object
     settings : object
     stage : str = 'engineer'
-    
-    def __post_init__(self):       
+
+    def __post_init__(self):
         if self.settings['general']['verbose']:
             print('Beginning feature engineering')
         sources = self.check_sources()
@@ -48,13 +48,13 @@ class CourtEngineer(CaseTools):
                            boolean_out = self.settings['files']['boolean_out'],
                            encoding = self.settings['files']['encoding'])
             self.loop_cleanup()
-        return   
+        return
 
 if __name__ == '__main__':
-    settings = Settings(os.path.join('..', 'ml_settings.ini'))
-    cp_settings = Settings(os.path.join('..', 'cp_settings.ini'))
-    settings.config.update(cp_settings.config) 
+    settings = Settings(os.path.join('..', 'settings', 'ml_settings.ini'))
+    cp_settings = Settings(os.path.join('..', 'settings', 'cp_settings.ini'))
+    settings.config.update(cp_settings.config)
     paths = Paths(settings)
-    if not settings['general']['warnings']:
+    if not settings['general']['pandas_warnings']:
         warnings.filterwarnings('ignore')
-    CourtEngineer(paths, settings)  
+    CourtEngineer(paths, settings)
