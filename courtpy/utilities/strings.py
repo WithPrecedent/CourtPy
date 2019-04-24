@@ -6,8 +6,8 @@ import re
 
 """
 Removes excess text included when parsing text into sections and strips text.
-Takes either string, pandas series, or pandas dataframe as input and returns 
-the same. 
+Takes either string, pandas series, or pandas dataframe as input and returns
+the same.
 """
 def remove_excess(in_var, excess, in_col = ''):
     if isinstance(in_var, pd.DataFrame):
@@ -25,7 +25,7 @@ def remove_excess(in_var, excess, in_col = ''):
 Removes line breaks and replaces them with single spaces. Also, removes
 hyphens at the end of a line and connects the surrounding text. Takes either
 string, pandas series, or pandas dataframe as input and returns the same.
-"""   
+"""
 def no_breaks(in_var, in_col = ''):
     if isinstance(in_var, pd.DataFrame):
         in_var[in_col].str.replace('[a-z]-\n', '')
@@ -40,9 +40,9 @@ def no_breaks(in_var, in_col = ''):
 
 """
 Removes double spaces and replaces them with single spaces from a string.
-Takes either string, pandas series, or pandas dataframe as input and returns 
+Takes either string, pandas series, or pandas dataframe as input and returns
 the same.
-"""    
+"""
 def no_double_space(in_var, in_col = ''):
     if isinstance(in_var, pd.DataFrame):
         in_var[in_col].str.replace('  +', ' ')
@@ -64,6 +64,4 @@ def list_to_string(in_value):
     return out_value
 
 def word_count(i_string):
-    words = i_string.split(' ')
-    value = len(words)
-    return value
+    return len(i_string.split(' '))

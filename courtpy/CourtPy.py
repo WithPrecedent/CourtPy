@@ -1,16 +1,16 @@
-""" 
+"""
 Master control script for CourtPy.
-Each major module can be called individually or through this class. 
-The CourtPy class allows the user to call a group of modules through an ad hoc 
-workflow or run the complete pipeline. The user determines which parts of the 
+Each major module can be called individually or through this class.
+The CourtPy class allows the user to call a group of modules through an ad hoc
+workflow or run the complete pipeline. The user determines which parts of the
 pipeline to invoke by changing the options in settings.ini.
 
-If there are any problems with this file or packaged modules, please contact 
+If there are any problems with this file or packaged modules, please contact
 the creator directly: coreyyung@ku.edu or post on the GitHub page.
-Also, if you find any errors or ways to increase efficiency, please email 
+Also, if you find any errors or ways to increase efficiency, please email
 or contribute.
 
-If you utilize any code for published work, please use the citation included 
+If you utilize any code for published work, please use the citation included
 on the WithPrecedent Github page. Acknowledgement is greatly appreciated.
 """
 from dataclasses import dataclass
@@ -31,121 +31,121 @@ class CourtPy(object):
 
     paths : object
     settings : object
-     
+
     def __post_init__ (self):
-        """            
-        Class invocations for the main sections of the CourtPy pipeline: 
+        """
+        Class invocations for the main sections of the CourtPy pipeline:
             1) CourtPrepper;
             2) CourtParser;
             3) CourtWrangler;
             4) CourtMerger;
-            5) CourtEngineer; 
+            5) CourtEngineer;
             6) CourtAnalyzer; and,
             7) CourtPlotter.
-        
+
         To conserve memory, specific packages are imported within the
         conditional statements instead of at the beginning of the module.
         """
-        if 'prep' in self.settings['general']['stages']:
-            """ 
-            ExternalData creates dictionaries from external sources to 
+        if 'prep' in self.settings['cases']['stages']:
+            """
+            ExternalData creates dictionaries from external sources to
             be added into the dataset.
             Lexis_Splitter divides groups of downloaded Lexis cases into
             individual .txt files. If lexis_split = False, the files will
             not be split.
             """
             from CourtPrepper import CourtPrepper
-            self.prepper = CourtPrepper(paths = self.paths, 
+            self.prepper = CourtPrepper(paths = self.paths,
                                         settings = self.settings)
             if self.settings['general']['verbose']:
                 print('Preparation complete')
-            if self.settings['defaults']['conserve_memory']:
+            if self.settings['general']['conserve_memory']:
                 del(self.prepper)
-            
-        if 'parse' in self.settings['general']['stages']:
+
+        if 'parse' in self.settings['cases']['stages']:
             """
             CourtParser separates court opinions into the key sections based
             upon the source format.
             """
-            from CourtParser import CourtParser  
-            self.parser = CourtParser(paths = self.paths, 
+            from CourtParser import CourtParser
+            self.parser = CourtParser(paths = self.paths,
                                       settings = self.settings)
             if self.settings['general']['verbose']:
                 print('Data collection and parsing complete')
-            if self.settings['defaults']['conserve_memory']:
+            if self.settings['general']['conserve_memory']:
                 del(self.parser)
-            
-        if 'wrangle' in self.settings['general']['stages']:
+
+        if 'wrangle' in self.settings['cases']['stages']:
             """
             CourtWrangler further parses string data stored in pandas dataframe
             created by CourtParser.
             """
-            from CourtWrangler import CourtWrangler  
-            self.wrangler = CourtWrangler(paths = self.paths, 
+            from CourtWrangler import CourtWrangler
+            self.wrangler = CourtWrangler(paths = self.paths,
                                           settings = self.settings)
             if self.settings['general']['verbose']:
                 print('Deep parsing and data wrangling complete')
-            if self.settings['defaults']['conserve_memory']:
+            if self.settings['general']['conserve_memory']:
                 del(self.wrangler)
-        
-        if 'merge' in self.settings['general']['stages']:
+
+        if 'merge' in self.settings['cases']['stages']:
             """
             CourtMerger merges the prepped and parsed database with select
             preexisting third-party databases.
             """
             from CourtMerger import CourtMerger
-            self.merger = CourtMerger(paths = self.paths, 
+            self.merger = CourtMerger(paths = self.paths,
                                       settings = self.settings)
             if self.settings['general']['verbose']:
                 print('Data merging complete')
-            if self.settings['defaults']['conserve_memory']:
+            if self.settings['general']['conserve_memory']:
                 del(self.merger)
-          
-        if 'engineer' in self.settings['general']['stages']:
+
+        if 'engineer' in self.settings['cases']['stages']:
             """
             CourtEngineer stages the data for input into common machine
             learning packages.
             """
             from CourtEngineer import CourtEngineer
-            self.engineer = CourtEngineer(paths = self.paths, 
+            self.engineer = CourtEngineer(paths = self.paths,
                                           settings = self.settings)
             if self.settings['general']['verbose']:
                 print('Feature engineering complete')
-            if self.settings['defaults']['conserve_memory']:
-                del(self.engineer)                   
-   
-        if 'analyze' in self.settings['general']['stages']:
+            if self.settings['general']['conserve_memory']:
+                del(self.engineer)
+
+        if 'analyze' in self.settings['cases']['stages']:
             """
-            CourtAnalyzer performs select machine learning algorithms to the 
+            CourtAnalyzer performs select machine learning algorithms to the
             data.
             """
-            from CourtAnalyzer import CourtAnalyzer 
-            self.analyzer = CourtAnalyzer(paths = self.paths, 
+            from CourtAnalyzer import CourtAnalyzer
+            self.analyzer = CourtAnalyzer(paths = self.paths,
                                           settings = self.settings)
             if self.settings['general']['verbose']:
                 print('Data analysis complete')
-            if self.settings['defaults']['conserve_memory']:
+            if self.settings['general']['conserve_memory']:
                 del(self.analyzer)
-        
-        if 'plot' in self.settings['general']['stages']:
+
+        if 'plot' in self.settings['cases']['stages']:
             """
             CourtPlotter automatically plots specific results from generated
             by CourtAnalyzer.
             """
             from CourtPlotter import CourtPlotter
-            self.plotter = CourtPlotter(paths = self.paths, 
+            self.plotter = CourtPlotter(paths = self.paths,
                                         settings = self.settings)
             if self.settings['general']['verbose']:
                 print('Plotting complete')
-            if self.settings['defaults']['conserve_memory']:
+            if self.settings['general']['conserve_memory']:
                 del(self.plotter)
-        return  
+        return
 
 if __name__ == '__main__':
-    settings = Settings(os.path.join('..', 'ml_settings.ini'))
-    cp_settings = Settings(os.path.join('..', 'cp_settings.ini'))
-    settings.config.update(cp_settings.config) 
+    settings = Settings(os.path.join('..', 'settings', 'ml_settings.ini'))
+    cp_settings = Settings(os.path.join('..', 'settings', 'cp_settings.ini'))
+    settings.config.update(cp_settings.config)
     paths = Paths(settings)
-    if not settings['general']['warnings']:
+    if not settings['general']['pandas_warnings']:
         warnings.filterwarnings('ignore')
-    CourtPy(paths, settings)   
+    CourtPy(paths, settings)

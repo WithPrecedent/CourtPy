@@ -91,10 +91,11 @@ class Paths(object):
                                                            '**', '*.txt'),
                                                            recursive = True)
         elif self.stage in ['parse']:
-            self.export_file = self._file_name(
-                    source = self.source,
-                    name = self.export_files[self.stage],
-                    extension = self.data_out)
+            self.export_file = (self.source
+                                + '_'
+                                + self.export_files[self.stage]
+                                + '.csv')
+            self.export_path = os.path.join(self.data, self.export_file)
             if source == 'lexis_nexis':
                 self.import_folder = self.lexis_input
                 self.import_paths = glob.glob(os.path.join(self.import_folder,
