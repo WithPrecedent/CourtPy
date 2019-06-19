@@ -1,0 +1,5 @@
+values,dotall,ignorecase,keys
+f3d,TRUE,TRUE,\d+ F\. ?3d \d+
+f2d,TRUE,TRUE,\d+ F\. ?2d \d+
+lexis,TRUE,TRUE,\d+ U\.S\. APP\. LEXIS \d+
+fappx,TRUE,TRUE,\d+ Fed\. Appx\. \d+

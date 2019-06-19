@@ -1,0 +1,3 @@
+values,dotall,ignorecase,keys
+CFR,FALSE,FALSE,\d* C\.F\.R\. §§* \d\d*.*?(?=\W?)
+Sent_Guide,FALSE,TRUE,U.S. SENTENCING GUIDELINES MANUAL (?:ch\. |app\. )?§§* \d\d*.?(?=\W?)

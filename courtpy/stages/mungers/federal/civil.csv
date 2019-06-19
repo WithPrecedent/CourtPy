@@ -1,0 +1,110 @@
+values,dotall,ignorecase,keys
+bad_faith,FALSE,FALSE,bad faith
+fiduciary,FALSE,FALSE,fiduciary
+bankruptcy,FALSE,FALSE,bankruptcy
+forfeiture,FALSE,FALSE,civil forfeiture
+foreclosure,FALSE,FALSE,foreclosure
+lanham act,FALSE,FALSE,Lanham Act
+medicaid,FALSE,FALSE,Medicaid
+medicare,FALSE,FALSE,Medicare
+hous_discrim,FALSE,FALSE,Fair Housing Act
+plra,FALSE,FALSE,Prison Litigation Reform Act
+vra,FALSE,FALSE,Voting Rights Act
+veil_piercing,FALSE,FALSE,(pierce the corporate veil|pierce the veil)
+twombly,FALSE,TRUE,(127 S\. ?Ct\. 1955|550 U\.S\. 544)
+iqbal,FALSE,TRUE,(556Â U\.S\.Â 662|129 S\. ?Ct\. 1937)
+habeas,FALSE,FALSE,habeas
+asylum,FALSE,FALSE,asylum
+titlevii,FALSE,FALSE,"Title VII(\.\, )"
+titleix,FALSE,FALSE,Title IX
+ada,FALSE,FALSE,Americans with Disabilities Act
+adea,FALSE,FALSE,(Age Discrimination in Employment Act|ADEA)
+patent,FALSE,FALSE,patent 
+copyright,FALSE,FALSE,copyright
+trademark,FALSE,FALSE,trademark
+cercla,FALSE,FALSE,C\.?E\.?R\.?C\.?L\.?A\.?
+caa,FALSE,FALSE,Clean Air Act
+cwa,FALSE,FALSE,(Water Pollution Control Act|Clean Water Act)
+tax,FALSE,FALSE,I(nternal|\.?)R(evenue|\.?)S(ervice|\.?)
+antitrust,FALSE,FALSE,antitrust
+labor,FALSE,FALSE,National Labor Relations
+social_security,FALSE,FALSE,Social Security
+sec1983,FALSE,FALSE,(section 1983|42 U\.?S\.?C\.? § 1983)
+qual_imm,FALSE,FALSE,qualified immunity
+abs_imm,FALSE,FALSE,absolute immunity
+div_juris,FALSE,FALSE,diversity jurisdiction
+fed_quest,FALSE,FALSE,federal question
+foia,FALSE,FALSE,(F\.?O\.?I\.?A\.?|Freedom of Information Act)
+civ_serv_act,FALSE,FALSE,Civil Service Reform Act
+fed_employ_pay,FALSE,FALSE,Federal Employees Pay Act
+fed_labor_rel,FALSE,FALSE,(F\.?L\.?R\.?A\.?|Federal Labor Relations)
+workmen's compensation,FALSE,FALSE,([Ww]orkmen's [Cc]ompensation|[Ww]orkers' [Cc]ompensation)
+declaratory judgment,FALSE,FALSE,[Dd]eclaratory [Jj]udgment
+commodity_acts,FALSE,FALSE,(Commodity Exchange Act|Federal Commodity Exchange|Futures Trading Commodity Credit)
+food_sec,FALSE,FALSE,Food Security Act
+false_claims,FALSE,FALSE,False Claims Act
+animal_welf,FALSE,FALSE,Animal Welfare Act
+agric_fair,FALSE,FALSE,Agricultural Fair Practices Act
+ina,FALSE,FALSE,Immigration & Nationality Act
+admin_subp,FALSE,FALSE,administrative subpoena
+arb_act,FALSE,FALSE,U(nited|\.) S(tates|\.) Arbitration Act
+mortgage_act,FALSE,FALSE,Home Loan Mortgage
+fdic,FALSE,FALSE,Federal Deposit Insurance Corporation
+bank_holding,FALSE,FALSE,Bank Holding Company Act
+respra,FALSE,FALSE,(Real Estate Settlement Procedures Act|R\.?E\.?S\.?P\.?A\.?)
+clayton_act,FALSE,FALSE,Clayton Act
+trade_comm_act,FALSE,FALSE,Federal Trade Commission Act
+coppa,FALSE,FALSE,(Children Online Privacy Protection Act|C\.?O\.?P\.?P\.?A\.?)
+sec_act,FALSE,FALSE,Securities Exchange Act
+invest_comp,FALSE,FALSE,Investment Company Act of 1940
+small_bus_act,FALSE,FALSE,Small Business Act
+haz_subst,FALSE,FALSE,[Hh]azardous [Ss]ubstances
+truth_lend,FALSE,FALSE,Truth in Lending
+fair_credit_bill,FALSE,FALSE,Fair Credit Billing Act
+fair_credit_report,FALSE,FALSE,Fair Credit Reporting Act
+fair_debt_collect,FALSE,FALSE,Fair Debt Collection Act
+product_safe,FALSE,FALSE,[Pp]roduct [Ss]afety
+asbestos,FALSE,FALSE,[Aa]sbestos
+national_historic_preservat,FALSE,FALSE,National Historic Preservation Act
+migratory_bird,FALSE,FALSE,Migratory Bird Act
+esa,FALSE,FALSE,Endangered Species Act
+lacey_act,FALSE,FALSE,Lacey Act
+dmca,FALSE,FALSE,(Digital Millennium Copyright Act|D\.?C\.?M\.?A\.?)
+terrorism_civil,FALSE,FALSE,Anti-Terrorism Act
+ferpa,FALSE,FALSE,(Family Education Rights (&|and) Privacy Act|F\.?E\.?R\.?P\.?A\.?)
+idea,FALSE,FALSE,Individuals [Ww]ith Disabilities Education Act
+fda_act,FALSE,FALSE,"Food, Drug & Cosmetic Act"
+med_mal,FALSE,FALSE,medical malpractice
+icwa,FALSE,FALSE,(Indian Child Welfare Act|I\.?C\.?W\.?A\.?)
+indian_gaming,FALSE,FALSE,Indian Gaming Regulatory Act
+admiralty,FALSE,FALSE,[Aa]dmiralty
+foreclosure,FALSE,FALSE,foreclosure
+atca,FALSE,FALSE,Alien Tort Claims Act
+erisa,FALSE,FALSE,E\.?R\.?I\.?S\.?A\.?
+fmla,FALSE,FALSE,(Family (&|and) Medical Leave Act|F\.?M\.?L\.?A\.?)
+foreign_sov_imm,FALSE,FALSE,Foreign Sovereign Immunities Act
+food_stamp,FALSE,FALSE,Food Stamp Act
+defame,FALSE,FALSE,( libel | slander | defamation)
+sec_fraud,FALSE,FALSE,[Ss]ecurities [Ff]raud
+prod_liab,FALSE,FALSE,[Pp]roduct [Ll]iability
+class_act,FALSE,FALSE,[Cc]lass [Aa]ction
+aedpa,FALSE,FALSE,(Antiterrorism (&|and) Effective Death Penalty Act|AEDPA)
+all_writs,FALSE,FALSE,All Writs Act
+rulemaking,FALSE,FALSE,[Rr]ule(-| )[Mm]aking [Pp]ower
+fed_tort_act,FALSE,FALSE,Federal Tort Claims Act
+min_wage,FALSE,FALSE,[Mm]inimum [Ww]age
+osha,FALSE,FALSE,(Occupational Safety|O\.?S\.?H\.?A\.?)
+mine_safety,FALSE,FALSE,Mine Safety (&|and) Health Act
+sdwa,FALSE,FALSE,Safe Drinking Water Act
+hhs,FALSE,FALSE,Health (&|and) Human Services
+voter_regis_act,FALSE,FALSE,National Voter Registration Act
+civ_rt_act,FALSE,FALSE,Civil Rights Act
+rfra,FALSE,FALSE,(Religious Freedom Restoration Act|R\.?F\.?R\.?A\.?)
+legal_serv,FALSE,FALSE,Legal Services Corporation
+solid_waste_act,FALSE,FALSE,Solid Waste Disposal Act
+vawa,FALSE,FALSE,(Violence [Aa]gainst Women Act|V\.?A\.?\W\.?A\.?)
+rail_labor,FALSE,FALSE,(Railway Labor Act|Railroad Unemployment Insurance Act)
+wrong_discharge,FALSE,FALSE,wrongful discharge
+fed_comm_act,FALSE,FALSE,Federal Communications Act
+phone_consum_act,FALSE,FALSE,Telephone Consumer Protection Act
+bjr,FALSE,FALSE,business judgment rule

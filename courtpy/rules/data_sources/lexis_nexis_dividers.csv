@@ -1,0 +1,18 @@
+values,dotall,ignorecase,keys
+opinion,FALSE,FALSE,\nOPINION(?=\n\n)
+party,TRUE,FALSE,\w.*?(?=\n\n)
+court,TRUE,TRUE,\n(IN )?(THE )?(UNITED STATES COURTS? OF APPEALS FOR THE|UNITED STATES BANKRUPTCY APPELLATE|TEMPORARY EMERGENCY COURT OF APPEALS|JUDICIAL COUNCIL (OF|FOR) THE).*?(?=\n\n)
+docket,TRUE,TRUE,(?=\n\n)?(C\.?A\.?|Case)? ?(DOCKET )? ?(NOS?\. )? ?(NO\:)? ?\d\d*\-\d\d*.*?(?=\n\n)
+history,TRUE,TRUE,\nPRIOR HISTORY\:.*?(?=\n\n)
+future,TRUE,TRUE,\nSUBSEQUENT HISTORY\:.*?(?=\n\n)
+counsel,TRUE,TRUE,"\nCOUNSEL\:.*?(?=(\nNOTICE\:|\nSUBSEQUENT HISTORY\:|\nPRIOR HISTORY\:|\n\n(DOCKET )?(NOS?\. )?\d\d*\-\d\d|\n(?:\d\d*)? ?(?:JAN(?:\.|UARY)|FEB(?:\.|RUARY)|MAR(?:\.|CH)|APR(?:\.|IL)|MAY |JUN(?:\.|E)|JUL(?:\.|Y)|AUG(?:\.|UST)|SEP(?:\.|T\.|TEMBER)|OCT(?:\.|OBER)|NOV(?:\.|EMBER)|DEC(?:\.|EMBER)).*? (?:\d\d*\, )?\d\d\d\d|\nDISPOSITION\:.|\n\d* (?:F\.[23]?d|U\.S\.|S\. Ct\.|U\.S\. APP\. LEXIS|Fed\. Appx\.) \d\d|\nJUDGES\:|\nOPINION BY\:|BEFORE\:|\nOPINION))"
+notice,TRUE,TRUE,\nNOTICE\:.*?(?=\n\n)
+date,FALSE,TRUE,"(?<=\n)(?:\d\d*)? ?(?:JAN(?:\.|UARY)|FEB(?:\.|RUARY)|MAR(?:\.|CH)|APR(?:\.|IL)|MAY |JUN(?:\.|E)|JUL(?:\.|Y)|AUG(?:\.|UST)|SEP(?:\.|T\.|TEMBER)|OCT(?:\.|OBER)|NOV(?:\.|EMBER)|DEC(?:\.|EMBER)).*? (?:\d\d*\, )?\d\d\d\d.*?(?=\n)"
+disposition,FALSE,TRUE,\nDISPOSITION\:.*?(?=\n\n)
+cite,TRUE,TRUE,(?<=\n)\d* (?:F\.[23]?d|U\.S\.|S\. Ct\.|U\.S\. APP\. LEXIS|Fed\. Appx\.) \d\d*.*?(?=\n)
+panel_judges,TRUE,TRUE,\nJUDGES\:.*?(?=(\n\n|\nOPINION))
+author,FALSE,FALSE,\nOPINION BY\:.*?(\n|$)
+concur,TRUE,TRUE,CONCUR
+mixed,TRUE,TRUE,IN PART
+dissent,TRUE,TRUE,DISSENT
+separate,FALSE,FALSE,(?<=\n)CONCUR.*?(?=\n)|(?<=\n)DISSENT.*?(?=\n)|concurring\:.*?(?=\n)|dissenting\:.*?(?=\n)|(?<=\n)Concur By\: .*?(?=\n)|(?<=\n)Dissent By\: .*?(?=\n)

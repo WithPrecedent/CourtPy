@@ -1,3 +1,0 @@
-values,DOTALL,IGNORECASE,keys
-CFR,n,n,\d* C\.F\.R\. §§* \d\d*.*?(?=\W?)
-Sent_Guide,n,y,U.S. SENTENCING GUIDELINES MANUAL (?:ch\. |app\. )?§§* \d\d*.?(?=\W?)

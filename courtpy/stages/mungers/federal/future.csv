@@ -1,0 +1,6 @@
+values,dotall,ignorecase,keys
+cert_petit,TRUE,TRUE,(certior|Supreme Court)
+en_banc_motion,TRUE,TRUE,en banc
+grant,TRUE,TRUE,(grant|approve|issued)
+deny,TRUE,TRUE,(denied|denial)
+remand,TRUE,TRUE,remand

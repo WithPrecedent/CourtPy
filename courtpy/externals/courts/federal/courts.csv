@@ -1,0 +1,160 @@
+keys,DOTALL,IGNORECASE,values,folder_name
+Supreme Court of the United States,TRUE,TRUE,99,supreme_court
+U\.S\. Circuit Court for the Districts of California,TRUE,TRUE,9,circuit_districts_of_california
+U\.S\. Circuit Court for the Fifth Circuit,TRUE,TRUE,5,fifth_circuit
+U\.S\. Circuit Court for the First Circuit,TRUE,TRUE,1,first_circuit
+U\.S\. Circuit Court for the Fourth Circuit,TRUE,TRUE,4,fourth_circuit
+U\.S\. Circuit Court for the Second Circuit,TRUE,TRUE,2,second_circuit
+U\.S\. Circuit Court for the Sixth Circuit,TRUE,TRUE,6,sixth_circuit
+U\.S\. Circuit Court for the Third Circuit,TRUE,TRUE,3,third_circuit
+U\.S\. Circuit Courts for the Eighth Circuit,TRUE,TRUE,8,eighth_circuit
+U\.S\. Circuit Courts for the Fifth Circuit,TRUE,TRUE,5,fifth_circuit
+U\.S\. Circuit Courts for the First Circuit,TRUE,TRUE,1,first_circuit
+U\.S\. Circuit Courts for the Fourth Circuit,TRUE,TRUE,4,fourth_circuit
+U\.S\. Circuit Courts for the Ninth Circuit,TRUE,TRUE,9,ninth_circuit
+U\.S\. Circuit Courts for the Second Circuit,TRUE,TRUE,2,second_circuit
+U\.S\. Circuit Courts for the Seventh Circuit,TRUE,TRUE,7,seventh_circuit
+U\.S\. Circuit Courts for the Sixth Circuit,TRUE,TRUE,6,sixth_circuit
+U\.S\. Circuit Courts for the Third Circuit,TRUE,TRUE,3,third_circuit
+U\.S\. Court of Appeals for the District of Columbia Circuit,TRUE,TRUE,12,dc_circuit
+U\.S\. Court of Appeals for the Eighth Circuit,TRUE,TRUE,8,eighth_circuit
+U\.S\. Court of Appeals for the Eleventh Circuit,TRUE,TRUE,11,eleventh_circuit
+U\.S\. Court of Appeals for the Federal Circuit,TRUE,TRUE,13,federal_circuit
+U\.S\. Court of Appeals for the Fifth Circuit,TRUE,TRUE,5,fifth_circuit
+U\.S\. Court of Appeals for the First Circuit,TRUE,TRUE,1,first_circuit
+U\.S\. Court of Appeals for the Fourth Circuit,TRUE,TRUE,4,fourth_circuit
+U\.S\. Court of Appeals for the Ninth Circuit,TRUE,TRUE,9,ninth_circuit
+U\.S\. Court of Appeals for the Second Circuit,TRUE,TRUE,2,second_circuit
+U\.S\. Court of Appeals for the Seventh Circuit,TRUE,TRUE,7,seventh_circuit
+U\.S\. Court of Appeals for the Sixth Circuit,TRUE,TRUE,6,sixth_circuit
+U\.S\. Court of Appeals for the Tenth Circuit,TRUE,TRUE,10,tenth_circuit
+U\.S\. Court of Appeals for the Third Circuit,TRUE,TRUE,3,third_circuit
+U\.S\. Court of Customs and Patent Appeals,TRUE,TRUE,13,court_of_customs_and_patent_appeals
+U\.S\. Court of Customs Appeals (later U\.S\. Court of Customs and Patent Appeals),TRUE,TRUE,13,court_of_customs_appeals
+U\.S\. Court of International Trade,TRUE,TRUE,101,court_of_international_trade
+U\.S\. Customs Court,TRUE,TRUE,102,customs_court
+"U\.S\. District Court for the Albemarle, Cape Fear & Pamptico Districts of North Carolina",TRUE,TRUE,1001,albemarle_cape_fear_pamptico_districts_of_north_carolina
+U\.S\. District Court for the Central District of California,TRUE,TRUE,1002,central_district_of_california
+U\.S\. District Court for the Central District of Illinois,TRUE,TRUE,1003,central_district_of_illinois
+U\.S\. District Court for the District of Alabama,TRUE,TRUE,1004,district_of_alabama
+U\.S\. District Court for the District of Alaska,TRUE,TRUE,1005,district_of_alaska
+U\.S\. District Court for the District of Arizona,TRUE,TRUE,1006,district_of_arizona
+U\.S\. District Court for the District of Arkansas,TRUE,TRUE,1007,district_of_arkansas
+U\.S\. District Court for the District of California,TRUE,TRUE,1008,district_of_california
+U\.S\. District Court for the District of Colorado,TRUE,TRUE,1009,district_of_colorado
+U\.S\. District Court for the District of Columbia,TRUE,TRUE,1010,district_of_columbia
+U\.S\. District Court for the District of Columbia (Supreme Court of the District of Columbia),TRUE,TRUE,1011,supreme_court_of_the_district_of_columbia
+U\.S\. District Court for the District of Connecticut,TRUE,TRUE,1012,district_of_connecticut
+U\.S\. District Court for the District of Delaware,TRUE,TRUE,1013,district_of_delaware
+U\.S\. District Court for the District of Florida,TRUE,TRUE,1014,district_of_florida
+U\.S\. District Court for the District of Georgia,TRUE,TRUE,1015,district_of_georgia
+U\.S\. District Court for the District of Hawaii,TRUE,TRUE,1016,district_of_hawaii
+U\.S\. District Court for the District of Idaho,TRUE,TRUE,1017,district_of_idaho
+U\.S\. District Court for the District of Illinois,TRUE,TRUE,1018,district_of_illinois
+U\.S\. District Court for the District of Indiana,TRUE,TRUE,1019,district_of_indiana
+U\.S\. District Court for the District of Iowa,TRUE,TRUE,1020,district_of_iowa
+U\.S\. District Court for the District of Kansas,TRUE,TRUE,1021,district_of_kansas
+U\.S\. District Court for the District of Kentucky,TRUE,TRUE,1022,district_of_kentucky
+U\.S\. District Court for the District of Louisiana,TRUE,TRUE,1023,district_of_louisiana
+U\.S\. District Court for the District of Maine,TRUE,TRUE,1024,district_of_maine
+U\.S\. District Court for the District of Maryland,TRUE,TRUE,1025,district_of_maryland
+U\.S\. District Court for the District of Massachusetts,TRUE,TRUE,1026,district_of_massachusetts
+U\.S\. District Court for the District of Michigan,TRUE,TRUE,1027,district_of_michigan
+U\.S\. District Court for the District of Minnesota,TRUE,TRUE,1028,district_of_minnesota
+U\.S\. District Court for the District of Mississippi,TRUE,TRUE,1029,district_of_mississippi
+U\.S\. District Court for the District of Missouri,TRUE,TRUE,1030,district_of_missouri
+U\.S\. District Court for the District of Montana,TRUE,TRUE,1031,district_of_montana
+U\.S\. District Court for the District of Nebraska,TRUE,TRUE,1032,district_of_nebraska
+U\.S\. District Court for the District of Nevada,TRUE,TRUE,1033,district_of_nevada
+U\.S\. District Court for the District of New Hampshire,TRUE,TRUE,1034,district_of_new_hampshire
+U\.S\. District Court for the District of New Jersey,TRUE,TRUE,1035,district_of_new_jersey
+U\.S\. District Court for the District of New Mexico,TRUE,TRUE,1036,district_of_new_mexico
+U\.S\. District Court for the District of New York,TRUE,TRUE,1037,district_of_new_york
+U\.S\. District Court for the District of North Carolina,TRUE,TRUE,1038,district_of_north_carolina
+U\.S\. District Court for the District of North Dakota,TRUE,TRUE,1039,district_of_north_dakota
+U\.S\. District Court for the District of Ohio,TRUE,TRUE,1040,district_of_ohio
+U\.S\. District Court for the District of Oregon,TRUE,TRUE,1041,district_of_oregon
+U\.S\. District Court for the District of Orleans,TRUE,TRUE,1042,district_of_orleans
+U\.S\. District Court for the District of Pennsylvania,TRUE,TRUE,1043,district_of_pennsylvania
+U\.S\. District Court for the District of Puerto Rico,TRUE,TRUE,1044,district_of_puerto_rico
+U\.S\. District Court for the District of Rhode Island,TRUE,TRUE,1045,district_of_rhode_island
+U\.S\. District Court for the District of South Carolina,TRUE,TRUE,1046,district_of_south_carolina
+U\.S\. District Court for the District of South Dakota,TRUE,TRUE,1047,district_of_south_dakota
+U\.S\. District Court for the District of Tennessee,TRUE,TRUE,1048,district_of_tennessee
+U\.S\. District Court for the District of Texas,TRUE,TRUE,1049,district_of_texas
+U\.S\. District Court for the District of Utah,TRUE,TRUE,1050,district_of_utah
+U\.S\. District Court for the District of Vermont,TRUE,TRUE,1051,district_of_vermont
+U\.S\. District Court for the District of Virginia,TRUE,TRUE,1052,district_of_virginia
+U\.S\. District Court for the District of Washington,TRUE,TRUE,1053,district_of_washington
+U\.S\. District Court for the District of West Virginia,TRUE,TRUE,1054,district_of_west_virginia
+U\.S\. District Court for the District of Wisconsin,TRUE,TRUE,1055,district_of_wisconsin
+U\.S\. District Court for the District of Wyoming,TRUE,TRUE,1056,district_of_wyoming
+U\.S\. District Court for the Eastern District of Arkansas,TRUE,TRUE,1057,eastern_district_of_arkansas
+U\.S\. District Court for the Eastern District of California,TRUE,TRUE,1058,eastern_district_of_california
+U\.S\. District Court for the Eastern District of Illinois,TRUE,TRUE,1059,eastern_district_of_illinois
+U\.S\. District Court for the Eastern District of Kentucky,TRUE,TRUE,1060,eastern_district_of_kentucky
+U\.S\. District Court for the Eastern District of Louisiana,TRUE,TRUE,1061,eastern_district_of_louisiana
+U\.S\. District Court for the Eastern District of Michigan,TRUE,TRUE,1062,eastern_district_of_michigan
+U\.S\. District Court for the Eastern District of Missouri,TRUE,TRUE,1063,eastern_district_of_missouri
+U\.S\. District Court for the Eastern District of New Jersey,TRUE,TRUE,1064,eastern_district_of_new_jersey
+U\.S\. District Court for the Eastern District of New York,TRUE,TRUE,1065,eastern_district_of_new_york
+U\.S\. District Court for the Eastern District of North Carolina,TRUE,TRUE,1066,eastern_district_of_north_carolina
+U\.S\. District Court for the Eastern District of Oklahoma,TRUE,TRUE,1067,eastern_district_of_oklahoma
+U\.S\. District Court for the Eastern District of Pennsylvania,TRUE,TRUE,1068,eastern_district_of_pennsylvania
+U\.S\. District Court for the Eastern District of South Carolina,TRUE,TRUE,1069,eastern_district_of_south_carolina
+U\.S\. District Court for the Eastern District of Tennessee,TRUE,TRUE,1070,eastern_district_of_tennessee
+U\.S\. District Court for the Eastern District of Texas,TRUE,TRUE,1071,eastern_district_of_texas
+U\.S\. District Court for the Eastern District of Virginia,TRUE,TRUE,1072,eastern_district_of_virginia
+U\.S\. District Court for the Eastern District of Washington,TRUE,TRUE,1073,eastern_district_of_washington
+U\.S\. District Court for the Eastern District of Wisconsin,TRUE,TRUE,1074,eastern_district_of_wisconsin
+"U\.S\. District Court for the Edenton, New Bern & Wilmington Districts of North Carolina",TRUE,TRUE,1075,edenton_new_bern_wilmington_districts_of_north_carolina
+U\.S\. District Court for the Middle District of Alabama,TRUE,TRUE,1076,middle_district_of_alabama
+U\.S\. District Court for the Middle District of Florida,TRUE,TRUE,1077,middle_district_of_florida
+U\.S\. District Court for the Middle District of Georgia,TRUE,TRUE,1078,middle_district_of_georgia
+U\.S\. District Court for the Middle District of Louisiana,TRUE,TRUE,1079,middle_district_of_louisiana
+U\.S\. District Court for the Middle District of North Carolina,TRUE,TRUE,1080,middle_district_of_north_carolina
+U\.S\. District Court for the Middle District of Pennsylvania,TRUE,TRUE,1081,middle_district_of_pennsylvania
+U\.S\. District Court for the Middle District of Tennessee,TRUE,TRUE,1082,middle_district_of_tennessee
+U\.S\. District Court for the Northern District of Alabama,TRUE,TRUE,1083,northern_district_of_alabama
+U\.S\. District Court for the Northern District of California,TRUE,TRUE,1084,northern_district_of_california
+U\.S\. District Court for the Northern District of Florida,TRUE,TRUE,1085,northern_district_of_florida
+U\.S\. District Court for the Northern District of Georgia,TRUE,TRUE,1086,northern_district_of_georgia
+U\.S\. District Court for the Northern District of Illinois,TRUE,TRUE,1087,northern_district_of_illinois
+U\.S\. District Court for the Northern District of Indiana,TRUE,TRUE,1088,northern_district_of_indiana
+U\.S\. District Court for the Northern District of Iowa,TRUE,TRUE,1089,northern_district_of_iowa
+U\.S\. District Court for the Northern District of Mississippi,TRUE,TRUE,1090,northern_district_of_mississippi
+U\.S\. District Court for the Northern District of New York,TRUE,TRUE,1091,northern_district_of_new_york
+U\.S\. District Court for the Northern District of Ohio,TRUE,TRUE,1092,northern_district_of_ohio
+U\.S\. District Court for the Northern District of Oklahoma,TRUE,TRUE,1093,northern_district_of_oklahoma
+U\.S\. District Court for the Northern District of Texas,TRUE,TRUE,1094,northern_district_of_texas
+U\.S\. District Court for the Northern District of West Virginia,TRUE,TRUE,1095,northern_district_of_west_virginia
+U\.S\. District Court for the Southern District of Alabama,TRUE,TRUE,1096,southern_district_of_alabama
+U\.S\. District Court for the Southern District of California,TRUE,TRUE,1097,southern_district_of_california
+U\.S\. District Court for the Southern District of Florida,TRUE,TRUE,1098,southern_district_of_florida
+U\.S\. District Court for the Southern District of Georgia,TRUE,TRUE,1099,southern_district_of_georgia
+U\.S\. District Court for the Southern District of Illinois,TRUE,TRUE,1100,southern_district_of_illinois
+U\.S\. District Court for the Southern District of Indiana,TRUE,TRUE,1101,southern_district_of_indiana
+U\.S\. District Court for the Southern District of Iowa,TRUE,TRUE,1102,southern_district_of_iowa
+U\.S\. District Court for the Southern District of Mississippi,TRUE,TRUE,1103,southern_district_of_mississippi
+U\.S\. District Court for the Southern District of New York,TRUE,TRUE,1104,southern_district_of_new_york
+U\.S\. District Court for the Southern District of Ohio,TRUE,TRUE,1105,southern_district_of_ohio
+U\.S\. District Court for the Southern District of Texas,TRUE,TRUE,1106,southern_district_of_texas
+U\.S\. District Court for the Southern District of West Virginia,TRUE,TRUE,1107,southern_district_of_west_virginia
+U\.S\. District Court for the Western District of Arkansas,TRUE,TRUE,1108,western_district_of_arkansas
+U\.S\. District Court for the Western District of Kentucky,TRUE,TRUE,1109,western_district_of_kentucky
+U\.S\. District Court for the Western District of Louisiana,TRUE,TRUE,1110,western_district_of_louisiana
+U\.S\. District Court for the Western District of Michigan,TRUE,TRUE,1111,western_district_of_michigan
+U\.S\. District Court for the Western District of Missouri,TRUE,TRUE,1112,western_district_of_missouri
+U\.S\. District Court for the Western District of New Jersey,TRUE,TRUE,1113,western_district_of_new_jersey
+U\.S\. District Court for the Western District of New York,TRUE,TRUE,1114,western_district_of_new_york
+U\.S\. District Court for the Western District of North Carolina,TRUE,TRUE,1115,western_district_of_north_carolina
+U\.S\. District Court for the Western District of Oklahoma,TRUE,TRUE,1116,western_district_of_oklahoma
+U\.S\. District Court for the Western District of Pennsylvania,TRUE,TRUE,1117,western_district_of_pennsylvania
+U\.S\. District Court for the Western District of South Carolina,TRUE,TRUE,1118,western_district_of_south_carolina
+U\.S\. District Court for the Western District of Tennessee,TRUE,TRUE,1119,western_district_of_tennessee
+U\.S\. District Court for the Western District of Texas,TRUE,TRUE,1120,western_district_of_texas
+U\.S\. District Court for the Western District of Virginia,TRUE,TRUE,1121,western_district_of_virginia
+U\.S\. District Court for the Western District of Washington,TRUE,TRUE,1122,western_district_of_washington
+U\.S\. District Court for the Western District of Wisconsin,TRUE,TRUE,1123,western_district_of_wisconsin
+Circuit Court of the District of Columbia,TRUE,TRUE,103,circuit_court_of_the_district_of_columbia
+Court of Claims,TRUE,TRUE,104,court_of_claims

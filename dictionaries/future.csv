@@ -1,6 +1,0 @@
-values,DOTALL,IGNORECASE,keys
-cert_petit,y,y,(certior|Supreme Court)
-en_banc_motion,y,y,en banc
-grant,y,y,(grant|approve|issued)
-deny,y,y,(denied|denial)
-remand,y,y,remand

@@ -1,0 +1,3 @@
+values,dotall,ignorecase,keys
+crim,TRUE,TRUE,(\W|\d)cr
+civ,TRUE,TRUE,(\W|\d)ci?v
