@@ -1,6 +1,4 @@
 __pycache__/
-*__init*
-*__main*
 .*
 *.py[cod]
 *$py.class
@@ -11,6 +9,7 @@ build/
 develop-eggs/
 dist/
 downloads/
+results/*/*
 eggs/
 .eggs/
 lib/
@@ -44,6 +43,10 @@ coverage.xml
 *.mo
 *.pot
 *.log
-docs/_build/
+docs/source/
 target/
 .python-version
+data/
+_build
+_static
+_templates

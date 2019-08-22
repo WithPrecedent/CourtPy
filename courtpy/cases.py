@@ -1,91 +1,60 @@
-"""
-Cases stores the key attributes of the court opinion data for use throughout
-the CourtPy package. Edits to the dictionaries and lists here will change
-the functionality of methods and functions throughout.
-"""
+
 from dataclasses import dataclass
 from functools import wraps
 from inspect import getfullargspec
 import os
 
-from simplify import Codex
-from simplify.tools.matcher import ReMatch
+from simplify import Ingredients
 
-from tools.combiner import Combiner
-from tools.divider import Divider
-from tools.munger import Munger
-from tools.external import External
-
+#from .combiners import (Biographies, Executive, Judges, Judiciary,
+#                        Legislature)
 
 @dataclass
-class Cases(Codex):
+class Cases(Ingredients):
+    """Cases stores the key attributes of the court opinion data and the data
+    itself for use throughout the CourtPy package.
 
-    settings : object
-    filer : object = None
+    Cases is a child class to Ingredients from the siMpLify package and makes
+    use of its methods.
+
+    Attributes:
+        df: a pandas dataframe or series.
+        menu: an instance of menu.
+        inventory: an instance of inventory.
+        quick_start: a boolean variable indicating whether data should
+            automatically be loaded into the df attribute.
+        default_df: the current default dataframe or series attribute that will
+            be used when a specific dataframe is not passed to a class method.
+            The value is a string corresponding to the attribute dataframe
+            name and is initially set to 'df'.
+        x, y, x_train, y_train, x_test, y_test, x_val, y_val: dataframes or
+            series. These dataframes (and corresponding columns dictionaries)
+            need not be passed when the class is instanced. They are merely
+            listed for users who already have divided datasets and still wish
+            to use the siMpLify package.
+        columns_dict: dictionary containing column names and datatypes for df
+            or x (if data has been split) dataframes or series
+        source_format: what database the court opinion data is from.
+    """
     df : object = None
+    menu : object = None
+    inventory : object = None
     quick_start : bool = False
-    default_df = str = 'df'
-    column_dict : object = None
-    source : str = ''
-    stage : str = ''
-    prefixes : object = None
-    drops : object = None
-    _scaler_columns : object = None
-    _categorical_columns : object = None
-    _interactor_columns : object = None
+    default_df : str = 'df'
+    x : object = None
+    y : object = None
+    x_train : object = None
+    y_train : object = None
+    x_test : object = None
+    y_test : object = None
+    x_val : object = None
+    y_val : object = None
+    columns_dict : object = None
+    source_format : str = ''
 
     def __post_init__(self):
         super().__post_init__()
-        self.rules_types = ['section', 'source', 'stage', 'jurisdiction',
-                            'case_type']
-        self._initialize()
         return
-
-    @property
-    def encoder_columns(self):
-        if not self._encoder_columns:
-            self._create_encoder_columns()
-        return self._encoder_columns
-
-    @property
-    def interactor_columns(self):
-        if not self._interactor_columns:
-            self._create_interactor_columns()
-        return self._interactor_columns
-
-    @property
-    def scaler_columns(self):
-        if not self._scaler_columns:
-            self._create_scaler_columns()
-        return self._scaler_columns
-
-    def _add_prefix_dict(self, i_dict, prefix):
-        return {f'{prefix}_{k}' : v for k, v in i_dict.items()}
-
-    def _add_underscore(self, iterable):
-        if isinstance(iterable, list):
-            return [string + '_' for string in iterable]
-        elif isinstance(iterable, dict):
-            return {key + '_' : value for key, value in iterable.items()}
-
-    def _check_df(func):
-        @wraps(func)
-        def wrapper(self, *args, **kwargs):
-            argspec = getfullargspec(func)
-            unpassed_args = argspec.args[len(args):]
-            if 'df' in argspec.args and 'df' in unpassed_args:
-                kwargs.update({'df' : getattr(self, self.default_df)})
-            return func(self, *args, **kwargs)
-        return wrapper
-
-    def _create_column_type_dict(self, type_group, col_type_dict):
-        new_list = []
-        for prefix, data_type in self.prefixes:
-            if data_type in self._listify(col_type_dict[type_group]):
-                    new_list.append(prefix)
-        type_prefixes = self._add_underscore(new_list)
-        type_columns = self.create_column_list(prefixes = type_prefixes)
-        return type_columns
 
     def _create_analyzer_rules(self):
         self.special_column_types = ['encoders', 'interactors', 'scalers']
@@ -104,7 +73,6 @@ class Cases(Codex):
             self.drops = self.default_drops
         return self
 
-
     def _create_munger_rules(self):
         for section, source in self.mungers_dict.items():
             file_name = section + '_munger.csv'
@@ -112,7 +80,7 @@ class Cases(Codex):
                 munger_type = 'specific'
             else:
                 munger_type = 'general'
-            self.mungers.append(Munger(settings = self.settings,
+            self.mungers.append(Munger(menu = self.menu,
                                        dicts_path = self.filer.dicts,
                                        source = self.source,
                                        section = section,
@@ -157,8 +125,8 @@ class Cases(Codex):
     def _create_wrangler_rules(self):
         self._create_munger_rules()
         self.externals.append(External(section = row['key'],
-                                       paths = self.paths,
-                                       settings = self.settings))
+                                       inventory = self.inventory,
+                                       menu = self.menu))
         for external in self.externals:
             if external.section == 'judge_exp':
                     df = external.section_adder(df = df,
@@ -167,20 +135,12 @@ class Cases(Codex):
                 df = external.section_adder(df)
         return self
 
-    def _drop_missing(self, iterable, missing_prefixes = None):
-        if not missing_prefixes and self.source:
-            missing_prefixes = self.missing_prefixes[self.source]
-        if missing_prefixes:
-            for prefix in missing_prefixes:
-                if prefix in self.prefixes:
-                    iterable.pop(prefix)
-        return iterable
 
     def _initialize(self):
         for rules in self.rules_types:
-            if rules == 'stage':
-                stage_method_name = '_initialize_' + self.stage + '_options'
-                getattr(self, stage_method_name)()
+            if rules == 'step':
+                step_method_name = '_initialize_' + self.step + '_options'
+                getattr(self, step_method_name)()
             method_name = '_initialize_' + rules + '_options'
             getattr(self, method_name)()
             return self
@@ -206,8 +166,8 @@ class Cases(Codex):
         self.combiners = []
         combiner_df = cases.rules.loc[cases.rules['combiner']]
         for i, row in combiner_df.iterrows():
-            self.combiners.append(Combiner(settings = self.settings,
-                                           dicts_path = self.paths.dicts,
+            self.combiners.append(Combiner(menu = self.menu,
+                                           dicts_path = self.inventory.dicts,
                                            section = row['key'],
                                            data_type = row['data_type'],
                                            munge_file = row['munge_file']))
@@ -223,7 +183,7 @@ class Cases(Codex):
                                               self.source + '_dividers.csv')
         else:
             self.dividers_file = None
-#        if self.stage == 'parser':
+#        if self.step == 'parser':
 
         return self
 
@@ -238,16 +198,15 @@ class Cases(Codex):
     def _initialize_judge_options(self):
         if self.jurisdiction == 'federal':
             from library.judges import FederalJudges
-            self.judges = FederalJudges(self.paths, self.settings, self.stage)
+            self.judges = FederalJudges(self.inventory, self.menu, self.step)
             self.judges.make_name_dicts()
         excess_table_file = (
                 cases.rules[cases.rules['key'] == 'panel_judges']
                     ['munge_file'].item())
-        excess_table_path = os.path.join(self.paths.dicts, excess_table_file)
+        excess_table_path = os.path.join(self.inventory.dicts, excess_table_file)
         self.excess_table = ReMatch(file_path = excess_table_path,
                                     reverse_dict = True)
         return self
-
 
     def _initialize_munger_options(self):
         self._conform_types()
@@ -261,31 +220,153 @@ class Cases(Codex):
         return self
 
     def _initialize_parser_options(self):
-        Divider.settings = self.settings
-        Divider.paths = self.paths
+        Divider.menu = self.menu
+        Divider.inventory = self.inventory
         self._initialize_munger_options()
         return self
 
-
-
-    def _initialize_stage_options(self):
+    def _initialize_step_options(self):
         self._dicts_to_check = {'parser' : [self.prefixes, self.dividers,
                                             self.mungers],
                                 'wrangler' : [self.prefixes, self.mungers,
                                               self.externals, self.combiners],
                                 'engineer' : [self.prefixes],
                                 'analyzer' : [self.prefixes]}
-        dict_list = self._dicts_to_check[self.stage]
+        dict_list = self._dicts_to_check[self.step]
         for subdict in dict_list:
             subdict = self._drop_missing(iterable = subdict)
         return self
 
     def _initialize_wrangler_options(self):
         self._initialize_munger_options()
-        External.settings = self.settings
-        External.paths = self.paths
+        External.menu = self.menu
+        External.inventory = self.inventory
         self.combiners = []
         self.externals = []
+        return self
+
+
+    def _judge_combiner(self, df, match_column, out_column, map_dict):
+        self.match_columns = {'judge_exp' : 'judge_name',
+                              'judge_attr' : 'judge_name',
+                              'judge_demo'  : 'judge_name',
+                              'judge_ideo' : 'judge_name',
+                              'panel_num' : 'judge_name',
+                              'panel_exp' : 'judge_name',
+                              'panel_attr' : 'judge_name',
+                              'panel_demo' : 'judge_name',
+                              'panel_ideo' : 'judge_name',
+                              'panel_size' : 'sec_panel_judges',
+                              'politics' : 'year'}
+        df[out_column] = df[match_column].astype(str).map(map_dict)
+        return df
+
+    def _check_df(func):
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            argspec = getfullargspec(func)
+            unpassed_args = argspec.args[len(args):]
+            if 'df' in argspec.args and 'df' in unpassed_args:
+                kwargs.update({'df' : getattr(self, self.default_df)})
+            return func(self, *args, **kwargs)
+        return wrapper
+
+    def _create_column_type_dict(self, type_group, col_type_dict):
+        new_list = []
+        for prefix, data_type in self.prefixes:
+            if data_type in self._listify(col_type_dict[type_group]):
+                    new_list.append(prefix)
+        type_prefixes = self._add_underscore(new_list)
+        type_columns = self.create_column_list(prefixes = type_prefixes)
+        return type_columns
+
+    def _drop_missing(self, iterable, missing_prefixes = None):
+        if not missing_prefixes and self.source:
+            missing_prefixes = self.missing_prefixes[self.source]
+        if missing_prefixes:
+            for prefix in missing_prefixes:
+                if prefix in self.prefixes:
+                    iterable.pop(prefix)
+        return iterable
+
+    def _set_defaults(self):
+        super()._set_defaults()
+        self.default_organize = {'file_path' : os.path.join(
+                self.inventory.organizers, self.data_source + '.csv')}
+        self.default_sections = {'index' : int,
+                                 'meta' : str,
+                                 'party' : str,
+                                 'court' : 'category',
+                                 'docket' : list,
+                                 'cite' : 'pattern',
+                                 'notice' : bool,
+                                 'date' : str,
+                                 'year' : int,
+                                 'history' : bool,
+                                 'future' : bool,
+                                 'counsel' : bool,
+                                 'disposition' : bool,
+                                 'author' : 'category',
+                                 'panel_judges' : list,
+                                 'separate' : list,
+                                 'criminal' : bool,
+                                 'civil' : bool,
+                                 'general' : bool,
+                                 'procedure' : bool,
+                                 'standard' : bool,
+                                 'disposition_op' : bool,
+                                 'admin_cites' : 'pattern',
+                                 'case_cites' : 'pattern',
+                                 'statute_cites' : 'pattern',
+                                 'other_cites' : 'pattern',
+                                 'judge_name' : 'category',
+                                 'judge_exp' : float,
+                                 'judge_attr' : str,
+                                 'judge_demo' : float,
+                                 'judge_ideo' : float,
+                                 'panel_size' : int,
+                                 'judge_vote' : bool,
+                                 'agency' : 'category',
+                                 'type' : bool,
+                                 'politics' : float,
+                                 'outcome' : bool,
+                                 'reference' : list,
+                                 'temp' : str}
+#        self.default_keyword = {'index' : None,
+#                                'meta' : None,
+#                                'criminal' : 'opinions',
+#                                'civil' : 'opinions',
+#                                'general' : 'opinions',
+#                                'procedure' : 'opinions',
+#                                'standard' : 'opinions',
+#                                'disposition_op' : 'opinions',
+#                                'admin_cites' : 'opinions',
+#                                'case_cites' : 'opinions',
+#                                'statute_cites' : 'opinions',
+#                                'other_cites' : 'opinions'}
+        self.default_parse = {'party' : 'section_party',
+                              'court' : 'section_court',
+                              'docket' : 'section_docket',
+                              'cite' : 'section_cite',
+                              'notice' : 'section_notice',
+                              'date' : None,
+                              'history' : 'section_history',
+                              'future' : 'section_future',
+                              'counsel' : 'section_counsel',
+                              'disposition' : 'section_disposition',
+                              'author' : 'section_author',
+                              'panel_judges' : 'section_panel_judges',
+                              'separate' : None}
+#        self.default_combiner = {'biographies' : Biographies,
+#                                 'executive' : Executive,
+#                                 'judges' : Judges,
+#                                 'judiciary' : Judiciary,
+#                                 'legislature' : Legislature}
+        self.default_merger = {'docket' : []}
+        self.default_shaper = {self.shape : 'judge'}
+        self.default_streamliner = {}
+        self.rules_types = ['section', 'source', 'step', 'jurisdiction',
+                            'case_type']
         return self
 
     def _set_prefixes(self):
@@ -306,39 +387,13 @@ class Cases(Codex):
     def add_munger(self, munger_name, source_section):
         return self.mungers.sources.update({munger_name, source_section})
 
-    @_check_df
-    def add_index(self, df = None, index_number = None):
-        if index_number:
-            df[self.index_column] = index_number
-        else:
-            self.add_unique_index(column = self.index_column)
-        return self
-
-    def create(self):
-        self._set_prefixes()
-        for rules in self.rules_types:
-            if rules == 'stage':
-                stage_method_name = '_create_' + self.stage + '_rules'
-                getattr(self, stage_method_name)()
-            method_name = '_create_' + rules + '_rules'
-            getattr(self, method_name)()
-        return self
-
-    def get_type_prefixes(self, data_type = None):
-        prefix_list = []
-        for prefix, d_type in self.prefixes.items():
-            if d_type == data_type:
-                prefix_list.append(prefix)
-        return prefix_list
-
-
     def munge(self, df = None, bundle = None):
-        if self.stage in ['wrangler']:
+        if self.step in ['wrangler']:
             df['court_num'].fillna(method = 'ffill', inplace = True,
                                    downcast = int)
             df['year'] = df['year'].replace(0, method = 'ffill').astype(int)
         for munger in self.cases.mungers:
-            if self.stage in ['parser']:
+            if self.step in ['parser']:
                 if munger.munge_type in ['general']:
                     if munger.source_col in ['opinions']:
                         df = munger.section_munger.match(
@@ -349,7 +404,7 @@ class Cases(Codex):
                 elif munger.munge_type in ['specific']:
                     df = munger.section_munger(df = df,
                                              bundle = bundle)
-            elif self.stage in ['wrangler']:
+            elif self.step in ['wrangler']:
                 if munger.section in ['panel_judges', 'author', 'separate']:
                     df = munger.section_munger(df = df,
                                              judges = self.judges)
@@ -361,10 +416,3 @@ class Cases(Codex):
             return df, bundle
         else:
             return df
-
-    def set_column_type(self, column_type, columns = None, prefixes = None):
-        col_type = '_' + column_type + '_columns'
-        col_list = self.create_column_list(columns = columns,
-                                           prefixes = prefixes)
-        setattr(self, col_type, col_list)
-        return self

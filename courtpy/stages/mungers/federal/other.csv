@@ -1,4 +1,0 @@
-values,dotall,ignorecase,keys
-date_pat,FALSE,TRUE,"(?:\d\d*)? ?(?:JAN(?:\.|UARY)|FEB(?:\.|RUARY)|MAR(?:\.|CH)|APR(?:\.|IL)|MAY |JUN(?:\.|E)|JUL(?:\.|Y)|AUG(?:\.|UST)|SEP(?:\.|T\.|TEMBER)|OCT(?:\.|OBER)|NOV(?:\.|EMBER)|DEC(?:\.|EMBER)).*? (?:\d\d*\, )?\d\d\d\d"
-party_excess,TRUE,TRUE,DEFENDANT|BANK|ATTORNEY|COMMISSION|TRADE|ASSOC|INSUR|CO\.|CORP\.|INC|INTERVEN
-party_div,TRUE,FALSE,\Wversus\W|\Wv\.\W|\Wvs\.\W|\Wv ?\-\W|\W\-?[Aa]gainst ?\-?\W|\W\-?GAINST ?\-?\W|\W\-?VERSUS\-?\W|\W\-?VS\.\-?\W

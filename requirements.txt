@@ -1,7 +1,6 @@
 dataclasses>=0.6
 more-itertools>=4.3.0
 numpy>=1.16.2
-pandas>=0.24.2
-requests>=2.21.0
+pandas>=0.25
 
 

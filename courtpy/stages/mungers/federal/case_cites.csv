@@ -1,2 +1,0 @@
-values,dotall,ignorecase,keys
-case_pat,FALSE,TRUE,\d* (?:F\.[23]?d|U\.S\.|S\. Ct\.) \d\d*
