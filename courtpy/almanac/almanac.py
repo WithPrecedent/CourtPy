@@ -29,7 +29,7 @@ class CPAlmanac(Almanac):
     plan : object = None
     auto_prepare : bool = True
     name : str = 'almanac'
-    data_source : object = None
+    data_source : str = ''
 #    jurisdiction : str = ''
 #    case_type : str = ''
 
@@ -320,13 +320,19 @@ class CPAlmanac(Almanac):
                     root_folder = self.inventory.raw,
                     subfolders = [self.jurisdiction, self.case_type,
                                   self.data_source])
+        self.inventory.raw = getattr(self.inventory, self.data_source)
         return self
-
-    def start(self, ingredients = None):
-        for plan in self.plans:
-            self.step = plan.name
-            self.conform()
-            self.ingredients = plan.start(ingredients = self.ingredients)
-            self.inventory.save(variable = self.ingredients,
-                                file_name = self.step + '_ingredients')
-        return self
+#
+#    def prepare(self):
+#        super().prepare()
+#        self._set_folders()
+#        return self
+#
+#    def start(self, ingredients = None):
+#        for plan in self.plans:
+#            self.step = plan.name
+#            self.conform()
+#            self.ingredients = plan.start(ingredients = self.ingredients)
+#            self.inventory.save(variable = self.ingredients,
+#                                file_name = self.step + '_ingredients')
+#        return self
