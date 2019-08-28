@@ -1,0 +1,8 @@
+values,dotall,ignorecase,keys
+cong_rec,FALSE,TRUE,\d*? CONG\. REC\. \d*?\b\(\d\d*.?\)
+const,FALSE,TRUE,U\.S\. CONST\. (?:Amend[s]?|Art)\.? \w\w*?(?=\W?)
+legis_list_h,FALSE,TRUE,H\. REP\. NO\. \d\d*-\d\d*.?(?=\W?)
+legis_hist_s,FALSE,TRUE,S\. REP\. NO\. \d\d*-\d\d*.?(?=\W?)
+mcpc,FALSE,TRUE,MODEL CODE OF PROF'L CONDUCT R\. §§* \d\d*.?(?=\W?)
+mcprc,FALSE,TRUE,MODEL CODE OF PROF'L RESPONSIBILITY CANON §§* \d\d*.?(?=\W?)
+mpc,FALSE,TRUE,MODEL PENAL CODE §§* \d\d*.?(?=\W?)

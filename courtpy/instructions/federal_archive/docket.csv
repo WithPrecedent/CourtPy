@@ -1,0 +1,2 @@
+values,dotall,ignorecase,keys
+nums,TRUE,TRUE,(\d+\-\d+)

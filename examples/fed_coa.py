@@ -10,7 +10,7 @@ case_type = 'appellate'
 data_source = 'lexis_nexis'
 
 menu = Menu(file_path = os.path.join('examples', 'fed_coa.ini'))
-inventory = Inventory(menu = menu, root_folder = '.')
+inventory = Inventory(menu = menu, root_folder = '..')
 ingredients = Ingredients(menu = menu, inventory = inventory)
 almanac = CPAlmanac(menu = menu,
                     inventory = inventory,

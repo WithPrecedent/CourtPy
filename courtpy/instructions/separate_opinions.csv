@@ -1,0 +1,5 @@
+values,dotall,ignorecase,keys
+concur,TRUE,TRUE,CONCUR
+mixed,TRUE,TRUE,IN PART
+dissent,TRUE,TRUE,DISSENT
+separate,FALSE,FALSE,(?<=\n)CONCUR.*?(?=\n)|(?<=\n)DISSENT.*?(?=\n)|concurring\:.*?(?=\n)|dissenting\:.*?(?=\n)|(?<=\n)Concur By\: .*?(?=\n)|(?<=\n)Dissent By\: .*?(?=\n)

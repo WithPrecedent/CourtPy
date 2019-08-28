@@ -1,0 +1,2 @@
+section,datatype,values,dotall,ignorecase,keys
+separate,remove,separate,TRUE,TRUE,IN PART|BY:\| BY |CONCURRING|DISSENTING|CONCUR|DISSENT

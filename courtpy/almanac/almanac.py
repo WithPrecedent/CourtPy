@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import os
 
 from simplify.almanac import Almanac
-from simplify.implements.tools import listify
+from simplify.tools import listify
 
 
 @dataclass
@@ -30,11 +30,12 @@ class CPAlmanac(Almanac):
     auto_prepare : bool = True
     name : str = 'almanac'
     data_source : str = ''
+    instructions_folder : object = None
 #    jurisdiction : str = ''
 #    case_type : str = ''
 
     def __post_init__(self):
-        self.menu.localize(instance = self, sections = ['cases'])
+        self.menu.inject(instance = self, sections = ['cases'])
         super().__post_init__()
         return self
 
@@ -294,7 +295,6 @@ class CPAlmanac(Almanac):
         self.externals = []
         return self
 
-
     def _judge_mapper(self, df, match_column, out_column, map_dict):
         self.match_columns = {'judge_exp' : 'judge_name',
                               'judge_attr' : 'judge_name',
@@ -315,12 +315,19 @@ class CPAlmanac(Almanac):
 #        return self
 
     def _set_folders(self):
+        self._check_steps()
         if self.step in ['sow', 'harvest']:
             self.inventory._add_branch(
                     root_folder = self.inventory.raw,
                     subfolders = [self.jurisdiction, self.case_type,
                                   self.data_source])
         self.inventory.raw = getattr(self.inventory, self.data_source)
+        if self.instructions_folder:
+            self.inventory.instructions = self.instructions_folder
+        else:
+            root_folder = os.path.join('.', 'courtpy')
+            self.inventory.add_folders(root_folder = root_folder,
+                                       subfolders = 'instructions')
         return self
 #
 #    def prepare(self):

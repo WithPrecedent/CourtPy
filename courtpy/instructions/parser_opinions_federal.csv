@@ -1,0 +1,246 @@
+section,datatype,values,dotall,ignorecase,keys
+references_admin,list,CFR,FALSE,FALSE,\d* C\.F\.R\. §§* \d\d*.*?(?=\W?)
+references_admin,list,Sent_Guide,FALSE,TRUE,U.S. SENTENCING GUIDELINES MANUAL (?:ch\. |app\. )?§§* \d\d*.?(?=\W?)
+references_case,list,case_pat,FALSE,TRUE,\d* (?:F\.[23]?d|U\.S\.|S\. Ct\.) \d\d*
+references_statute,list,APA,FALSE,TRUE,ADMINISTRATIVE PROCEDURE ACT §§* \d\d*.?\b
+references_statute,list,Fed_App_P,FALSE,TRUE,FED\. R\. APP\. §§* \d\d*.?(?=\W?)
+references_statute,list,Fed_Civ_P,FALSE,TRUE,FED(?:\.|ERAL) R(?:\.|ULE) (?:OF )?CIV(?:\.|IL) P(?:\.|ROC\.|ROCEDURE) §§* \d\d*.*?(?:\(\w)?\)?
+references_statute,list,Fed_Crim_P,FALSE,TRUE,FED(?:\.|ERAL) R(?:\.|ULE) (?:OF )?CRIM(?:\.|INAL) P(?:\.|ROC\.|ROCEDURE) §§* \d\d*.*?(?:\(\w)?\)?
+references_statute,list,Fed_Evid,FALSE,TRUE,FED(?:\.|ERAL) R(?:\.|ULE) (?:OF )?EV?:(\.|IDENCE) §§* \d\d*.*?(\(?:\w)?\)?
+references_statute,list,IRC,FALSE,FALSE,I.R.C. §§* \d\d*.?(?=\W?)
+references_statute,list,statute_pat,FALSE,FALSE,\b\d*. U\.S\.C\.[SC]?\.? §§* \d\d*.*?(?=\W?)
+references_statute,list,UCC,FALSE,FALSE,U.C.C. §§* \d\d*.?(?=\W?)
+references_statute,list,Unif_Adopt,FALSE,TRUE,UNIF. ADOPTION ACT §§* \d\d*.?(?=\W?)
+references_statute,list,Unif_Probate,FALSE,TRUE,UNIF. PROBATE CODE §§* \d\d*.?(?=\W?)
+references_statute,list,Unif_Trust,FALSE,TRUE,UNIF. TRUST CODE §§* \d\d*.?(?=\W?)
+references_other,list,cong_rec,FALSE,TRUE,\d*? CONG\. REC\. \d*?\b\(\d\d*.?\)
+references_other,list,const,FALSE,TRUE,U\.S\. CONST\. (?:Amend[s]?|Art)\.? \w\w*?(?=\W?)
+references_other,list,legis_list_h,FALSE,TRUE,H\. REP\. NO\. \d\d*-\d\d*.?(?=\W?)
+references_other,list,legis_hist_s,FALSE,TRUE,S\. REP\. NO\. \d\d*-\d\d*.?(?=\W?)
+references_other,list,mcpc,FALSE,TRUE,MODEL CODE OF PROF'L CONDUCT R\. §§* \d\d*.?(?=\W?)
+references_other,list,mcprc,FALSE,TRUE,MODEL CODE OF PROF'L RESPONSIBILITY CANON §§* \d\d*.?(?=\W?)
+references_other,list,mpc,FALSE,TRUE,MODEL PENAL CODE §§* \d\d*.?(?=\W?)
+civil,bool,bad_faith,FALSE,FALSE,bad faith
+civil,bool,fiduciary,FALSE,FALSE,fiduciary
+civil,bool,bankruptcy,FALSE,FALSE,bankruptcy
+civil,bool,forfeiture,FALSE,FALSE,civil forfeiture
+civil,bool,foreclosure,FALSE,FALSE,foreclosure
+civil,bool,lanham act,FALSE,FALSE,Lanham Act
+civil,bool,medicaid,FALSE,FALSE,Medicaid
+civil,bool,medicare,FALSE,FALSE,Medicare
+civil,bool,hous_discrim,FALSE,FALSE,Fair Housing Act
+civil,bool,plra,FALSE,FALSE,Prison Litigation Reform Act
+civil,bool,vra,FALSE,FALSE,Voting Rights Act
+civil,bool,veil_piercing,FALSE,FALSE,(pierce the corporate veil|pierce the veil)
+civil,bool,twombly,FALSE,TRUE,(127 S\. ?Ct\. 1955|550 U\.S\. 544)
+civil,bool,iqbal,FALSE,TRUE,(556Â U\.S\.Â 662|129 S\. ?Ct\. 1937)
+civil,bool,habeas,FALSE,FALSE,habeas
+civil,bool,asylum,FALSE,FALSE,asylum
+civil,bool,titlevii,FALSE,FALSE,"Title VII(\.\, )"
+civil,bool,titleix,FALSE,FALSE,Title IX
+civil,bool,ada,FALSE,FALSE,Americans with Disabilities Act
+civil,bool,adea,FALSE,FALSE,(Age Discrimination in Employment Act|ADEA)
+civil,bool,patent,FALSE,FALSE,patent 
+civil,bool,copyright,FALSE,FALSE,copyright
+civil,bool,trademark,FALSE,FALSE,trademark
+civil,bool,cercla,FALSE,FALSE,C\.?E\.?R\.?C\.?L\.?A\.?
+civil,bool,caa,FALSE,FALSE,Clean Air Act
+civil,bool,cwa,FALSE,FALSE,(Water Pollution Control Act|Clean Water Act)
+civil,bool,tax,FALSE,FALSE,I(nternal|\.?)R(evenue|\.?)S(ervice|\.?)
+civil,bool,antitrust,FALSE,FALSE,antitrust
+civil,bool,labor,FALSE,FALSE,National Labor Relations
+civil,bool,social_security,FALSE,FALSE,Social Security
+civil,bool,sec1983,FALSE,FALSE,(section 1983|42 U\.?S\.?C\.? § 1983)
+civil,bool,qual_imm,FALSE,FALSE,qualified immunity
+civil,bool,abs_imm,FALSE,FALSE,absolute immunity
+civil,bool,div_juris,FALSE,FALSE,diversity jurisdiction
+civil,bool,fed_quest,FALSE,FALSE,federal question
+civil,bool,foia,FALSE,FALSE,(F\.?O\.?I\.?A\.?|Freedom of Information Act)
+civil,bool,civ_serv_act,FALSE,FALSE,Civil Service Reform Act
+civil,bool,fed_employ_pay,FALSE,FALSE,Federal Employees Pay Act
+civil,bool,fed_labor_rel,FALSE,FALSE,(F\.?L\.?R\.?A\.?|Federal Labor Relations)
+civil,bool,workmen's compensation,FALSE,FALSE,([Ww]orkmen's [Cc]ompensation|[Ww]orkers' [Cc]ompensation)
+civil,bool,declaratory judgment,FALSE,FALSE,[Dd]eclaratory [Jj]udgment
+civil,bool,commodity_acts,FALSE,FALSE,(Commodity Exchange Act|Federal Commodity Exchange|Futures Trading Commodity Credit)
+civil,bool,food_sec,FALSE,FALSE,Food Security Act
+civil,bool,false_claims,FALSE,FALSE,False Claims Act
+civil,bool,animal_welf,FALSE,FALSE,Animal Welfare Act
+civil,bool,agric_fair,FALSE,FALSE,Agricultural Fair Practices Act
+civil,bool,ina,FALSE,FALSE,Immigration & Nationality Act
+civil,bool,admin_subp,FALSE,FALSE,administrative subpoena
+civil,bool,arb_act,FALSE,FALSE,U(nited|\.) S(tates|\.) Arbitration Act
+civil,bool,mortgage_act,FALSE,FALSE,Home Loan Mortgage
+civil,bool,fdic,FALSE,FALSE,Federal Deposit Insurance Corporation
+civil,bool,bank_holding,FALSE,FALSE,Bank Holding Company Act
+civil,bool,respra,FALSE,FALSE,(Real Estate Settlement Procedures Act|R\.?E\.?S\.?P\.?A\.?)
+civil,bool,clayton_act,FALSE,FALSE,Clayton Act
+civil,bool,trade_comm_act,FALSE,FALSE,Federal Trade Commission Act
+civil,bool,coppa,FALSE,FALSE,(Children Online Privacy Protection Act|C\.?O\.?P\.?P\.?A\.?)
+civil,bool,sec_act,FALSE,FALSE,Securities Exchange Act
+civil,bool,invest_comp,FALSE,FALSE,Investment Company Act of 1940
+civil,bool,small_bus_act,FALSE,FALSE,Small Business Act
+civil,bool,haz_subst,FALSE,FALSE,[Hh]azardous [Ss]ubstances
+civil,bool,truth_lend,FALSE,FALSE,Truth in Lending
+civil,bool,fair_credit_bill,FALSE,FALSE,Fair Credit Billing Act
+civil,bool,fair_credit_report,FALSE,FALSE,Fair Credit Reporting Act
+civil,bool,fair_debt_collect,FALSE,FALSE,Fair Debt Collection Act
+civil,bool,product_safe,FALSE,FALSE,[Pp]roduct [Ss]afety
+civil,bool,asbestos,FALSE,FALSE,[Aa]sbestos
+civil,bool,national_historic_preservat,FALSE,FALSE,National Historic Preservation Act
+civil,bool,migratory_bird,FALSE,FALSE,Migratory Bird Act
+civil,bool,esa,FALSE,FALSE,Endangered Species Act
+civil,bool,lacey_act,FALSE,FALSE,Lacey Act
+civil,bool,dmca,FALSE,FALSE,(Digital Millennium Copyright Act|D\.?C\.?M\.?A\.?)
+civil,bool,terrorism_civil,FALSE,FALSE,Anti-Terrorism Act
+civil,bool,ferpa,FALSE,FALSE,(Family Education Rights (&|and) Privacy Act|F\.?E\.?R\.?P\.?A\.?)
+civil,bool,idea,FALSE,FALSE,Individuals [Ww]ith Disabilities Education Act
+civil,bool,fda_act,FALSE,FALSE,"Food, Drug & Cosmetic Act"
+civil,bool,med_mal,FALSE,FALSE,medical malpractice
+civil,bool,icwa,FALSE,FALSE,(Indian Child Welfare Act|I\.?C\.?W\.?A\.?)
+civil,bool,indian_gaming,FALSE,FALSE,Indian Gaming Regulatory Act
+civil,bool,admiralty,FALSE,FALSE,[Aa]dmiralty
+civil,bool,foreclosure,FALSE,FALSE,foreclosure
+civil,bool,atca,FALSE,FALSE,Alien Tort Claims Act
+civil,bool,erisa,FALSE,FALSE,E\.?R\.?I\.?S\.?A\.?
+civil,bool,fmla,FALSE,FALSE,(Family (&|and) Medical Leave Act|F\.?M\.?L\.?A\.?)
+civil,bool,foreign_sov_imm,FALSE,FALSE,Foreign Sovereign Immunities Act
+civil,bool,food_stamp,FALSE,FALSE,Food Stamp Act
+civil,bool,defame,FALSE,FALSE,( libel | slander | defamation)
+civil,bool,sec_fraud,FALSE,FALSE,[Ss]ecurities [Ff]raud
+civil,bool,prod_liab,FALSE,FALSE,[Pp]roduct [Ll]iability
+civil,bool,class_act,FALSE,FALSE,[Cc]lass [Aa]ction
+civil,bool,aedpa,FALSE,FALSE,(Antiterrorism (&|and) Effective Death Penalty Act|AEDPA)
+civil,bool,all_writs,FALSE,FALSE,All Writs Act
+civil,bool,rulemaking,FALSE,FALSE,[Rr]ule(-| )[Mm]aking [Pp]ower
+civil,bool,fed_tort_act,FALSE,FALSE,Federal Tort Claims Act
+civil,bool,min_wage,FALSE,FALSE,[Mm]inimum [Ww]age
+civil,bool,osha,FALSE,FALSE,(Occupational Safety|O\.?S\.?H\.?A\.?)
+civil,bool,mine_safety,FALSE,FALSE,Mine Safety (&|and) Health Act
+civil,bool,sdwa,FALSE,FALSE,Safe Drinking Water Act
+civil,bool,hhs,FALSE,FALSE,Health (&|and) Human Services
+civil,bool,voter_regis_act,FALSE,FALSE,National Voter Registration Act
+civil,bool,civ_rt_act,FALSE,FALSE,Civil Rights Act
+civil,bool,rfra,FALSE,FALSE,(Religious Freedom Restoration Act|R\.?F\.?R\.?A\.?)
+civil,bool,legal_serv,FALSE,FALSE,Legal Services Corporation
+civil,bool,solid_waste_act,FALSE,FALSE,Solid Waste Disposal Act
+civil,bool,vawa,FALSE,FALSE,(Violence [Aa]gainst Women Act|V\.?A\.?\W\.?A\.?)
+civil,bool,rail_labor,FALSE,FALSE,(Railway Labor Act|Railroad Unemployment Insurance Act)
+civil,bool,wrong_discharge,FALSE,FALSE,wrongful discharge
+civil,bool,fed_comm_act,FALSE,FALSE,Federal Communications Act
+civil,bool,phone_consum_act,FALSE,FALSE,Telephone Consumer Protection Act
+civil,bool,bjr,FALSE,FALSE,business judgment rule
+criminal,bool,sentencing,FALSE,FALSE,([Ss]entencing [Gg]uidelines|U\.?S\.?S\.?G\.?|United States vs?\. Booker|543 U\.S\. 220|[Gg]uidelines range|[Ss]entencing [Cc]ommission)
+criminal,bool,death_penalty,FALSE,FALSE,(sentenced to death|death penalty|capital punishment)
+criminal,bool,crimmigration,FALSE,FALSE,((illegal|unlawful) reentry|unlawfully entering)
+criminal,bool,lenity,FALSE,FALSE,[Rr]ule of [Ll]enity
+criminal,bool,acca,FALSE,FALSE,Armed Career Criminal Act
+criminal,bool,child_porn,FALSE,FALSE,[Cc]hild [Pp]ornography
+criminal,bool,conspiracy,FALSE,FALSE,conspiracy to 
+criminal,bool,drugs,FALSE,FALSE,"(mari[jh]uana|cocaine|methamphetamine|heroin[ \.\,]|MDMA|narcotics|[Ll]ysergic [Aa]cid [Dd]iethylamide)"
+criminal,bool,sorna,FALSE,FALSE,(S\.?O\.?R\.?N\.?A\.?|Sex Offender Registration and Notification Act)
+criminal,bool,wire_fraud,FALSE,FALSE,(wire fraud|fraud by wire)
+criminal,bool,kidnapping,FALSE,FALSE,[Kk]idnapping
+criminal,bool,mann_act,FALSE,FALSE,Mann Act
+criminal,bool,tax_evasion,FALSE,FALSE,[Tt]ax [Ee]vasion
+criminal,bool,bank_robbery,FALSE,FALSE,[Bb]ank [Rr]obbery
+criminal,bool,fraud_us,FALSE,FALSE,[Ff]raud against the United States
+criminal,bool,robbery,FALSE,FALSE,[Rr]obbery
+criminal,bool,assault,FALSE,FALSE,[Aa]ssault
+criminal,bool,bank_fraud,FALSE,FALSE,[Bb]ank [Ff]raud
+criminal,bool,arson,FALSE,FALSE, [Aa]rson
+criminal,bool,bribery,FALSE,FALSE,[Bb]rib(e |ry)
+criminal,bool,child_support,FALSE,FALSE,[Ff]ailure to [Pp]ay (legal )?child( support)?
+criminal,bool,color_of_law,FALSE,FALSE,[Rr]ights under [Cc]olor of [Ll]aw
+criminal,bool,counterfeit,FALSE,FALSE,[Cc]ounterfeit
+criminal,bool,crim_contempt,FALSE,FALSE,[Cc]riminal [Cc]ontempt
+criminal,bool,forgery,FALSE,FALSE,[Ff]orgery
+criminal,bool,voter_intim,FALSE,FALSE,[Vv]oter [Ii]ntimidation
+criminal,bool,campaign,FALSE,FALSE,[Cc]ampaign [Ff]inance
+criminal,bool,gangs,FALSE,FALSE,[Cc]riminal [Ss]treet [Gg]ang
+criminal,bool,embezzlement,FALSE,FALSE,[Ee]mbezzlement
+criminal,bool,money_launder,FALSE,FALSE,[Mm]oney [Ll]aunder
+criminal,bool,escape,FALSE,FALSE,[Ee]scape and [Rr]escue
+criminal,bool,harboring,FALSE,FALSE,[Hh]arboring a [Ff]ugitive
+criminal,bool,classified,FALSE,FALSE,[Cc]lassified [Ii]nformation
+criminal,bool,chem_bio,FALSE,FALSE,([Cc]hemical|[Bb]iological) [Ww]eapon
+criminal,bool,nuclear,FALSE,FALSE,[Nn]uclear [Ww]eapon
+criminal,bool,extortion,FALSE,FALSE,[Ee]xtortion
+criminal,bool,kickbacks,FALSE,FALSE,[Kk]ickback
+criminal,bool,threats,FALSE,FALSE,[Cc]ommunication [Cc]ontaining any [Tt]hreat
+criminal,bool,impersonate,FALSE,FALSE,[Ff]alsely [Aa]ssumes
+criminal,bool,firearm,FALSE,FALSE,[Pp]ossession of (a )?[Ff]irearm
+criminal,bool,false_statements,FALSE,FALSE,[Ff]alse [Ss]tatements
+criminal,bool,perjury,FALSE,FALSE,[Pp]erjury
+criminal,bool,hacking,FALSE,FALSE,Computer Fraud (and|\&) Abuse Act
+criminal,bool,murder,FALSE,FALSE,[Mm]urder
+criminal,bool,manslaugther,FALSE,FALSE,[Mm]anslaughter
+criminal,bool,indian_country,FALSE,FALSE,Indian Country
+criminal,bool,gambling,FALSE,FALSE,[Ii]llegal [Gg]ambling
+criminal,bool,desertion,FALSE,FALSE,([Dd]esertion|[Aa]ttempt to [Dd]esert)
+criminal,bool,obscenity,FALSE,FALSE,[Oo]bscen(e|ity)
+criminal,bool,fetus_crime,FALSE,FALSE,([Pp]artial-[Bb]irth [Aa]bortion|[Pp]rotection of [Uu]nborn [Cc]hildren)
+criminal,bool,obst_just,FALSE,FALSE,[Oo]bstruction of 
+criminal,bool,passports,FALSE,FALSE,([Ff]alse [Uu]se|[Ff]orgery of [Pp]assport)
+criminal,bool,slavery,FALSE,FALSE,([Ss]lavery|[Pp]eonage|[Ii]nvoluntary [Ss]ervitude)
+criminal,bool,president_crime,FALSE,FALSE,[Tt]hreats against President
+criminal,bool,pub_land,FALSE,FALSE,[Ll]aws of [Ss]tates [Aa]dopted
+criminal,bool,rico,FALSE,FALSE,R\.?I\.?C\.?O\.?
+criminal,bool,riots,FALSE,FALSE,[Ii]ncite a [Rr]iot
+criminal,bool,sabotage,FALSE,FALSE,[Ss]abotage
+criminal,bool,child_sexual,FALSE,FALSE,[Ss]exual [Aa]buse of a [Mm]inor
+criminal,bool,destruct_ev,FALSE,FALSE,[Dd]estruction or [Rr]emoval of [Pp]roperty
+criminal,bool,stalking,FALSE,FALSE, [Ss]talking
+criminal,bool,rape,FALSE,FALSE,[Aa]ggravated [Ss]exual [Aa]buse
+criminal,bool,terrorism,FALSE,FALSE,[Tt]errorism
+criminal,bool,cigarette,FALSE,FALSE,[Cc]ontraband [Cc]igar
+criminal,bool,torture,FALSE,FALSE,[Cc]ommit [Tt]orture
+criminal,bool,treason,FALSE,FALSE, [Tt]reason
+criminal,bool,alcohol,FALSE,FALSE,[Dd]distilled [Ss]pirits
+criminal,bool,vehicles,FALSE,FALSE,([Vv]ehicle|[Aa]ir(plane|craft) theft)
+criminal,bool,harmless_error,FALSE,FALSE,(harmless error|error was (not)?harmless)
+criminal,bool,anders,FALSE,FALSE,(386 U\.S\. 738|Anders vs?\. California)
+criminal,bool,guilty_plea,FALSE,FALSE,(plea?d(ing|ed)? guilty|guilty plea|plea agreement)
+general,bool,amend1_religion,FALSE,FALSE,([Ee]stablishment of [Rr]eligion|Establishment Clause|Free Exercise Clause|free exercise thereof)
+general,bool,amend1_speech,FALSE,FALSE,[Ff]ree [Ss]peech
+general,bool,amend1_general,FALSE,TRUE,"((First|1st) Amendment|U\.S\. Const\. Amend\. I[\.\,])"
+general,bool,amend2,FALSE,TRUE,"((Second|2nd) Amendment|U\.S\. Const\. Amend\. II[\.\,]|right (of the people) to (keep and )bear arms)"
+general,bool,amend4,FALSE,TRUE,"((Fourth|4th) Amendment|U\.S\. Const\. Amend\. IV[\.\,]|reasonable (search|seizure))"
+general,bool,amend5_miranda,FALSE,TRUE,(Miranda rights|Arizona vs?\. Miranda|384 U\.S\. 436)
+general,bool,amend5_general,FALSE,TRUE,"((Fifth|5th) Amendment|U\.S\. Const\. Amend\. V[\.\,])"
+general,bool,amend6,FALSE,TRUE,"((Sixth|6th) Amendment|U\.S\. Const\. Amend\. VI[\.\,])"
+general,bool,amend7,FALSE,TRUE,"((Seventh|7th) Amendment|U\.S\. Const\. Amend\. VII[\.\,])"
+general,bool,amend8,FALSE,TRUE,"((Eighth|8th) Amendment|U\.S\. Const\. Amend\. VII[\.\,]|[Cc]ruel and [Uu]nusual|[Ee]xcessive [Bb]ail)"
+general,bool,amend9,FALSE,TRUE,"((Ninth|9th) Amendment|U\.S\. Const\. Amend\. IX[\.\,])"
+general,bool,amend10,FALSE,TRUE,"((Tenth|10th) Amendment|U\.S\. Const\. Amend\. X[\.\,])"
+general,bool,amend11,FALSE,TRUE,"((Eleventh|11th) Amendment|U\.S\. Const\. Amend\. XI[\.\,])"
+general,bool,amend12,FALSE,TRUE,"((Twelfth|12th) Amendment|U\.S\. Const\. Amend\. XII[\.\,])"
+general,bool,amend13,FALSE,TRUE,"((Thirteenth|13th) Amendment|U\.S\. Const\. Amend\. XIII[\.\,])"
+general,bool,amend14,FALSE,TRUE,"((Fourteenth|14th) Amendment|U\.S\. Const\. Amend\. XIV[\.\,]|[Ee]qual [Pp]rotection)"
+general,bool,amend15,FALSE,TRUE,"((Fifteenth|15th) Amendment|U\.S\. Const\. Amend\. XV[\.\,])"
+general,bool,articlei,FALSE,TRUE,U\.S\. Const\. Art\. I\.
+general,bool,articleii,FALSE,TRUE,U\.S\. Const\. Art\. II\.
+general,bool,articleiii,FALSE,TRUE,U\.S\. Const\. Art\. III\.
+general,bool,aritcleiv,FALSE,TRUE,U\.S\. Const\. Art\. IV\.
+general,bool,expostfacto,FALSE,FALSE,[Ee]x [Pp]ost [Ff]acto
+general,bool,rule_law,FALSE,FALSE,[Rr]ule of [Ll]aw
+general,bool,indian_commerce,FALSE,FALSE,Indian Commerce Clause
+general,bool,standing,TRUE,FALSE,(?<!was )(?<!is )(?<!not )(?<!been )standing
+general,bool,ripeness,TRUE,FALSE,[Rr]ipeness
+general,bool,commerce_clause,TRUE,FALSE,(?<!Indian )Commerce Clause
+disposition_op,bool,affirm,FALSE,FALSE,(AFFIRM|[Ww]e (thus |will )?[Aa]ffirm| is affirmed|must be affirmed)
+disposition_op,bool,denied,FALSE,FALSE,(DEN(IED|Y)| is denied|[Ww]e (will )?deny)
+disposition_op,bool,reversed,FALSE,FALSE,(REVERSE|[Ww]e (will)?reverse| is reversed)
+disposition_op,bool,vacate,FALSE,FALSE,(VACATE|[Ww]e (will)?vacate| is vacated)
+disposition_op,bool,remand,FALSE,FALSE,(REMAND|[Ww]e (will)?remand| is remanded)
+disposition_op,bool,dismiss,FALSE,FALSE,(DISMISS|[Ww]e (will)? Dismiss| is dismissed)
+disposition_op,bool,order_enforced,FALSE,FALSE,Order of the National Labor Relations Board enforced
+procedure,bool,pro_se,FALSE,FALSE,pro se 
+procedure,bool,indigent,FALSE,TRUE,in forma pauperis
+procedure,bool,mandamus,FALSE,FALSE,[Mm]andamus
+procedure,bool,mootness,FALSE,FALSE, [Mm]oot 
+procedure,bool,interloc,FALSE,FALSE,[Ii]nterlocutory
+procedure,bool,jury_trial,FALSE,FALSE, jury
+standard,bool,de_novo,FALSE,FALSE,de novo
+standard,bool,clear_error,FALSE,FALSE,clearly erro(r|neous)
+standard,bool,abuse_disc,FALSE,FALSE,abused? (of|its|his|her) discretion
+standard,bool,arb_cap,FALSE,FALSE,arbitrary and capricious
