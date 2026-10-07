@@ -29,7 +29,7 @@ If applicable, add screenshots to help explain your problem.
 
 **System (please complete the following information):**
 
-- `CourtPy` version: [e.g. 0.2.0]
+- `CourtPy` version: [e.g. 0.1.0]
 - Python version: [e.g. 3.12]
 - OS: [Windows/Linux/MacOS]
 - Source of the opinions: [CourtListener bulk data, CourtListener API, or Lexis-Nexis]

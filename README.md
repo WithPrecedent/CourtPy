@@ -68,6 +68,12 @@ account.
 To install `CourtPy`, use `pip`:
 
 ```sh
+pip install courtpy
+```
+
+To install the latest development version from GitHub instead:
+
+```sh
 pip install git+https://github.com/WithPrecedent/CourtPy
 ```
 

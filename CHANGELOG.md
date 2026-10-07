@@ -4,12 +4,13 @@ All notable changes to this project will be documented in this file.
 
 <!-- insertion marker -->
 
-## 0.2.0
+## 0.1.0
 
-A complete rewrite. The analysis is done with
-[amos](https://github.com/WithPrecedent/amos) (and its workflows with
-[chrisjen](https://github.com/WithPrecedent/chrisjen)), which replace
-siMpLify.
+The first release, and the first on PyPI. It is a complete rewrite of the
+earlier, unreleased CourtPy, which was built on siMpLify. The analysis is now
+done with [amos](https://github.com/WithPrecedent/amos) (and its workflows
+with [chrisjen](https://github.com/WithPrecedent/chrisjen)). The changes below
+are from that earlier code.
 
 ### Added
 

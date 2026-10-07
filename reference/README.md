@@ -1,9 +1,9 @@
 # Reference data
 
-These files were used by the old version of CourtPy (0.1) to add information
-about judges and the political context to court cases. They are kept here,
-unchanged, until those features are rebuilt on the new version. They are not
-part of the installed package.
+These files were used by the earlier, unreleased CourtPy (built on siMpLify)
+to add information about judges and the political context to court cases.
+They are kept here, unchanged, until those features are rebuilt on the new
+version. They are not part of the installed package.
 
 | Folder | Contents | Source |
 | --- | --- | --- |
