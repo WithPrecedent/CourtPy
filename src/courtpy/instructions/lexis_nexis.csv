@@ -1,0 +1,16 @@
+target,variable,kind,pattern,value,ignorecase,dotall,note
+text,"header, opinion",split,\nOPINION(?=\n\n),,FALSE,FALSE,"Divides the header from the opinions at the line ""OPINION"""
+header,party,section,\w.*?(?=\n\n|$),,FALSE,TRUE,"The caption, which is the first paragraph"
+header,court,section,\n(IN )?(THE )?(UNITED STATES COURTS? OF APPEALS FOR THE|UNITED STATES BANKRUPTCY APPELLATE|TEMPORARY EMERGENCY COURT OF APPEALS|JUDICIAL COUNCIL (OF|FOR) THE).*?(?=\n\n|$),,TRUE,TRUE,
+header,docket_number,section,(C\.?A\.?|Case)? ?(DOCKET )? ?(NOS?\. )? ?(NO\:)? ?\d\d*\-\d\d*.*?(?=\n\n|$),,TRUE,TRUE,
+header,history,section,\nPRIOR HISTORY\:.*?(?=\n\n|$),,TRUE,TRUE,
+header,future,section,\nSUBSEQUENT HISTORY\:.*?(?=\n\n|$),,TRUE,TRUE,
+header,counsel,section,"\nCOUNSEL\:.*?(?=(\nNOTICE\:|\nSUBSEQUENT HISTORY\:|\nPRIOR HISTORY\:|\n\n(DOCKET )?(NOS?\. )?\d\d*\-\d\d|\n(?:\d\d*)? ?(?:JAN(?:\.|UARY)|FEB(?:\.|RUARY)|MAR(?:\.|CH)|APR(?:\.|IL)|MAY |JUN(?:\.|E)|JUL(?:\.|Y)|AUG(?:\.|UST)|SEP(?:\.|T\.|TEMBER)|OCT(?:\.|OBER)|NOV(?:\.|EMBER)|DEC(?:\.|EMBER)).*? (?:\d\d*\, )?\d\d\d\d|\nDISPOSITION\:.|\n\d* (?:F\.[23]?d|U\.S\.|S\. Ct\.|U\.S\. APP\. LEXIS|Fed\. Appx\.) \d\d|\nJUDGES\:|\nOPINION BY\:|BEFORE\:|\nOPINION|$))",,TRUE,TRUE,
+header,notice,section,\nNOTICE\:.*?(?=\n\n|$),,TRUE,TRUE,
+header,dates,excerpts,"(?<=\n)(?:\d\d*)? ?(?:JAN(?:\.|UARY)|FEB(?:\.|RUARY)|MAR(?:\.|CH)|APR(?:\.|IL)|MAY |JUN(?:\.|E)|JUL(?:\.|Y)|AUG(?:\.|UST)|SEP(?:\.|T\.|TEMBER)|OCT(?:\.|OBER)|NOV(?:\.|EMBER)|DEC(?:\.|EMBER)).*? (?:\d\d*\, )?\d\d\d\d.*?(?=\n)",,TRUE,FALSE,"Every line with a date (argued, submitted, decided, filed)"
+header,disposition,section,\nDISPOSITION\:.*?(?=\n\n|$),,TRUE,FALSE,
+header,citation,section,(?<=\n)\d* (?:F\.(?:[23]d|4th)|U\.S\.|S\. Ct\.|U\.S\. APP\. LEXIS|Fed\. Appx\.) \d\d*.*?(?=\n),,TRUE,TRUE,
+header,judges,section,\nJUDGES\:.*?(?=\n\n|\nOPINION|$),,TRUE,TRUE,"The ""JUDGES:"" paragraph"
+header,opinion_by,section,\nOPINION BY\:.*?(\n|$),,FALSE,FALSE,"The ""OPINION BY:"" line"
+text,concurring_lines,excerpts,(?<=\n)CONCUR.*?(?=\n)|concurring\:.*?(?=\n)|(?<=\n)Concur By\: .*?(?=\n)|(?<=\n)DISSENT[^\n]*?IN PART[^\n]*,,FALSE,FALSE,Lines about concurrences (and opinions dissenting in part)
+text,dissenting_lines,excerpts,(?<=\n)DISSENT.*?(?=\n)|dissenting\:.*?(?=\n)|(?<=\n)Dissent By\: .*?(?=\n)|(?<=\n)CONCUR[^\n]*?IN PART[^\n]*,,FALSE,FALSE,Lines about dissents (and opinions concurring in part)

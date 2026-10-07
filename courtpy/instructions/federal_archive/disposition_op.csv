@@ -1,8 +1,0 @@
-values,dotall,ignorecase,keys
-affirm,FALSE,FALSE,(AFFIRM|[Ww]e (thus |will )?[Aa]ffirm| is affirmed|must be affirmed)
-denied,FALSE,FALSE,(DEN(IED|Y)| is denied|[Ww]e (will )?deny)
-reversed,FALSE,FALSE,(REVERSE|[Ww]e (will)?reverse| is reversed)
-vacate,FALSE,FALSE,(VACATE|[Ww]e (will)?vacate| is vacated)
-remand,FALSE,FALSE,(REMAND|[Ww]e (will)?remand| is remanded)
-dismiss,FALSE,FALSE,(DISMISS|[Ww]e (will)? Dismiss| is dismissed)
-order_enforced,FALSE,FALSE,Order of the National Labor Relations Board enforced

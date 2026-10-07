@@ -1,0 +1,261 @@
+# Project packaging rules and instructions
+
+[project]
+name = "courtpy"
+description = "Accessible tools for collecting, parsing, and analyzing court opinions"
+authors = [{name = "Corey Rayburn Yung", email = "coreyrayburnyung@gmail.com"}]
+license = {text = "Apache Software License 2.0"}
+readme = "README.md"
+requires-python = ">=3.11"
+version = "0.2.0"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Education",
+    "Intended Audience :: Legal Industry",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Text Processing"]
+keywords = [
+    "courtlistener",
+    "court opinions",
+    "empirical legal studies",
+    "law",
+    "lexis",
+    "text parsing"]
+dependencies = [
+    "amos>=0.2.2",
+    "chrisjen>=0.2.0",
+    "keyring>=24",
+    "nagata>=0.2.0",
+    "pandas>=2.2",
+    "requests>=2.31"]
+
+[project.optional-dependencies]
+# Saves case tables as parquet files, which keep lists and types.
+parquet = ["pyarrow>=15"]
+# Every optional package that amos can use for analysis.
+analysis = ["amos[all]"]
+
+[project.scripts]
+courtpy = "courtpy.cli:main"
+
+[project.urls]
+Documentation = "https://WithPrecedent.github.io/CourtPy"
+Repository = "https://github.com/WithPrecedent/CourtPy"
+Homepage = "https://github.com/WithPrecedent/CourtPy"
+Issues = "https://github.com/WithPrecedent/CourtPy/issues"
+Changelog = "https://WithPrecedent.github.io/CourtPy/changelog"
+
+[dependency-groups]
+dev = [
+    "uv",
+    "markdown-callouts",
+    "markdown-exec",
+    "mkdocs",
+    "mkdocs-coverage",
+    "mkdocs-gen-files",
+    "mkdocs-git-committers-plugin-2",
+    "mkdocs-literate-nav",
+    "mkdocs-material",
+    "mkdocs-minify-plugin",
+    "mkdocstrings[python]",
+    "toml",
+    "mypy",
+    "pandas-stubs",
+    "pre-commit",
+    "ruff",
+    "types-requests",
+    {include-group = "tests"}]
+tests = [
+    "coverage",
+    "pytest",
+    "pytest-cov",
+    "pytest-randomly",
+    "pytest-xdist"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/courtpy"]
+
+
+[tool.coverage.report]
+skip_empty = true
+show_missing = true
+exclude_lines = [
+  "if TYPE_CHECKING:"]
+
+[tool.coverage.paths]
+source = ["src", "*/site-packages"]
+tests = ["tests", "*/tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["courtpy", "tests"]
+
+
+[tool.mypy]
+files = ['src']
+disallow_untyped_defs = true
+disallow_any_unimported = true
+no_implicit_optional = true
+check_untyped_defs = true
+warn_return_any = true
+warn_unused_ignores = true
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+# These packages are annotated but do not ship a py.typed marker.
+module = [
+    "amos.*",
+    "bobbie.*",
+    "camina.*",
+    "chrisjen.*",
+    "holden.*",
+    "keyring.*",
+    "miller.*",
+    "nagata.*",
+    "wonka.*"]
+follow_untyped_imports = true
+ignore_missing_imports = true
+
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--showlocals"
+filterwarnings = ["ignore::DeprecationWarning"]
+pythonpath = ["src"]
+
+[tool.ruff]
+extend-exclude = ["docs", "scripts", "site", "tests", "examples", ".*.*"]
+fix = true
+line-length = 80
+lint.dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+lint.fixable = ["ALL"]
+lint.ignore = [
+    "A001",  # Variable is shadowing a Python builtin
+    "A005",  # Module shadows a Python standard-library module ('secrets')
+    "ANN401",  # Dynamically typed expressions (typing.Any) are disallowed
+    "ARG003",  # Unused class method argument: `parameters`
+    "ARG005",  # Unused lambda argument
+    "COM812",  # Recommended disable by Ruff
+    "C901",  # Too complex
+    "D105",  # Missing docstring in magic method
+    "D400",  # First line must end in a period
+    "D401",  # First line of docstring should be in imperative mood
+    "D406",  # Section name should end with a newline - bugged for 'Attributes:'
+    "D407",  # Missing dashed underline after section ("Args")
+    "D415",  # First line must end in a period, question mark, or exclamation point
+    "E501",  # Line too long
+    "E731",  # Do not assign a `lambda` expression, use a `def`
+    "ERA001",  # Commented out code
+    "EXE002",  # No shebang is present in an executable file
+    "FBT001",  # Boolean positional arg in function definition
+    "FBT002",  # Boolean default positional argument in function definition
+    "FBT003",  # Boolean positional value in function call (pd.Series(False))
+    "G004",  # Logging statement uses f-string
+    "PTH123",  # `open()` should be replaced by `Path.open()`
+    "PLR0911",  # Too many return statements
+    "PLR0912",  # Too many branches
+    "PLR0913",  # Too many arguments to function call
+    "PLR0915",  # Too many statements
+    "PLR1711", # Useless 'return' at the end of function
+    "PLR2004",  # Magic value used in comparison
+    "Q000",  # Single quotes found but double quotes preferred
+    "RET505",  # Unnecessary `else` after `return` statement
+    # "S0001",  # Use of assert detected
+    "SLF001", # Private member accessed
+    "T201",  # `print` found (the command line interface prints)
+    "TID252",  # Relative imports are banned
+    "TRY003",]  # Avoid specifying long messages outside the exception class
+lint.select = [
+    "A",  # flake8-buttons
+    "ANN",  # flake8-annotations
+    "ARG",  # flake8-unused-arguments
+    "B",  # flake8-bugbear
+    "BLE",  # flake8-blind-except
+    "C",  #
+    "C4",  # flake8-comprehensions
+    "COM",  # flake8-commas
+    "D",  # pydocstyle
+    "DTZ",  # flake8-datetimez
+    "E",  # pydocstyle errors
+    "ERA",  # eradicate
+    "EXE",  # flake8-executable
+    "F",  # Pyflakes
+    "FBT",  # flake8-boolean-trap
+    "G",  # flake8-logging-format
+    "I",  # isort
+    "ICN",  # flake8-import-conventions
+    "INP",  # flake8-no-pep420
+    "ISC",  # flake8-implicit-str-concat
+    "N",  # pep8-naming
+    "NPY",  # NumPy-specific rules
+    "PD",  # pandas-vet
+    "PGH",  # pygrep-hooks
+    "PIE",  # flake8-pie
+    "PL",  # Pylint
+    "PLC",  # Pylint
+    "PLE",  # Pylint
+    "PLR",  # Pylint
+    "PLW",  # Pylint
+    "PT",  # flake8-pytest-style
+    "PTH",  # flake8-use-pathlib
+    "PYI",  # flake8-pyi
+    "Q",  # flake8-quotes
+    "RUF",  # Ruff-specific rules
+    "RSE",  # flake8-raise
+    "RET",  # flake8-return
+    "S",  # bandit
+    "SIM",  # flake8-slots
+    "SLF",  # flake8-self
+    "T",  #
+    "T10",  # flake8-debugger
+    "T20",  # flake8-print
+    "TID",  # flake8-tidy-imports
+    "TRY",  # tryceratops
+    "UP",  # pyupgrade
+    "W",  # pydocstyle warnings
+    "YTT",]  # flake8-2020
+lint.task-tags = ["To Do:"]
+
+[tool.ruff.lint.flake8-annotations]
+suppress-none-returning = true
+
+[tool.ruff.lint.flake8-quotes]
+docstring-quotes = "double"
+inline-quotes = "double"
+multiline-quotes = "double"
+
+[tool.ruff.lint.flake8-type-checking]
+exempt-modules = ["typing", "typing_extensions"]
+
+[tool.ruff.lint.flake8-unused-arguments]
+ignore-variadic-names = true
+
+[tool.ruff.lint.isort]
+case-sensitive = true
+required-imports = ["from __future__ import annotations"]
+split-on-trailing-comma = false
+
+[tool.ruff.lint.per-file-ignores]
+# The package's docstring is its license notice.
+"src/courtpy/__init__.py" = ["D205"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+ignore-decorators = ["typing.overload"]
+
+[tool.uv]
+package = true

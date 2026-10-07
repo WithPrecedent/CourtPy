@@ -1,0 +1,108 @@
+# Automatically performs jobs upon a commit push or pull-request
+
+# This Action builds, tests, and lints the package. Then, it builds the
+# documentation and deploys it on GitHub Pages.
+
+# If the commit message matches a semantic version (e.g. "v0.1.2"), a GitHub
+# release will be created by the `create_github_release` job.
+
+name: continuous integration
+
+# Allows this Action to be called by a push or pull request
+on: [push, pull_request]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  DISABLE_MKDOCS_2_WARNING: "true"
+
+jobs:
+
+  build_and_test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # amos, which CourtPy is built on, requires Python 3.11 or later.
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+    - name: checkout repository
+      uses: actions/checkout@v7
+
+    - name: install python
+      uses: actions/setup-python@v7
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: install uv
+      uses: astral-sh/setup-uv@v10.2.0
+
+    - name: install dependencies
+      run: uv sync --python ${{ matrix.python-version }}
+
+    - name: run pre-commit
+      run: uv run pre-commit run -a --show-diff-on-failure
+
+    - name: run tests
+      run: uv run pytest tests
+
+  lint_and_format:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: checkout repository
+      uses: actions/checkout@v7
+
+    - name: install uv
+      uses: astral-sh/setup-uv@v10.2.0
+
+    - name: install dependencies
+      run: uv sync
+
+    - name: run ruff
+      run: uv run ruff check --no-fix --output-format=github
+
+    - name: run mypy
+      run: uv run mypy
+
+  document_and_deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: checkout repository
+      uses: actions/checkout@v7
+
+    - name: install uv
+      uses: astral-sh/setup-uv@v10.2.0
+
+    - name: install dependencies
+      run: uv sync
+
+    - name: build documentation with mkdocs
+      run: uv run mkdocs build
+
+    - name: deploy documentation to github pages
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      run: uv run mkdocs gh-deploy --force --clean --verbose
+
+  # Only triggered if a line of the commit message is a semantic version (e.g.
+  # "v0.1.2"). The `m` flag lets the version be followed by other lines, such
+  # as a "Co-Authored-By:" trailer.
+  create_github_release:
+    name: create github release
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: initiate github release
+      uses: CupOfTea696/gh-action-auto-release@v1.0.2
+      with:
+        title: "Release: $version"
+        tag: "v$semver"
+        regex: "/^v#{semver}$/im"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

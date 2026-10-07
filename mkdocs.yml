@@ -1,0 +1,159 @@
+# Project Documentation Rules and Instructions
+
+# Project Information
+
+site_name: CourtPy
+site_description: Accessible tools for collecting, parsing, and analyzing court opinions
+site_url: https://WithPrecedent.github.io/CourtPy
+repo_name: WithPrecedent/CourtPy
+repo_url: https://github.com/WithPrecedent/CourtPy
+edit_uri: edit/main/docs/
+watch: [
+  mkdocs.yml,
+  README.md,
+  CONTRIBUTING.md,
+  CHANGELOG.md,
+  src/courtpy]
+copyright: Copyright, 2026 Corey Rayburn Yung
+docs_dir: docs
+
+# Documentation Structure
+
+nav:
+- Home:
+  - Overview: index.md
+  - Changelog: changelog.md
+  - License: license.md
+- User Guide:
+  - Tutorial: tutorial.md
+  - Advanced User Guide: advanced.md
+  - Writing Rules: rules.md
+  - Recipes: recipes.md
+- API: reference/
+- Development:
+  - Contributing: contributing.md
+  - Code of Conduct: code_of_conduct.md
+  # - Coverage Report: coverage.md
+
+# Documentation Appearance
+
+theme:
+  name: material
+  locale: en
+  icon:
+    repo: fontawesome/brands/github
+  features:
+  - announce.dismiss
+  - content.action.edit
+  - content.action.view
+  - content.code.annotate
+  - content.code.copy
+  - content.tabs.link
+  - content.tooltips
+  - navigation.footer
+  - navigation.indexes
+  - navigation.path
+  - navigation.sections
+  - navigation.tabs
+  - navigation.tabs.sticky
+  - navigation.top
+  - navigation.tracking
+  - search.highlight
+  - search.suggest
+  - toc.follow
+  palette:
+  - media: "(prefers-color-scheme)"
+    toggle:
+      icon: material/brightness-auto
+      name: Switch to light mode
+  - media: "(prefers-color-scheme: light)"
+    scheme: default
+    primary: teal
+    accent: purple
+    toggle:
+      icon: material/weather-sunny
+      name: Switch to dark mode
+  - media: "(prefers-color-scheme: dark)"
+    scheme: slate
+    primary: black
+    accent: lime
+    toggle:
+      icon: material/weather-night
+      name: Switch to system preference
+
+# Extras, Extensions, and Plugins
+
+extra_css:
+- css/material.css
+- css/mkdocstrings.css
+
+markdown_extensions:
+- attr_list
+- admonition
+- callouts
+- footnotes
+- md_in_html
+- pymdownx.details
+- pymdownx.emoji:
+    emoji_index: !!python/name:material.extensions.emoji.twemoji
+    emoji_generator: !!python/name:material.extensions.emoji.to_svg
+- pymdownx.highlight:
+    anchor_linenums: true
+    line_spans: __span
+- pymdownx.inlinehilite
+- pymdownx.magiclink
+- pymdownx.mark
+- pymdownx.smartsymbols
+- pymdownx.snippets:
+    check_paths: true
+- pymdownx.superfences:
+    custom_fences:
+    - name: mermaid
+      class: mermaid
+      format: !!python/name:pymdownx.superfences.fence_code_format
+- pymdownx.tabbed:
+    alternate_style: true
+- pymdownx.tasklist:
+    custom_checkbox: true
+- sane_lists
+- tables
+- toc:
+    permalink: true
+
+plugins:
+- autorefs
+# - coverage:
+#     page_name: coverage
+#     html_report_dir: htmlcov
+- gen-files:
+    scripts:
+    - docs/scripts/gen_ref_nav.py
+- literate-nav:
+    nav_file: SUMMARY.md
+- markdown-exec:
+- minify:
+    minify_html: !ENV [DEPLOY, false]
+- mkdocstrings:
+    handlers:
+      python:
+        options:
+          docstring_section_style: table
+          # Leaves out private and dunder members (names that start with "_").
+          filters:
+            - "!^_"
+          heading_level: 1
+          # members_order: alphabetical
+          merge_init_into_class: true
+          # Lets griffe see the fields that CourtPy classes inherit.
+          preload_modules: [amos, chrisjen, holden]
+          separate_signature: false
+          show_signature_annotations: false
+        paths: [src]
+- search:
+
+extra:
+  social:
+  - icon: fontawesome/brands/github
+    link: https://github.com/WithPrecedent
+  - icon: fontawesome/brands/python
+    link: https://pypi.org/project/courtpy/

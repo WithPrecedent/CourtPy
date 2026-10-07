@@ -1,0 +1,34 @@
+# Securely publishes the repository on PyPI
+
+
+# To make this action work, you need to configure PyPI properly, using this
+# guide: https://docs.pypi.org/trusted-publishers/adding-a-publisher/
+
+name: publish
+
+# Allows this Action to be called by other Actions or through GitHub
+on: [workflow_call, workflow_dispatch]
+
+jobs:
+
+  pypi_publish:
+    name: publish to pypi
+    runs-on: ubuntu-latest
+    permissions:
+      # This permission is needed for private repositories.
+      contents: read
+      # IMPORTANT: this permission is mandatory for trusted publishing
+      id-token: write
+
+    steps:
+    - name: get repository
+      uses: actions/checkout@v7
+
+    - name: install uv
+      uses: astral-sh/setup-uv@v10.2.0
+
+    - name: build package
+      run: uv build
+
+    - name: push to pypi
+      run: uv publish

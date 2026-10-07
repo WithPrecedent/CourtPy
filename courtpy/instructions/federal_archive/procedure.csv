@@ -1,7 +1,0 @@
-values,dotall,ignorecase,keys
-pro_se,FALSE,FALSE,pro se 
-indigent,FALSE,TRUE,in forma pauperis
-mandamus,FALSE,FALSE,[Mm]andamus
-mootness,FALSE,FALSE, [Mm]oot 
-interloc,FALSE,FALSE,[Ii]nterlocutory
-jury_trial,FALSE,FALSE, jury

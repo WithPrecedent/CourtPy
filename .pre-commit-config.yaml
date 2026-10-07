@@ -1,0 +1,44 @@
+# The reference data (large CSV files kept from CourtPy 0.1) is left exactly as
+# it is.
+exclude: ^reference/
+
+repos:
+
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: "v6.0.0"
+  hooks:
+  - id: check-added-large-files
+    # The lock file lists every package and its hashes.
+    exclude: ^uv\.lock$
+  - id: check-ast
+  - id: check-json
+  - id: check-toml
+  - id: detect-private-key
+  - id: end-of-file-fixer
+  - id: trailing-whitespace
+
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  # Ruff version.
+  rev: v0.16.9
+  hooks:
+    # Run the linter. The formatter is not used because it removes the spaces
+    # around "=" in keyword arguments (see CONTRIBUTING.md).
+    - id: ruff
+      args: [ --fix ]
+
+- repo: https://github.com/astral-sh/uv-pre-commit
+  # uv version.
+  rev: 0.12.20
+  hooks:
+    - id: uv-lock
+
+- repo: https://github.com/jsh9/pydoclint
+  rev: 0.10.1
+  hooks:
+    - id: pydoclint
+      args:
+        - --style=google
+        - --check-return-types=False
+        - --arg-type-hints-in-docstring=False
+        - --check-class-attributes=False
+        - --skip-checking-raises=True
