@@ -138,9 +138,11 @@ plugins:
       python:
         options:
           docstring_section_style: table
-          # Leaves out private and dunder members (names that start with "_").
+          # Leaves out private and dunder members (names that start with "_"),
+          # and `Project`, which is `amos.Project` (documented by amos).
           filters:
             - "!^_"
+            - "!^Project$"
           heading_level: 1
           # members_order: alphabetical
           merge_init_into_class: true

@@ -6,7 +6,9 @@ and the [advanced user guide](advanced.md) for every setting.
 ## Study only criminal appeals
 
 `outcome_criminal_defendant_won` is missing for civil cases, so keep only the
-criminal cases (and those whose winner is known) before using it as a label:
+criminal cases (and those whose winner is known) before using it as a label.
+This study loads a table of cases saved earlier (with `courtpy parse` or
+`courtpy.save_cases`):
 
 ```ini
 [general]
@@ -17,7 +19,10 @@ label = outcome_criminal_defendant_won
 criminal_workers = wrangler, analyst, critic
 
 [wrangler]
-techniques = filter_rows, drop_missing, drop_text
+techniques = load_cases, filter_rows, drop_missing, drop_text
+
+[load_cases_parameters]
+source = cases.csv
 
 [filter_rows_parameters]
 query = type_criminal
@@ -26,7 +31,7 @@ query = type_criminal
 columns = outcome_criminal_defendant_won
 
 [analyst]
-techniques = stratified, logit
+techniques = stratified, sk_logit
 
 [critic]
 techniques = scorecard
@@ -53,8 +58,9 @@ opinion,chevron_mentions,count,\bChevron\b,,FALSE,FALSE,
 table = courtpy.parse("court_listener", rulebooks = ["federal", "deference.csv"])
 ```
 
-or, in a settings file, `rulebooks = federal, deference.csv` in the "cases"
-section. Check the file first with `courtpy rules deference.csv`.
+or, in a settings file, `rulebooks = federal, deference.csv` in the loader's
+parameters (such as the "load_court_listener_parameters" section). Check the
+file first with `courtpy rules deference.csv`.
 
 ## Keep a set of recent cases up to date
 

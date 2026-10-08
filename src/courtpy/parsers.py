@@ -20,6 +20,10 @@ Contents:
     Source: how to read and parse one source of opinions.
     find_files: returns the saved cases of a source in a folder.
     parse: parses a folder of saved cases into a table.
+    logger: the module's logger, which reports parsing progress and cases
+        that could not be parsed.
+    _derive: adds columns that summarize others to a parsed case.
+    _parse_all: parses each saved case, in one process or several.
 
 """
 
@@ -180,7 +184,19 @@ class Parser:
     """ Private Methods """
 
     def _structure(self, name: str) -> rules.Rulebook:
-        """Returns the rulebook `name`, loading it the first time."""
+        """Returns the rulebook that finds the sections of a source's cases.
+
+        The rulebook is loaded the first time it is needed and kept in
+        `structures`, so its CSV files are read only once.
+
+        Args:
+            name: the name of a built-in rulebook or the path to a CSV file
+                (a `Source`'s `structure`, such as "lexis_nexis").
+
+        Returns:
+            The rulebook.
+
+        """
         if name not in self.structures:
             self.structures[name] = rules.Rulebook.load(name)
         return self.structures[name]
@@ -277,11 +293,17 @@ def parse(
 
 
 def _derive(row: MutableMapping[str, Any], sections: dict[str, str]) -> None:
-    """Adds columns that summarize others.
+    """Adds columns that summarize others to a parsed case.
+
+    The columns are "author" (the first of "authors", unless the case's
+    metadata already gave one), "panel_size" (the number of judges named, or
+    of CourtListener's panel ids if there are more of them), "concurrences"
+    and "dissents" (the number of judges who concurred or dissented), and
+    "word_count" (the number of words in the opinions).
 
     Args:
-        row: a parsed case.
-        sections: its sections of text.
+        row: a parsed case. It is changed in place.
+        sections: its sections of text, after the rules were applied.
 
     """
     authors = row.get('authors') or []
@@ -299,7 +321,24 @@ def _parse_all(
     paths: Sequence[pathlib.Path],
     source: str,
     workers: int) -> list[Any]:
-    """Parses each path, returning its result or the error it raised."""
+    """Parses each saved case, in one process or several.
+
+    An error while reading or parsing one case does not stop the others: the
+    error takes the place of the case's result. With one worker (or one
+    case), the cases are parsed in this process, and progress is logged every
+    1,000 cases. Otherwise, they are parsed in a pool of `workers` processes.
+
+    Args:
+        parser: the parser to use. It is copied to each process.
+        paths: the paths of the saved cases.
+        source: the name of their source, such as "court_listener".
+        workers: number of processes to parse with.
+
+    Returns:
+        For each path, in order, the case's id and row (see
+            `Parser.parse_file`) or the error that parsing it raised.
+
+    """
     if workers <= 1 or len(paths) < 2:
         results: list[Any] = []
         for number, path in enumerate(paths, start = 1):

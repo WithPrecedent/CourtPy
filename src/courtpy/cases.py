@@ -5,6 +5,16 @@ Contents:
     load_cases: loads a table of parsed cases.
     save_cases: saves a table of parsed cases.
     tidy: gives columns with missing values the right type.
+    _LIST_COLUMNS_FILE: the name of the file, saved beside a CSV file of
+        cases, that lists the columns that held lists, so that `load_cases`
+        can restore them. "{stem}" is replaced with the name of the CSV file
+        without its extension.
+    _SEPARATOR: the text between the items of a list when a table is saved as
+        a CSV file.
+    _WHOLE_NUMBERS: columns of whole numbers that may be missing for some
+        cases, which `tidy` gives the "Int64" type.
+    _is_list: returns whether a value is a `list` or `tuple`.
+    _unjoin: returns text saved by `save_cases` as a list again.
 
 """
 
@@ -17,11 +27,8 @@ from typing import Any
 
 import pandas as pd
 
-# Separates the items of a list when a table is saved as a CSV file.
 _SEPARATOR: str = '; '
-# Columns that hold lists, so that they can be restored from a CSV file.
 _LIST_COLUMNS_FILE: str = '{stem}.lists.json'
-# Columns of whole numbers that may be missing for some cases.
 _WHOLE_NUMBERS: frozenset[str] = frozenset({
     'year', 'court_num', 'cluster_id', 'docket_id', 'author_id',
     'citation_count'})
@@ -154,12 +161,31 @@ def tidy(data: pd.DataFrame) -> pd.DataFrame:
 
 
 def _is_list(value: Any) -> bool:
-    """Returns whether `value` is a `list` or `tuple`."""
+    """Returns whether `value` is a `list` or `tuple`.
+
+    Args:
+        value: a value in a table of cases.
+
+    Returns:
+        Whether `value` is a `list` or `tuple` (such as the names made by a
+            `names` rule).
+
+    """
     return isinstance(value, list | tuple)
 
 
 def _unjoin(value: Any) -> list[str]:
-    """Returns text saved by `save_cases` as a list again."""
+    """Returns text saved by `save_cases` as a list again.
+
+    Args:
+        value: a cell of a column that held lists, read from a CSV file: the
+            items joined by `_SEPARATOR`, or a missing value for an empty
+            list.
+
+    Returns:
+        The items, or an empty `list` if `value` is not text or is blank.
+
+    """
     if not isinstance(value, str) or not value:
         return []
     return value.split(_SEPARATOR)

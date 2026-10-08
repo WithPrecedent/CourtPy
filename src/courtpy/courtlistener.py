@@ -29,6 +29,31 @@ Contents:
     read_case: reads a saved case for parsing.
     save_case: saves a case.
     slim_opinion: keeps one field of an opinion's text, to save space.
+    logger: the module's logger, which reports the progress of downloads and
+        pauses asked for by CourtListener.
+    _OPINION_KEPT: the fields of an opinion that are kept in a saved case,
+        besides one field of text (see `slim_opinion`).
+    _RETRIES: most times a request is tried again after a temporary error
+        (see `_TEMPORARY`) or a failed connection.
+    _ROLES: pairs of a fragment of an opinion's type (as CourtListener names
+        types, such as "010combined" and "040dissent") and the role of
+        opinions whose types contain it, in the order they are checked. Types
+        that contain none of them (such as "050addendum") have the role
+        "other" (see `opinion_role`).
+    _SITE: the address of CourtListener's website, which begins the address
+        of each case.
+    _TEMPORARY: HTTP status codes of temporary server errors, after which a
+        request is tried again.
+    _cluster_id: returns the cluster id of an opinion.
+    _detail: returns the explanation in an error response.
+    _first: returns the first value that is not blank, as text.
+    _id_from_url: returns the id at the end of an API address.
+    _load_json: returns the contents of a JSON file.
+    _retry_after: returns how many seconds a 429 response asks to wait.
+    _save_json: saves a JSON file, creating its folder if needed.
+    _texts: returns the values that are not blank, as text.
+    _true: returns whether a value from the API or bulk data is true.
+    _url: returns the address of a case on CourtListener.
 
 """
 
@@ -51,15 +76,13 @@ from . import cases, options, secrets, utilities
 
 logger = logging.getLogger(__name__)
 _SITE: str = 'https://www.courtlistener.com'
-# Status codes that are worth trying again after a pause.
 _TEMPORARY: frozenset[int] = frozenset({500, 502, 503, 504})
 _RETRIES: int = 4
-# Opinion fields kept in a saved case (besides one field of text).
 _OPINION_KEPT: tuple[str, ...] = (
     'id', 'cluster_id', 'type', 'author_id', 'author_str', 'per_curiam',
     'joined_by_str', 'joined_by', 'ordering_key', 'download_url')
-# The kind of each opinion type that CourtListener uses ("010combined" and
-# so on). Types not listed here (such as "050addendum") are "other".
+# "Concurrence in part" is checked before "dissent" and "concur", which it
+# also contains. "unamimous" is CourtListener's own spelling of the type.
 _ROLES: tuple[tuple[str, str], ...] = (
     ('concurrenceinpart', 'mixed'),
     ('in part', 'mixed'),
@@ -128,6 +151,12 @@ class CourtListener:
 
     Attributes:
         requests_made: number of requests made by this client.
+        _courts: information about each court that has been looked up (see
+            `court`), by its id, so that each court is asked for only once.
+        _last_request: when the last request was made, from
+            `time.monotonic`, so that the next one can wait until
+            `min_interval` seconds have passed. It is 0 before the first
+            request.
 
     """
 
@@ -146,7 +175,15 @@ class CourtListener:
     """ Initialization Methods """
 
     def __post_init__(self) -> None:
-        """Finds the API key and prepares the session."""
+        """Finds the API key and prepares the session.
+
+        If no `api_key` was passed, it is found with
+        `courtpy.secrets.get_api_key`. If no `session` was passed, a
+        `requests.Session` is made. The session's headers (if it has any) are
+        set so that every request includes the key, asks for JSON, and
+        identifies courtpy.
+
+        """
         if self.api_key is None:
             self.api_key = secrets.get_api_key()
         if self.session is None:
@@ -360,7 +397,35 @@ class CourtListener:
         max_cases: int | None,
         dockets: bool,
         overwrite: bool) -> list[pathlib.Path]:
-        """Downloads the cases of one court (see `download`)."""
+        """Downloads the cases of one court (see `download`).
+
+        The court's cases (opinion clusters) are listed one page at a time, in
+        the order they were added to CourtListener. For each page, the
+        opinions of the cases that are not already saved are requested
+        together, and each case is saved. After each page, the address of the
+        next page (and of the page just read) is saved in a state file in the
+        ".courtpy" folder of `folder`, named for the court and dates, so that
+        the download can be resumed. Information about the court is saved
+        there too, so that it is asked for only once.
+
+        Args:
+            court: a CourtListener court id, such as "ca1".
+            start_date: earliest date filed, as YYYY-MM-DD, or `None` for no
+                earliest date.
+            end_date: latest date filed, as YYYY-MM-DD, or `None` for no latest
+                date.
+            folder: folder to save the cases in.
+            max_cases: most cases to save in this run, or `None` for every
+                case. A page that would go past it is cut short and read again
+                the next time, so that the cases left out are not skipped.
+            dockets: whether to also download each case's docket.
+            overwrite: whether to start from the first page and download cases
+                that were already saved.
+
+        Returns:
+            The paths of the cases saved in this run.
+
+        """
         state_path = folder / '.courtpy' / (
             f'api_{court}_{start_date or "start"}_{end_date or "end"}.json')
         state = _load_json(state_path) or {}
@@ -463,7 +528,12 @@ class CourtListener:
         return found
 
     def _space_requests(self) -> None:
-        """Waits until `min_interval` seconds have passed since the last request."""
+        """Waits until `min_interval` seconds have passed since the last request.
+
+        Nothing is done before the first request (when `_last_request` is 0)
+        or if enough time has passed already.
+
+        """
         if self._last_request:
             wait = self.min_interval - (time.monotonic() - self._last_request)
             if wait > 0:
@@ -477,7 +547,29 @@ class CourtListener:
         *,
         court: Mapping[str, Any] | None,
         docket: bool) -> pathlib.Path:
-        """Saves a cluster and its opinions (and docket, if asked) as a case."""
+        """Saves a cluster and its opinions (and docket, if asked) as a case.
+
+        The case is saved in the folder of its court, which is the court's id
+        from `court` or, if that is `None`, from the docket. A case whose court
+        cannot be found is saved in a folder named "unknown". The cluster's
+        list of opinion addresses ("sub_opinions") is not kept, because the
+        opinions themselves are.
+
+        Args:
+            cluster: the opinion cluster, from the API.
+            opinions: its opinions, each with one field of text (see
+                `slim_opinion`).
+            folder: the folder of saved cases.
+            court: information about the case's court (see `court`), or `None`
+                if it is not known. If it is `None` and the docket is
+                downloaded, the court is looked up from the docket's
+                "court_id".
+            docket: whether to download the case's docket (one more request).
+
+        Returns:
+            The path of the saved case.
+
+        """
         docket_record = None
         docket_id = cluster.get('docket_id') or _id_from_url(
             cluster.get('docket'))
@@ -647,6 +739,17 @@ def read_case(path: pathlib.Path | str) -> cases.Case:
     roles = [opinion_role(o.get('type')) for o in opinions]
 
     def authors(*kinds: str) -> str:
+        """Returns the authors of the case's opinions with some roles.
+
+        Args:
+            *kinds: roles of opinions (see `opinion_role`), such as
+                "majority" or "dissent".
+
+        Returns:
+            The "author_str" of each opinion with one of those roles, one per
+                line, leaving out blank ones.
+
+        """
         return '\n'.join(
             str(o.get('author_str') or '').strip()
             for o, role in zip(opinions, roles, strict = True)
@@ -758,7 +861,17 @@ def slim_opinion(opinion: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _cluster_id(opinion: Mapping[str, Any]) -> int | None:
-    """Returns the cluster id of an opinion, from its id or its address."""
+    """Returns the cluster id of an opinion.
+
+    Args:
+        opinion: an opinion from the API or the bulk data.
+
+    Returns:
+        Its "cluster_id" or, if that is missing, the id at the end of its
+            "cluster" address (as the API gives it), or `None` if it has
+            neither.
+
+    """
     value = opinion.get('cluster_id')
     if value not in (None, ''):
         return int(value)
@@ -766,7 +879,17 @@ def _cluster_id(opinion: Mapping[str, Any]) -> int | None:
 
 
 def _detail(response: Any) -> str:
-    """Returns the explanation in an error response, shortened."""
+    """Returns the explanation in an error response, shortened.
+
+    Args:
+        response: a response from the API, like a `requests.Response`.
+
+    Returns:
+        The "detail" of its JSON (where CourtListener explains an error) or,
+            if there is none, the text of the response, cut to 300
+            characters.
+
+    """
     try:
         detail = response.json().get('detail')
     except Exception:  # noqa: BLE001
@@ -775,7 +898,17 @@ def _detail(response: Any) -> str:
 
 
 def _first(*values: Any) -> str:
-    """Returns the first value that is not blank, as text."""
+    """Returns the first value that is not blank, as text.
+
+    Args:
+        *values: values to check, in order of preference (such as a case's
+            full name and then its short name).
+
+    Returns:
+        The first value that is not `None` or blank, with spaces trimmed from
+            each end, or an empty `str` if they are all blank.
+
+    """
     for value in values:
         if value not in (None, '') and str(value).strip():
             return str(value).strip()
@@ -783,7 +916,19 @@ def _first(*values: Any) -> str:
 
 
 def _id_from_url(url: Any) -> int | None:
-    """Returns the id at the end of an API address (or an id itself)."""
+    """Returns the id at the end of an API address.
+
+    The API refers to related objects by their addresses, such as
+    "https://www.courtlistener.com/api/rest/v4/people/101/".
+
+    Args:
+        url: an address that ends in a number (with or without a final
+            slash), an id itself, or `None`.
+
+    Returns:
+        The id, or `None` if `url` is blank or does not end in a number.
+
+    """
     if url in (None, ''):
         return None
     if isinstance(url, int):
@@ -793,7 +938,15 @@ def _id_from_url(url: Any) -> int | None:
 
 
 def _load_json(path: pathlib.Path) -> dict[str, Any] | None:
-    """Returns the contents of a JSON file, or `None` if there is none."""
+    """Returns the contents of a JSON file.
+
+    Args:
+        path: path of the file, such as a download's state file.
+
+    Returns:
+        The contents, or `None` if there is no file.
+
+    """
     if not path.is_file():
         return None
     return dict(json.loads(path.read_text(encoding = 'utf-8')))
@@ -803,7 +956,7 @@ def _retry_after(response: Any) -> float:
     """Returns how many seconds a 429 response asks the client to wait.
 
     Args:
-        response: the response.
+        response: the response, like a `requests.Response`.
 
     Returns:
         The seconds in the "Retry-After" header (a number of seconds or a
@@ -824,25 +977,62 @@ def _retry_after(response: Any) -> float:
 
 
 def _save_json(path: pathlib.Path, contents: Mapping[str, Any]) -> None:
-    """Saves `contents` as a JSON file, creating its folder if needed."""
+    """Saves `contents` as a JSON file, creating its folder if needed.
+
+    Args:
+        path: path to save the file to.
+        contents: what to save. It must be something that `json` can write.
+
+    """
     path.parent.mkdir(parents = True, exist_ok = True)
     path.write_text(json.dumps(contents, indent = 2), encoding = 'utf-8')
 
 
 def _texts(*values: Any) -> list[str]:
-    """Returns the values that are not blank, as text."""
+    """Returns the values that are not blank, as text.
+
+    Args:
+        *values: values to keep, if they are not blank (such as a case's
+            procedural history and the court it was appealed from).
+
+    Returns:
+        Each value that is not `None` or blank, with spaces trimmed from each
+            end, in order.
+
+    """
     return [str(v).strip() for v in values if v not in (None, '') and str(v).strip()]
 
 
 def _true(value: Any) -> bool:
-    """Returns whether a value from the API or bulk data is true."""
+    """Returns whether a value from the API or bulk data is true.
+
+    The API gives booleans, but the bulk data (written by PostgreSQL) gives
+    "t" and "f".
+
+    Args:
+        value: a boolean, or text such as "t", "true", or "1" (in any case).
+
+    Returns:
+        Whether `value` is true.
+
+    """
     if isinstance(value, str):
         return value.strip().lower() in {'t', 'true', '1'}
     return bool(value)
 
 
 def _url(cluster: Mapping[str, Any]) -> str | None:
-    """Returns the address of a case on CourtListener."""
+    """Returns the address of a case on CourtListener.
+
+    Args:
+        cluster: the case's opinion cluster.
+
+    Returns:
+        Its "absolute_url" on CourtListener's website or, if it has none (as
+            in the bulk data), an address made from its id and "slug", or
+            `None` if it has no id either.
+
+    """
     if cluster.get('absolute_url'):
         return f'{_SITE}{cluster["absolute_url"]}'
     if cluster.get('id'):

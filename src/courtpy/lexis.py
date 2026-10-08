@@ -14,6 +14,13 @@ Contents:
     finish: adds dates and publication status to a parsed case.
     read_case: reads a Lexis-Nexis case for parsing.
     split: divides files of many cases into one file for each case.
+    logger: the module's logger, which reports how many cases each file held.
+    _DATE_KINDS: words in a line of dates that say what each date is (such
+        as "Argued" in "March 3, 2009, Argued"), in capitals. Each becomes a
+        column such as "date_argued".
+    _DIVIDER: pattern for the line that Lexis-Nexis puts before each case in
+        a file of many cases, such as "3 of 250 DOCUMENTS".
+    _read_text: returns the text of a file in UTF-8 or Windows-1252.
 
 """
 
@@ -28,9 +35,7 @@ from typing import Any
 from . import cases, utilities
 
 logger = logging.getLogger(__name__)
-# The line before each case in a file of many cases.
 _DIVIDER: re.Pattern[str] = re.compile(r'\d+ of \d+ DOCUMENTS', re.IGNORECASE)
-# Words in a line of dates that say what each date is.
 _DATE_KINDS: tuple[str, ...] = (
     'DECIDED', 'FILED', 'ARGUED', 'SUBMITTED', 'AMENDED')
 
@@ -160,11 +165,15 @@ def split(
 def _read_text(path: pathlib.Path) -> str:
     """Returns the text of a file in UTF-8 or, failing that, Windows-1252.
 
+    Lexis-Nexis has saved downloads in both encodings. Text that is not valid
+    UTF-8 is read as Windows-1252, with any byte that is not valid there
+    either replaced by a placeholder character.
+
     Args:
         path: path of a text file.
 
     Returns:
-        The text.
+        The text, without a UTF-8 byte order mark if the file had one.
 
     """
     data = path.read_bytes()

@@ -4,6 +4,45 @@ All notable changes to this project will be documented in this file.
 
 <!-- insertion marker -->
 
+## 0.2.0
+
+Updated to [amos](https://github.com/WithPrecedent/amos) 0.2.3, whose loaders
+replace the "cases" section of a project's settings. Settings written for
+0.1.0 need the changes below.
+
+### Added
+
+* Loaders, a genre of `amos` loaders (`CaseLoader`) in the new `loaders`
+  module: `load_court_listener` downloads (if asked), parses, and codes
+  CourtListener cases; `load_lexis_nexis` divides, parses, and codes
+  Lexis-Nexis cases; and `load_cases` loads a table saved by `save_cases`.
+  Named first in the wrangler, a loader makes the project's data, so a
+  project needs no `item`. Loaders work through the project's clerk: sources
+  are found (and downloads saved) in its input folder, and a "save"d table is
+  kept in its interim folder. The label is checked after the coders run, so
+  it can be a column that a coder makes, and the dataset's history records
+  the loader and each coder.
+
+### Changed
+
+* Requires amos 0.2.3 (and pandas 3).
+* `courtpy.Project` is now `amos.Project` itself, which runs a workflow with a
+  loader without an `item`.
+* `code` moved to the `coders` module (it is still `courtpy.code`).
+* The example study and the documentation use `sk_logit`, scikit-learn's
+  logistic regression, because amos 0.2.3 gave the name `logit` to the
+  statsmodels model (which needs `pip install amos[statistics]`).
+
+### Removed
+
+* The "cases" section of a project's settings, `courtpy.build`,
+  `courtpy.collect`, and the `interface` module. Move the settings of a
+  "cases" section to a "load_court_listener_parameters" (or
+  "load_lexis_nexis_parameters") section, add the loader to the start of the
+  wrangler's techniques, and rename "folder" to "source". Relative paths are
+  now in the clerk's input folder ("save" in its interim folder) rather than
+  its root folder.
+
 ## 0.1.0
 
 The first release, and the first on PyPI. It is a complete rewrite of the

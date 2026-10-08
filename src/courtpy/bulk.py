@@ -29,6 +29,33 @@ over if the connection fails.
 
 Contents:
     BulkData: lists, downloads, and extracts cases from the bulk data.
+    logger: the module's logger, which reports the progress of downloads and
+        of reading the files.
+    _BOOLEANS: columns of the bulk files that hold booleans, written as "t"
+        and "f".
+    _BUFFER_BYTES: how many bytes of opinion text are held in memory before
+        the opinions are written to their saved cases.
+    _CHUNK: how many bytes of a bulk file are downloaded at a time.
+    _CLUSTER_SKIPPED: columns of the opinion clusters file that are not kept
+        with a saved case (dates the record changed and the paths of files
+        stored by CourtListener).
+    _DATE: pattern for the date in the name of a bulk file, such as
+        "opinions-2026-09-30.csv.bz2", with the date as its group.
+    _DIALECT: settings for the `csv` module to read the bulk files, which
+        PostgreSQL writes with a backslash before quotes in values (instead of
+        doubling them).
+    _FIELD_LIMIT: the longest value (in characters) that the `csv` module
+        reads, which is raised because opinions are longer than its default.
+        It is at most 2 ** 31 - 1, because a C `long` is 32 bits on Windows.
+    _INTEGERS: columns of the bulk files that hold whole numbers.
+    _KINDS: the bulk files that `BulkData` uses, in the order `extract` reads
+        them.
+    _REPORT_EVERY: how many rows of a bulk file are read between progress
+        messages.
+    _convert: returns a row of a bulk file with numbers, booleans, and missing
+        values.
+    _flush: writes buffered opinions to their saved cases.
+    _integer: returns a value as an `int`, if it is a whole number.
 
 """
 
@@ -52,18 +79,12 @@ import requests
 from . import courtlistener, options, utilities
 
 logger = logging.getLogger(__name__)
-# The bulk data is written by PostgreSQL, which escapes quotes with a
-# backslash.
 _DIALECT: dict[str, Any] = {'escapechar': '\\', 'doublequote': False}
-# Opinions can be longer than the csv module allows by default. (A C `long`
-# is 32 bits on Windows, so `sys.maxsize` is too large there.)
 _FIELD_LIMIT: int = min(sys.maxsize, 2 ** 31 - 1)
 _KINDS: tuple[str, ...] = (
     'courts', 'dockets', 'opinion-clusters', 'citations', 'opinions')
 _CHUNK: int = 8 * 1024 * 1024
-# Rows between progress messages.
 _REPORT_EVERY: int = 1_000_000
-# Opinions held in memory before they are written to their cases.
 _BUFFER_BYTES: int = 200 * 1024 * 1024
 _DATE: re.Pattern[str] = re.compile(r'(\d{4}-\d{2}-\d{2})\.csv\.bz2$')
 _INTEGERS: frozenset[str] = frozenset({
@@ -72,7 +93,6 @@ _INTEGERS: frozenset[str] = frozenset({
     'scdb_votes_majority', 'scdb_votes_minority'})
 _BOOLEANS: frozenset[str] = frozenset({
     'per_curiam', 'blocked', 'date_filed_is_approximate', 'extracted_by_ocr'})
-# Columns of the clusters file that are not kept with a case.
 _CLUSTER_SKIPPED: frozenset[str] = frozenset({
     'date_created', 'date_modified', 'filepath_json_harvard',
     'filepath_pdf_harvard', 'filepath_pdf_scan', 'filepath_xml_scan'})
@@ -108,7 +128,13 @@ class BulkData:
     """ Initialization Methods """
 
     def __post_init__(self) -> None:
-        """Sets the folder and session."""
+        """Sets the folder and session.
+
+        If no `folder` was passed, "bulk" in `utilities.data_folder()` is used,
+        and `folder` is made a `pathlib.Path`. If no `session` was passed, a
+        `requests.Session` is made that identifies courtpy.
+
+        """
         if self.folder is None:
             self.folder = utilities.data_folder() / 'bulk'
         self.folder = pathlib.Path(self.folder)
@@ -297,7 +323,18 @@ class BulkData:
     """ Private Methods """
 
     def _citations(self, cluster_ids: set[int]) -> dict[int, list[str]]:
-        """Returns the citations of the clusters in `cluster_ids`."""
+        """Returns the citations of the clusters in `cluster_ids`.
+
+        The citations file is read only if there are clusters to look for.
+
+        Args:
+            cluster_ids: ids of the opinion clusters (cases) being extracted.
+
+        Returns:
+            The citations of each cluster, as text such as "950 F.3d 12", by
+                its id. Clusters without citations are left out.
+
+        """
         found: dict[int, list[str]] = {}
         if not cluster_ids:
             return found
@@ -314,7 +351,25 @@ class BulkData:
         start_date: str | None,
         end_date: str | None,
         max_cases: int | None) -> dict[int, dict[str, Any]]:
-        """Returns the clusters of `dockets` filed between two dates."""
+        """Returns the clusters of `dockets` filed between two dates.
+
+        The clusters file is read only if there are dockets to look for, and
+        reading stops once `max_cases` clusters are found. Dates are compared
+        as text, which works because they are written as YYYY-MM-DD.
+
+        Args:
+            dockets: the dockets of the courts being extracted, by their ids.
+            start_date: earliest date filed, as YYYY-MM-DD, or `None` for no
+                earliest date.
+            end_date: latest date filed, as YYYY-MM-DD, or `None` for no latest
+                date.
+            max_cases: most clusters to find, or `None` for every cluster.
+
+        Returns:
+            Each cluster (converted with `_convert`, without the columns in
+                `_CLUSTER_SKIPPED`), by its id.
+
+        """
         found: dict[int, dict[str, Any]] = {}
         if not dockets:
             return found
@@ -336,8 +391,20 @@ class BulkData:
         return found
 
     def _courts(self, wanted: list[str]) -> dict[str, dict[str, Any]]:
-        """Returns information about the courts in `wanted`."""
-        kept = ('id', 'full_name', 'short_name', 'citation_string', 'jurisdiction')
+        """Returns information about the courts in `wanted`.
+
+        A warning is logged for any court in `wanted` that is not in the
+        courts file (usually a misspelled court id).
+
+        Args:
+            wanted: CourtListener court ids.
+
+        Returns:
+            The "id", "full_name", "short_name", "citation_string", and
+                "jurisdiction" of each court that was found, by its id.
+
+        """
+        kept =('id', 'full_name', 'short_name', 'citation_string', 'jurisdiction')
         found = {
             row['id']: {k: row.get(k) for k in kept}
             for row in self.rows('courts') if row.get('id') in wanted}
@@ -347,7 +414,18 @@ class BulkData:
         return found
 
     def _dockets(self, wanted: set[str]) -> dict[int, dict[str, Any]]:
-        """Returns the dockets of the courts in `wanted`, by their ids."""
+        """Returns the dockets of the courts in `wanted`.
+
+        Only the columns in `options._DOCKET_FIELDS` are kept, which keeps the
+        dockets of large courts small enough to hold in memory.
+
+        Args:
+            wanted: CourtListener court ids.
+
+        Returns:
+            Each docket of those courts (converted with `_convert`), by its id.
+
+        """
         found: dict[int, dict[str, Any]] = {}
         for row in self.rows('dockets'):
             if row.get('court_id') in wanted:
@@ -357,7 +435,23 @@ class BulkData:
         return found
 
     def _list(self, prefix: str) -> list[str]:
-        """Returns the keys in the bucket that start with `prefix`."""
+        """Returns the keys in the bucket that start with `prefix`.
+
+        The bucket is listed with Amazon S3's "ListObjectsV2" request, which
+        returns at most 1,000 keys at a time as XML, with a token for the next
+        part of the list when there are more.
+
+        Args:
+            prefix: the start of the keys (file paths) to list, such as
+                "bulk-data/opinions-".
+
+        Raises:
+            requests.HTTPError: if the bucket cannot be listed.
+
+        Returns:
+            The keys, in the order the bucket lists them.
+
+        """
         keys: list[str] = []
         token = None
         while True:
@@ -379,7 +473,19 @@ class BulkData:
                 return keys
 
     def _name(self, kind: str) -> str:
-        """Returns the name of the file of one kind."""
+        """Returns the name of the bulk file of one kind.
+
+        Args:
+            kind: one of `_KINDS`.
+
+        Raises:
+            ValueError: if `kind` is not one of `_KINDS`.
+
+        Returns:
+            The file's name, such as "opinions-2026-09-30.csv.bz2", for the date
+                from `resolve_date`.
+
+        """
         if kind not in _KINDS:
             message = f'kind must be one of {list(_KINDS)}, not {kind!r}'
             raise ValueError(message)
@@ -387,7 +493,20 @@ class BulkData:
 
     @contextlib.contextmanager
     def _open(self, kind: str) -> Iterator[io.TextIOBase]:
-        """Opens one bulk file as text, from the folder or the bucket."""
+        """Opens one bulk file as text, from the folder or the bucket.
+
+        If `stream` is true, the file is read from the bucket as it arrives
+        and decompressed on the way, without being saved. Otherwise, it is
+        downloaded first (or found in `folder`) with `fetch`. Either way, the
+        connection or file is closed when the `with` statement ends.
+
+        Args:
+            kind: one of `_KINDS`.
+
+        Yields:
+            io.TextIOBase: the decompressed file, as UTF-8 text.
+
+        """
         if self.stream:
             url = f'{self.base_url}{options._BULK_PREFIX}{self._name(kind)}'
             response = self.session.get(url, stream = True, timeout = self.timeout)
@@ -403,7 +522,18 @@ class BulkData:
                 yield text
 
     def _opinions(self, paths: Mapping[int, pathlib.Path]) -> None:
-        """Adds the opinions of the cases in `paths` to their files."""
+        """Adds the opinions of the cases in `paths` to their files.
+
+        The opinions file is not sorted by case, so a case's opinions can be
+        anywhere in it. Opinions are held in memory (with one field of text
+        each, see `courtlistener.slim_opinion`) until their text reaches
+        `_BUFFER_BYTES`, and then written to their cases, which keeps memory
+        use bounded without rewriting a case's file for every opinion.
+
+        Args:
+            paths: the path of each saved case, by its cluster id.
+
+        """
         buffer: dict[int, list[dict[str, Any]]] = {}
         size = 0
         for row in self.rows('opinions'):
@@ -449,14 +579,29 @@ def _convert(row: Mapping[str, str]) -> dict[str, Any]:
 def _flush(
     buffer: dict[int, list[dict[str, Any]]],
     paths: Mapping[int, pathlib.Path]) -> None:
-    """Writes buffered opinions to their cases and empties the buffer."""
+    """Writes buffered opinions to their cases and empties the buffer.
+
+    Args:
+        buffer: opinions that have not been written yet, by the cluster id of
+            their case. It is emptied.
+        paths: the path of each saved case, by its cluster id.
+
+    """
     for cluster_id, opinions in buffer.items():
         courtlistener.add_opinions(paths[cluster_id], opinions)
     buffer.clear()
 
 
 def _integer(value: Any) -> int | None:
-    """Returns `value` as an `int`, or `None` if it is not a whole number."""
+    """Returns `value` as an `int`, if it is a whole number.
+
+    Args:
+        value: a value from a bulk file, usually text such as "4567890".
+
+    Returns:
+        The number, or `None` if `value` is missing or is not a whole number.
+
+    """
     try:
         return int(value)
     except (TypeError, ValueError):

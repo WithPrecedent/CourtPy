@@ -11,6 +11,9 @@ Lexis-Nexis   ──lexis.split──────────────▶ (JS
                                                                    of text)                 per case)     outcomes)                   figures, report)
 ```
 
+In a project, a loader (such as `load_court_listener`) does every step before
+`amos.Dataset` as the first technique of the wrangler.
+
 | Module | Contents |
 | --- | --- |
 | `courtpy.bulk` | `BulkData`, which extracts cases from CourtListener's bulk data. |
@@ -18,9 +21,9 @@ Lexis-Nexis   ──lexis.split──────────────▶ (JS
 | `courtpy.lexis` | `split` and `read_case` for Lexis-Nexis text files. |
 | `courtpy.rules` | `Rule` and `Rulebook`, which apply the CSV files of rules. |
 | `courtpy.parsers` | `Parser` and `parse`, which turn saved cases into a table. |
-| `courtpy.coders` | The coders, which are `amos` techniques. |
+| `courtpy.coders` | The coders, which are `amos` techniques, and `code`, which applies them. |
+| `courtpy.loaders` | The loaders, which are `amos` techniques that collect, parse, and code cases in a project. |
 | `courtpy.cases` | `Case`, and `save_cases` and `load_cases` for case tables. |
-| `courtpy.interface` | `Project`, `build`, `code`, and `collect`. |
 | `courtpy.secrets` | Storing and finding the CourtListener API key. |
 | `courtpy.options` | Defaults that a project can change before they are used. |
 
@@ -109,29 +112,52 @@ class CodeLongOpinion(amos.Cleaner):
         return data
 ```
 
-## The "cases" section
+## Loaders
 
-| Setting | Meaning |
-| --- | --- |
-| `source` | "court_listener" (the default) or "lexis_nexis". |
-| `folder` | Folder of the saved cases, in the root folder. Defaults to the name of the source. |
-| `download` | For CourtListener: "bulk" to extract cases from the bulk data, "api" to download them with the API, or "none" (the default) to use the cases already in `folder`. |
-| `courts` | CourtListener court ids (such as "ca1, ca2") or groups (`federal_appellate`, `federal_circuits`, or `supreme_court`). |
-| `start_date`, `end_date` | Dates filed (YYYY-MM-DD). |
-| `max_cases` | Most cases to download. |
-| `dockets` | For "api", whether to download each case's docket too (one more request per case). |
-| `bulk_folder`, `bulk_date`, `stream` | For "bulk", where to keep the bulk files, which date's files to use, and whether to read them from CourtListener without saving them. |
-| `batches` | For Lexis-Nexis, files (or a folder) of many cases to divide into `folder` first. |
-| `rulebooks` | Rules to parse with: built-in names (such as "federal") or CSV files or folders. Defaults to "federal". |
-| `keep_text` | Whether to keep the text of the opinions in the table. |
-| `limit` | Most cases to parse, for trying out rules. |
-| `workers` | Number of processes to parse with. |
-| `coders` | Techniques to apply after parsing. Defaults to "code_parties, code_case_type, code_outcome". Use "none" for none. Parameters for them go in "{coder}_parameters" sections. |
-| `save` | File to save the table to (".csv" or ".parquet"), in the root folder. |
-| `reuse` | Whether to load the saved table, if there is one, instead of collecting and parsing again. |
+`amos` (0.2.3 and later) loads a project's data with loaders, the first
+techniques of the wrangler, so a project with a loader needs no `item`.
+CourtPy's loaders are a genre of `amos` loaders, `CaseLoader`:
 
-Relative paths are in the project's root folder: the "root_folder" of the
-"files" section, the `clerk` passed to `Project.create`, or the current folder.
+| Loader | Source | Does |
+| --- | --- | --- |
+| `load_court_listener` | A folder of saved CourtListener cases. Defaults to "court_listener". | Downloads cases into the folder (if "download" is set), parses them, and codes them. |
+| `load_lexis_nexis` | A folder of Lexis-Nexis cases, one per text file. Defaults to "lexis_nexis". | Divides any "batches" into the folder, parses the cases, and codes them. |
+| `load_cases` | A table saved by `save_cases` (or `courtpy parse`). | Loads the table, with its lists and types. It applies no coders unless "coders" names some. |
+
+Their parameters go in a "{loader}_parameters" section of the settings:
+
+| Parameter | Loaders | Meaning |
+| --- | --- | --- |
+| `source` | all | The folder (or, for `load_cases`, the file) to load. |
+| `coders` | all | Techniques to apply after parsing. Defaults to "code_parties, code_case_type, code_outcome" ("none" for `load_cases`). Use "none" for none. |
+| `save` | all | File to save the coded table to (".csv" or ".parquet"). |
+| `reuse` | all | Whether to load the saved table, if there is one, instead of collecting, parsing, and coding again. |
+| `label`, `task`, `groups` | all | As in `amos`. They default to those in the "general" section. |
+| `download` | `load_court_listener` | "bulk" to extract cases from the bulk data, "api" to download them with the API, or "none" (the default) to use the cases already in the folder. |
+| `courts` | `load_court_listener` | CourtListener court ids (such as "ca1, ca2") or groups (`federal_appellate`, `federal_circuits`, or `supreme_court`). |
+| `start_date`, `end_date` | `load_court_listener` | Dates filed (YYYY-MM-DD). |
+| `max_cases`, `overwrite` | `load_court_listener` | Most cases to download, and whether to download cases saved before. |
+| `dockets` | `load_court_listener` | For "api", whether to download each case's docket too (one more request per case). |
+| `bulk_folder`, `bulk_date`, `stream` | `load_court_listener` | For "bulk", where to keep the bulk files, which date's files to use, and whether to read them from CourtListener without saving them. |
+| `batches` | `load_lexis_nexis` | Files (or folders) of many cases to divide into the source folder first. |
+| `rulebooks` | `load_court_listener`, `load_lexis_nexis` | Rules to parse with: built-in names (such as "federal") or CSV files or folders. Defaults to "federal". |
+| `keep_text`, `limit`, `workers` | `load_court_listener`, `load_lexis_nexis` | Whether to keep the opinions' text, most cases to parse, and processes to parse with. |
+
+The loaders work through the project's clerk, as `amos` loaders do. A folder
+or file named by a relative path is looked for in the current folder and
+then in the clerk's input folder (the "input_folder" of the "files" section),
+where downloads save their cases, and "save" is in the clerk's interim folder
+("interim_folder"). The label is checked after the coders run, so it can be a
+column that a coder makes (such as `outcome_reversal`), and the dataset's
+history records the loader and then each coder.
+
+A loader can also be used without a project. `apply` returns an
+`amos.Dataset`:
+
+```python
+dataset = courtpy.loaders.LoadCourtListener().apply(
+    source = "court_listener", label = "outcome_reversal")
+```
 
 ## The CourtListener API
 
@@ -202,5 +228,6 @@ courtpy.options._COURT_GROUPS["new_england"] = ("ca1", "mad", "nhd", "med", "rid
 | `RateLimitError: CourtListener asked courtpy to wait ... hours` | The account's daily limit was reached. Run the same download again later. |
 | `ValueError: ... row N: the pattern ... is not valid` | A rule's regular expression has an error. `courtpy rules file.csv` checks a file. |
 | `KeyError: 'code_outcome' needs the columns [...]` | A coder needs columns made by the federal rules. |
-| `ValueError: no court_listener cases were found in ...` | The "cases" section's folder has no saved cases. Set "download" or "folder". |
+| `ValueError: no court_listener cases were found in ...` | The loader's source folder has no saved cases. Set "download" or "source". |
+| `ModuleNotFoundError: No module named 'statsmodels'` | `logit` is the statsmodels model since `amos` 0.2.3. Use `sk_logit` for scikit-learn's, or `pip install amos[statistics]`. |
 | `KeyError: the label 'outcome_reversal' is not a column of the data` | The label is made by a coder that was not run. Check the "coders" setting. |

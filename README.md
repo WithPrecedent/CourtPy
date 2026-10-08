@@ -185,9 +185,11 @@ the outcomes: `outcome_reversal`, `outcome_party1_won`,
 
 #### Describing a whole study in one file
 
-A settings file can describe the cases and the analysis together. Its "cases"
-section says which cases to collect and how to parse them, and its other
-sections are an [amos](https://github.com/WithPrecedent/amos) project. See
+A study is an [amos](https://github.com/WithPrecedent/amos) project, described
+in one settings file. CourtPy adds loaders to amos: `load_court_listener`,
+`load_lexis_nexis`, and `load_cases`. Named first in the wrangler, a loader
+collects the cases (downloading them, if asked), parses them, and codes them,
+so the project needs no other data. See
 [examples/federal_appeals.ini](https://github.com/WithPrecedent/CourtPy/blob/main/examples/federal_appeals.ini):
 
 ```ini
@@ -195,30 +197,39 @@ sections are an [amos](https://github.com/WithPrecedent/amos) project. See
 seed = 43
 label = outcome_reversal
 
-[cases]
-download = bulk
-courts = federal_circuits
-start_date = 2019-01-01
-end_date = 2019-12-31
-save = data/cases.csv
-reuse = true
+[files]
+input_folder = data
+interim_folder = data
 
 [appeals_project]
 appeals_workers = wrangler, analyst, critic
 
 [wrangler]
-techniques = filter_rows, keep_columns, drop_missing
+techniques = load_court_listener, filter_rows, keep_columns, drop_missing
+
+[load_court_listener_parameters]
+source = court_listener
+download = bulk
+courts = federal_circuits
+start_date = 2019-01-01
+end_date = 2019-12-31
+save = cases.csv
+reuse = true
 
 [analyst]
 design = experiment
 criterion = roc_auc
 steps = split, model
 split_techniques = stratified
-model_techniques = baseline, logit, random_forest
+model_techniques = baseline, sk_logit, random_forest
 
 [critic]
 techniques = scorecard
 ```
+
+The loader finds (and saves) the cases in the input folder ("data") and saves
+the coded table in the interim folder. With `reuse = true`, later runs load
+that table instead of parsing the cases again.
 
 Run it from a terminal with `courtpy run federal_appeals.ini --export`, or in
 Python:
@@ -229,8 +240,8 @@ print(project.result.tables["scorecard"])
 project.export()
 ```
 
-`courtpy.Project` is an `amos.Project`, so everything in the amos
-documentation works.
+`courtpy.Project` is `amos.Project`, so everything in the amos documentation
+works.
 
 #### Commands
 
@@ -261,14 +272,6 @@ Contributors are always welcome. Feel free to grab an [issue](https://www.github
   opinions from court websites).
 * [amos](https://github.com/WithPrecedent/amos), which CourtPy uses to analyze
   the cases it parses.
-
-## Acknowledgments
-
-CourtPy's opinions come from CourtListener, a project of the [Free Law
-Project](https://free.law), whose bulk data and API make empirical legal
-research on court opinions possible at no cost.
-
-This project was generated from [@WithPrecedent](https://github.com/WithPrecedent)'s [![cookiecutter Template](https://img.shields.io/badge/snickerdoodle-bisque?style=flat-square&logo=cookiecutter&labelColor=gray)](https://www.github.com/WithPrecedent/snickerdoodle) template.
 
 ## License
 

@@ -14,8 +14,21 @@ Run `courtpy --help` (or `courtpy {command} --help`) in a terminal for help.
 | `courtpy rules` | Checks a rulebook and lists the variables it makes. |
 | `courtpy run` | Collects, parses, and analyzes cases as a settings file describes. |
 
+Each command is a private function that takes the parsed arguments and
+returns the program's exit code (0 for success). `_parser` connects each
+command's name to its function.
+
 Contents:
     main: runs a command.
+    _download: downloads cases from CourtListener ("download").
+    _key_delete: removes the stored API key ("key delete").
+    _key_set: stores the API key ("key set").
+    _key_show: shows where the API key is found ("key show").
+    _parse: parses saved cases into a table ("parse").
+    _parser: returns the parser of the command line arguments.
+    _rules: checks a rulebook and lists its variables ("rules").
+    _run: runs a study from a settings file ("run").
+    _split: divides Lexis-Nexis files of many cases ("split").
 
 """
 
@@ -28,12 +41,14 @@ import pathlib
 import sys
 from collections.abc import Sequence
 
+import amos
+
 from . import (
     __version__,
     bulk,
     cases,
+    coders,
     courtlistener,
-    interface,
     lexis,
     options,
     parsers,
@@ -44,6 +59,10 @@ from . import (
 
 def main(argv: Sequence[str] | None = None) -> int:
     """Runs a courtpy command.
+
+    Messages about progress are shown unless "--quiet" is passed. Errors that
+    a user can fix (such as a missing API key, a misspelled file, or an
+    invalid rule) are shown as one line instead of a traceback.
 
     Args:
         argv: the command's arguments. Defaults to `None`, in which case the
@@ -74,7 +93,22 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 
 def _download(arguments: argparse.Namespace) -> int:
-    """Downloads cases from CourtListener."""
+    """Downloads cases from CourtListener ("courtpy download").
+
+    "bulk" extracts the cases from the bulk data with `bulk.BulkData`, and
+    "api" downloads them with `courtlistener.CourtListener` (which needs an
+    API key).
+
+    Args:
+        arguments: the parsed arguments: "method" ("bulk" or "api"),
+            "courts", "start", "end", "folder", "max_cases", and "overwrite",
+            and "dockets" (for "api") or "bulk_folder", "bulk_date", and
+            "stream" (for "bulk").
+
+    Returns:
+        0.
+
+    """
     common = {
         'courts': arguments.courts,
         'start_date': arguments.start,
@@ -96,7 +130,19 @@ def _download(arguments: argparse.Namespace) -> int:
 
 
 def _key_delete(arguments: argparse.Namespace) -> int:  # noqa: ARG001
-    """Removes the stored API key."""
+    """Removes the stored API key ("courtpy key delete").
+
+    The key is removed from the keyring and the secrets file. If a key is
+    still found elsewhere (in an environment variable or a `.env` file, which
+    courtpy does not change), where it is found is shown.
+
+    Args:
+        arguments: the parsed arguments, which this command does not use.
+
+    Returns:
+        0.
+
+    """
     removed = secrets.delete_api_key()
     if removed:
         print('Removed the API key from ' + ' and '.join(removed))
@@ -109,7 +155,19 @@ def _key_delete(arguments: argparse.Namespace) -> int:  # noqa: ARG001
 
 
 def _key_set(arguments: argparse.Namespace) -> int:
-    """Stores the API key."""
+    """Stores the API key ("courtpy key set").
+
+    The key is asked for without being shown as it is typed, or read from
+    standard input with "--stdin" (for scripts).
+
+    Args:
+        arguments: the parsed arguments: "store" (where to store the key) and
+            "stdin" (whether to read it from standard input).
+
+    Returns:
+        0.
+
+    """
     if arguments.stdin:
         key = sys.stdin.readline()
     else:
@@ -120,7 +178,18 @@ def _key_set(arguments: argparse.Namespace) -> int:
 
 
 def _key_show(arguments: argparse.Namespace) -> int:  # noqa: ARG001
-    """Shows where the API key is found, with most of it hidden."""
+    """Shows where the API key is found, with most of it hidden.
+
+    This is "courtpy key show". It also shows the path of the secrets file.
+
+    Args:
+        arguments: the parsed arguments, which this command does not use.
+
+    Returns:
+        0 if a key was found, and 1 (with an explanation of how to store one)
+            if not.
+
+    """
     found = secrets.find_api_key()
     if found is None:
         print(secrets.MissingAPIKeyError())
@@ -132,7 +201,19 @@ def _key_show(arguments: argparse.Namespace) -> int:  # noqa: ARG001
 
 
 def _parse(arguments: argparse.Namespace) -> int:
-    """Parses saved cases into a table."""
+    """Parses saved cases into a table ("courtpy parse").
+
+    Unless "--no-code" is passed, the default coders are applied (see
+    `coders.code`) before the table is saved.
+
+    Args:
+        arguments: the parsed arguments: "folder", "source", "rulebooks",
+            "keep_text", "limit", "workers", "no_code", and "output".
+
+    Returns:
+        0 if cases were parsed, and 1 if the folder had none.
+
+    """
     data = parsers.parse(
         arguments.folder,
         source = arguments.source,
@@ -144,14 +225,26 @@ def _parse(arguments: argparse.Namespace) -> int:
         print(f'courtpy: no {arguments.source} cases in {arguments.folder}', file = sys.stderr)
         return 1
     if not arguments.no_code:
-        data = interface.code(data).data
+        data = coders.code(data).data
     path = cases.save_cases(data, arguments.output)
     print(f'{len(data)} cases parsed into {path}')
     return 0
 
 
 def _rules(arguments: argparse.Namespace) -> int:
-    """Checks a rulebook and lists the variables it makes."""
+    """Checks a rulebook and lists the variables it makes ("courtpy rules").
+
+    An invalid rule raises a `ValueError` naming its file and row, which
+    `main` shows.
+
+    Args:
+        arguments: the parsed arguments: "rulebooks" (names of built-in
+            rulebooks or paths to CSV files).
+
+    Returns:
+        0.
+
+    """
     rulebook = rules.Rulebook.load(*arguments.rulebooks)
     print(f'{len(rulebook)} rules are valid ({rulebook.name}).')
     print(f'They search: {", ".join(rulebook.targets)}')
@@ -164,8 +257,20 @@ def _rules(arguments: argparse.Namespace) -> int:
 
 
 def _run(arguments: argparse.Namespace) -> int:
-    """Collects, parses, and analyzes cases as a settings file describes."""
-    project = interface.Project.create(arguments.settings)
+    """Collects, parses, and analyzes cases as a settings file describes.
+
+    This is "courtpy run". The project's report is shown, and its results are
+    exported if "--export" is passed (see `amos.Project.export`).
+
+    Args:
+        arguments: the parsed arguments: "settings" (the path to a settings
+            file) and "export".
+
+    Returns:
+        0.
+
+    """
+    project = amos.Project.create(arguments.settings)
     print(project.report.contents if project.report else project.result)
     if arguments.export:
         folder = project.export()
@@ -174,7 +279,16 @@ def _run(arguments: argparse.Namespace) -> int:
 
 
 def _split(arguments: argparse.Namespace) -> int:
-    """Divides Lexis-Nexis files of many cases."""
+    """Divides Lexis-Nexis files of many cases ("courtpy split").
+
+    Args:
+        arguments: the parsed arguments: "files" (text files, or folders whose
+            ".txt" files are used) and "folder" (where to save the cases).
+
+    Returns:
+        0.
+
+    """
     files = [pathlib.Path(f) for f in arguments.files]
     expanded = [p for f in files for p in (sorted(f.glob('*.txt')) if f.is_dir() else [f])]
     saved = lexis.split(expanded, arguments.folder)
@@ -186,7 +300,16 @@ def _split(arguments: argparse.Namespace) -> int:
 
 
 def _parser() -> argparse.ArgumentParser:
-    """Returns the parser of the command line arguments."""
+    """Returns the parser of the command line arguments.
+
+    Each command is a subparser whose "command" default is the function that
+    runs it, which `main` calls with the parsed arguments.
+
+    Returns:
+        The parser, with the options shared by every command ("--version"
+            and "--quiet") and a subparser for each command.
+
+    """
     parser = argparse.ArgumentParser(
         prog = 'courtpy',
         description = 'Collect, parse, and analyze court opinions.')

@@ -38,6 +38,19 @@ Contents:
     Rule: one rule from a CSV file.
     Rulebook: an ordered collection of rules.
     find_instructions: returns the CSV files for a built-in or custom rulebook.
+    split_names: splits text into names wherever a pattern matches.
+    _BUILT_IN: the CSV files of each built-in rulebook that is made of
+        several files, by its name, in the order they are applied. Any other
+        name is a file or folder in courtpy's "instructions" folder.
+    _PUNCTUATION: pattern for the periods and apostrophes (straight and curly)
+        that `split_names` removes from names.
+    _REQUIRED: columns that every rules file must have. "value" and "note"
+        are optional.
+    _SECTION_KINDS: kinds of rules that make new sections of text, which later
+        rules can search.
+    _convert: returns a cell of a CSV file as a number if it is one.
+    _read: returns the rules in a CSV file.
+    _unique: returns names in order, without repeats.
 
 """
 
@@ -62,15 +75,12 @@ from . import utilities
 KINDS: tuple[str, ...] = (
     'count', 'excerpts', 'flag', 'label', 'matches', 'names', 'remove',
     'section', 'split')
-# Kinds of rules that make new sections of text, which later rules can search.
 _SECTION_KINDS: frozenset[str] = frozenset({'excerpts', 'section', 'split'})
-# Periods and apostrophes (straight and curly), which are removed from names.
+# The curly apostrophe (U+2019) is added with `chr` so that the source file
+# has only plain characters.
 _PUNCTUATION: re.Pattern[str] = re.compile("[.'" + chr(0x2019) + ']')
-# Columns that every rules file must have. "value" and "note" are optional.
 _REQUIRED: tuple[str, ...] = (
     'target', 'variable', 'kind', 'pattern', 'ignorecase', 'dotall')
-# Built-in rulebooks that are made of several files, in the order they are
-# applied. Any other name is a file or folder in the "instructions" folder.
 _BUILT_IN: dict[str, tuple[str, ...]] = {
     'federal': ('federal/header.csv', 'federal/opinion.csv')}
 
@@ -161,7 +171,13 @@ class Rule:
 
     @property
     def variable(self) -> str:
-        """Returns the name of the (first) variable that the rule makes."""
+        """Returns the name of the (first) variable that the rule makes.
+
+        Returns:
+            The first of `variables`, or an empty `str` for a `remove` rule,
+                which makes none.
+
+        """
         return self.variables[0] if self.variables else ''
 
     """ Public Methods """
@@ -306,19 +322,36 @@ class Rulebook:
 
     @property
     def sections(self) -> list[str]:
-        """Returns the names of the sections of text that the rules make."""
+        """Returns the names of the sections of text that the rules make.
+
+        Returns:
+            The variables of the `section`, `excerpts`, and `split` rules, in
+                order, without repeats.
+
+        """
         return _unique(
             v for r in self.rules if r.kind in _SECTION_KINDS
             for v in r.variables)
 
     @property
     def targets(self) -> list[str]:
-        """Returns the names of the sections of text that the rules search."""
+        """Returns the names of the sections of text that the rules search.
+
+        Returns:
+            The targets of every rule, in order, without repeats.
+
+        """
         return _unique(t for rule in self.rules for t in rule.targets)
 
     @property
     def variables(self) -> list[str]:
-        """Returns the names of the columns that the rules make, in order."""
+        """Returns the names of the columns that the rules make.
+
+        Returns:
+            The variables of every rule except `remove` rules (which make
+                none), in order, without repeats.
+
+        """
         return _unique(
             v for r in self.rules if r.kind != 'remove' for v in r.variables)
 
@@ -345,16 +378,35 @@ class Rulebook:
     """ Dunder Methods """
 
     def __add__(self, other: Rulebook) -> Rulebook:
-        """Returns a rulebook with the rules of both, this one's first."""
+        """Returns a rulebook with the rules of both rulebooks.
+
+        Args:
+            other: the rulebook whose rules come second.
+
+        Returns:
+            A new rulebook with this rulebook's rules followed by those of
+                `other`, named for both.
+
+        """
         name = ', '.join(n for n in (self.name, other.name) if n)
         return Rulebook(rules = [*self.rules, *other.rules], name = name)
 
     def __iter__(self) -> Iterator[Rule]:
-        """Returns an iterator of the rules."""
+        """Returns an iterator of the rules.
+
+        Returns:
+            An iterator of `rules`, in the order they are applied.
+
+        """
         return iter(self.rules)
 
     def __len__(self) -> int:
-        """Returns the number of rules."""
+        """Returns the number of rules.
+
+        Returns:
+            The length of `rules`.
+
+        """
         return len(self.rules)
 
 

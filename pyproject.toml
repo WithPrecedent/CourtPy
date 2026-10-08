@@ -7,7 +7,7 @@ authors = [{name = "Corey Rayburn Yung", email = "coreyrayburnyung@gmail.com"}]
 license = {text = "Apache Software License 2.0"}
 readme = "README.md"
 requires-python = ">=3.11"
-version = "0.1.0"
+version = "0.2.0"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Environment :: Console",
@@ -32,11 +32,11 @@ keywords = [
     "lexis",
     "text parsing"]
 dependencies = [
-    "amos>=0.2.2",
+    "amos>=0.2.3",
     "chrisjen>=0.2.0",
     "keyring>=24",
     "nagata>=0.2.0",
-    "pandas>=2.2",
+    "pandas>=3.0",
     "requests>=2.31"]
 
 [project.optional-dependencies]

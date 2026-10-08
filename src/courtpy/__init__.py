@@ -42,43 +42,38 @@ License: Apache-2.0
 
 from __future__ import annotations
 
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 
 __author__: str = 'Corey Rayburn Yung'
 
 __all__: list[str] = [
     'BulkData',
     'Case',
+    'CaseLoader',
     'CourtListener',
     'Parser',
     'Project',
     'Rule',
     'Rulebook',
-    'build',
     'code',
     'coders',
-    'collect',
     'load_cases',
+    'loaders',
     'parse',
     'save_cases',
     'secrets',
 ]
 
-import chrisjen.options
+# A study is an `amos.Project`, which courtpy offers under the same name.
+from amos import Project
 
-from . import options
-
-# The "cases" section of a project's settings describes its cases. It is not
-# a worker, so `chrisjen` must not try to build it.
-if options._CASES_SECTION not in chrisjen.options._SPECIAL_SETTINGS:
-    chrisjen.options._SPECIAL_SETTINGS.append(options._CASES_SECTION)
-
-# Importing `coders` adds its techniques to the `amos` library, so they can be
-# named in settings as soon as courtpy is imported.
-from . import coders, secrets
+# Importing `coders` and `loaders` adds their techniques to the `amos`
+# library, so they can be named in settings as soon as courtpy is imported.
+from . import coders, loaders, secrets
 from .bulk import BulkData
 from .cases import Case, load_cases, save_cases
+from .coders import code
 from .courtlistener import CourtListener
-from .interface import Project, build, code, collect
+from .loaders import CaseLoader
 from .parsers import Parser, parse
 from .rules import Rule, Rulebook

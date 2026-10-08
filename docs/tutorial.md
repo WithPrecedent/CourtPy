@@ -96,8 +96,10 @@ lists.
 
 ## 4. Analyze the table
 
-`courtpy.Project` is an `amos.Project`, so an analysis is described with
-`amos` settings. This one predicts reversals from a few features:
+`courtpy.Project` is `amos.Project`, so an analysis is described with `amos`
+settings. This one predicts reversals from a few features. (`sk_logit` is
+scikit-learn's logistic regression; amos's `logit` is the statsmodels model,
+with a table of coefficients, which needs `pip install amos[statistics]`.)
 
 ```python
 settings = {
@@ -113,7 +115,7 @@ settings = {
         "criterion": "roc_auc",
         "steps": "split, model",
         "split_techniques": "stratified",
-        "model_techniques": "baseline, logit"},
+        "model_techniques": "baseline, sk_logit"},
     "critic": {"techniques": "scorecard"},
 }
 project = courtpy.Project.create(settings, item = coded)
@@ -127,15 +129,23 @@ the run, so the study can be reported and reproduced.
 
 ## 5. Describe the whole study in one file
 
-The cases can be described in the same settings, in a "cases" section, so that
-one file describes the whole study. Save this as `study.ini`:
+Steps 1 to 3 can be part of the study itself. CourtPy's loaders are `amos`
+techniques that collect, parse, and code cases, so a project whose wrangler
+starts with one needs no other data. Save this as `study.ini`:
 
 ```ini
 [general]
 seed = 43
 label = outcome_reversal
 
-[cases]
+[study_project]
+study_workers = wrangler, analyst, critic
+
+[wrangler]
+techniques = load_court_listener, keep_columns, drop_missing
+
+[load_court_listener_parameters]
+source = court_listener
 download = api
 courts = ca1
 start_date = 2026-09-01
@@ -144,17 +154,11 @@ max_cases = 40
 save = cases.csv
 reuse = true
 
-[study_project]
-study_workers = wrangler, analyst, critic
-
-[wrangler]
-techniques = keep_columns, drop_missing
-
 [keep_columns_parameters]
 columns = year, published, type_criminal, dissents, word_count
 
 [analyst]
-techniques = stratified, logit
+techniques = stratified, sk_logit
 
 [critic]
 techniques = scorecard
@@ -166,7 +170,8 @@ and run it in a terminal:
 courtpy run study.ini --export
 ```
 
-The first run downloads, parses, and codes the cases and saves them in
+The first run downloads, parses, and codes the cases and saves the table in
 `cases.csv`. Later runs reuse that file (because of `reuse = true`) and only
-repeat the analysis. See [examples/federal_appeals.ini](https://github.com/WithPrecedent/CourtPy/blob/main/examples/federal_appeals.ini)
+repeat the analysis. The project's history records the loader and each
+coder, so the export shows exactly how the data was made. See [examples/federal_appeals.ini](https://github.com/WithPrecedent/CourtPy/blob/main/examples/federal_appeals.ini)
 for a fuller study.

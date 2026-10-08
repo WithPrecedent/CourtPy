@@ -40,7 +40,7 @@ wheels = [
 
 [[package]]
 name = "amos"
-version = "0.2.2"
+version = "0.2.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "camina" },
@@ -53,9 +53,9 @@ dependencies = [
     { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "scipy", version = "1.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/74/b0/c93cdde8f2911ee2657dec8987b39442ffb5d75aa2f19cdd3c6b0537c888/amos-0.2.2.tar.gz", hash = "sha256:a7296da87a187e59afa8fdaef5912e6901213932c032122c20a02c3b8764f704", size = 637009, upload-time = "2026-10-07T02:16:21.715Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/45/15/00e52be3df61c1cdac03124c290e46d657217d6a051e0a9ddccabeb069a2/amos-0.2.3.tar.gz", hash = "sha256:f3eedba3a0e738f2ba1852d9d54aa9d425ba478286419b59bfeb9c676ed8427c", size = 680298, upload-time = "2026-10-08T17:36:56.001Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/25/12/badbd1bf9e84fd81abcc232249c8626aef776e64837137e6b85dbdfe3d19/amos-0.2.2-py3-none-any.whl", hash = "sha256:a5a692d3932b6ce04190df5d34c60a14d6706cbf6bd4523823c97772a3d44b55", size = 98674, upload-time = "2026-10-07T02:16:19.777Z" },
+    { url = "https://files.pythonhosted.org/packages/82/c1/a0ace5a0e7e255e4880b67923d81c451440702ef05df89f196f1de0eb046/amos-0.2.3-py3-none-any.whl", hash = "sha256:c01d5d549f73f564468bb228d535bc71386175ab8c679662343599e2ce94b20a", size = 124218, upload-time = "2026-10-08T17:36:54.52Z" },
 ]
 
 [package.optional-dependencies]
@@ -68,7 +68,6 @@ all = [
     { name = "great-tables" },
     { name = "imbalanced-learn" },
     { name = "interpret-core" },
-    { name = "lifelines" },
     { name = "lightgbm" },
     { name = "mapie" },
     { name = "matplotlib" },
@@ -168,30 +167,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/9a/8e/82a0fe20a541c0314
 wheels = [
     { url = "https://files.pythonhosted.org/packages/64/b4/17d4b0b2a2dc85a6df63d1157e028ed19f90d4cd97c36717afef2bc2f395/attrs-26.1.0-py3-none-any.whl", hash = "sha256:c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309", size = 67548, upload-time = "2026-03-19T14:22:23.645Z" },
 ]
-
-[[package]]
-name = "autograd"
-version = "1.9.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
-    { name = "numpy", version = "2.5.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/9d/ac/4a8b58364ba865ab545251edbe475e5a35326814a5d274a2211d33ed8a5d/autograd-1.9.1.tar.gz", hash = "sha256:7818c5c69ddf9efb7da74097bd741a4c7920133f41966f68537223a15ef798bc", size = 2566975, upload-time = "2026-07-02T07:43:58.255Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/6e/ce/8c98e6604bb1ec9d03c8493c328185b69bb7533fe08f3640f0f3641bd9d1/autograd-1.9.1-py3-none-any.whl", hash = "sha256:b788bae3fa010cbffb4cfb7b8ba2a3f0daa6072a8506da6164c779fe9cf3e05a", size = 54387, upload-time = "2026-07-02T07:43:56.502Z" },
-]
-
-[[package]]
-name = "autograd-gamma"
-version = "0.5.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "autograd" },
-    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
-    { name = "scipy", version = "1.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/85/ae/7f2031ea76140444b2453fa139041e5afd4a09fc5300cfefeb1103291f80/autograd-gamma-0.5.0.tar.gz", hash = "sha256:f27abb7b8bb9cffc8badcbf59f3fe44a9db39e124ecacf1992b6d952934ac9c4", size = 3952, upload-time = "2020-10-15T16:51:06.785Z" }
 
 [[package]]
 name = "babel"
@@ -814,7 +789,7 @@ wheels = [
 
 [[package]]
 name = "courtpy"
-version = "0.1.0"
+version = "0.2.0"
 source = { editable = "." }
 dependencies = [
     { name = "amos" },
@@ -868,12 +843,12 @@ tests = [
 
 [package.metadata]
 requires-dist = [
-    { name = "amos", specifier = ">=0.2.2" },
+    { name = "amos", specifier = ">=0.2.3" },
     { name = "amos", extras = ["all"], marker = "extra == 'analysis'" },
     { name = "chrisjen", specifier = ">=0.2.0" },
     { name = "keyring", specifier = ">=24" },
     { name = "nagata", specifier = ">=0.2.0" },
-    { name = "pandas", specifier = ">=2.2" },
+    { name = "pandas", specifier = ">=3.0" },
     { name = "pyarrow", marker = "extra == 'parquet'", specifier = ">=15" },
     { name = "requests", specifier = ">=2.31" },
 ]
@@ -1882,26 +1857,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/c1/ea/7421d9e6db894cd6cd788b604b3394a163ded6b942052b6f96c23ccf08e1/librt-0.16.0-cp315-cp315t-win32.whl", hash = "sha256:375bfe6b572a8f6cfc398709356046173bf27e64c4c5edaf5f7062f051fb4bf9", size = 104355, upload-time = "2026-09-29T00:55:04.533Z" },
     { url = "https://files.pythonhosted.org/packages/85/6d/7c31a506eb847bc58aeb2402d58e17605e821f68ab5df5e66fe274a6df41/librt-0.16.0-cp315-cp315t-win_amd64.whl", hash = "sha256:bd3150023d3dc2bc70f3784e59ffa1140d56ddba3d8125b3d6f9f85221279bfc", size = 126134, upload-time = "2026-09-29T00:55:06.017Z" },
     { url = "https://files.pythonhosted.org/packages/36/69/7a5d10ac409c4da0355e054a14371871da9b5557fcc42772cd00181c6cce/librt-0.16.0-cp315-cp315t-win_arm64.whl", hash = "sha256:8ceafb70f2a4f0826f11031942e59c0728fd98da112dc346d4352bde1e486866", size = 116391, upload-time = "2026-09-29T00:55:07.484Z" },
-]
-
-[[package]]
-name = "lifelines"
-version = "0.30.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "autograd" },
-    { name = "autograd-gamma" },
-    { name = "formulaic" },
-    { name = "matplotlib" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
-    { name = "numpy", version = "2.5.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
-    { name = "pandas" },
-    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
-    { name = "scipy", version = "1.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/ea/4f/f0b363278d40baf7d7a03217bee839cb880946c62109f243391c8754bb09/lifelines-0.30.0.tar.gz", hash = "sha256:f7f6f6275fcb167fe0f5b1ef98f868993f9c074cb74b1dd6e92736efa854be18", size = 383221, upload-time = "2024-10-29T12:00:43.513Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/14/f7/379e185a75ac8166ac70756d0ba68d9a2b02b555c7fde4983246752396bd/lifelines-0.30.0-py3-none-any.whl", hash = "sha256:ac7c602c8aceced9770d3977817c9d99c250ed8cd86f2567fa0d23e4e8014bf9", size = 349319, upload-time = "2024-10-29T12:00:41.749Z" },
 ]
 
 [[package]]

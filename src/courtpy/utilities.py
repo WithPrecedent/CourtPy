@@ -9,6 +9,22 @@ Contents:
     normalize: collapses all whitespace in text into single spaces.
     parse_date: returns an ISO date (YYYY-MM-DD) from a date in text.
     to_bool: converts a setting or a CSV cell to a boolean.
+    _BLOCKS: HTML and XML tags that start a new line when markup is converted
+        to text.
+    _ISO_DATE: pattern for a date written as YYYY-MM-DD, with the year, month,
+        and day as its groups.
+    _MONTHS: the number of each month, by the first three letters of its name
+        in capitals.
+    _SKIPPED: tags whose contents are page numbers or code rather than words
+        of an opinion, so their text is left out.
+    _SKIPPED_CLASSES: values of an element's "class" attribute that mark its
+        contents as page numbers inserted by a publisher (star pagination), so
+        its text is left out.
+    _TextExtractor: collects the text of HTML or XML for `html_to_text`.
+    _VOID: tags that never have a closing tag (such as "br").
+    _WRITTEN_DATE: pattern for a date written out, such as "January 5, 2010",
+        "Jan. 5, 2010", or "Sept. 5 2010", with the month, day, and year as
+        its groups.
 
 """
 
@@ -51,48 +67,87 @@ _ISO_DATE: re.Pattern[str] = re.compile(r'\b(\d{4})-(\d{2})-(\d{2})\b')
 
 
 class _TextExtractor(html.parser.HTMLParser):
-    """Collects the text of HTML or XML, with line breaks between blocks."""
+    """Collects the text of HTML or XML, with line breaks between blocks.
+
+    `html.parser.HTMLParser` reads the markup and calls the `handle_...`
+    methods for each tag and piece of text, which this class records. Feed it
+    markup with `feed`, call `close`, and join `parts` to get the text.
+    Character references (such as "&sect;") are converted to characters by
+    the parser (`convert_charrefs`).
+
+    Attributes:
+        parts: the pieces of text found so far, in order, with a line break
+            for the start and end of each block (see `_BLOCKS`).
+        stack: the tags that are open (started but not yet closed), from the
+            outermost to the innermost, each with whether its contents are
+            skipped (see `_SKIPPED` and `_SKIPPED_CLASSES`).
+
+    """
 
     def __init__(self) -> None:
         super().__init__(convert_charrefs = True)
         self.parts: list[str] = []
-        # Open tags, each with whether its contents are skipped.
         self.stack: list[tuple[str, bool]] = []
-        self.preformatted = 0
 
     @property
     def skipping(self) -> bool:
-        """Returns whether the current element's text is being skipped."""
+        """Returns whether the current element's text is being skipped.
+
+        Returns:
+            Whether any open tag (the current one or one that contains it) is
+                skipped.
+
+        """
         return any(skip for _, skip in self.stack)
 
     def handle_starttag(
         self,
         tag: str,
         attrs: list[tuple[str, str | None]]) -> None:
-        """Records an opening tag."""
+        """Records an opening tag.
+
+        A block tag adds a line break. The tag is added to `stack` (unless it
+        never has a closing tag), marked as skipped if it is in `_SKIPPED` or
+        has a class in `_SKIPPED_CLASSES`.
+
+        Args:
+            tag: the name of the tag, in lower case.
+            attrs: the tag's attributes, as (name, value) pairs.
+
+        """
         classes = set((dict(attrs).get('class') or '').split())
         skip = tag in _SKIPPED or bool(classes & _SKIPPED_CLASSES)
         if tag in _BLOCKS:
             self.parts.append('\n')
-        if tag == 'pre':
-            self.preformatted += 1
         if tag not in _VOID:
             self.stack.append((tag, skip))
 
     def handle_endtag(self, tag: str) -> None:
-        """Records a closing tag, closing any tags left open inside it."""
+        """Records a closing tag, closing any tags left open inside it.
+
+        A block tag adds a line break. The innermost open tag with the same
+        name is removed from `stack`, with any tags opened after it (which the
+        markup failed to close). A closing tag that was never opened is
+        ignored.
+
+        Args:
+            tag: the name of the tag, in lower case.
+
+        """
         if tag in _BLOCKS:
             self.parts.append('\n')
-        if tag == 'pre' and self.preformatted:
-            self.preformatted -= 1
         names = [name for name, _ in self.stack]
         if tag in names:
-            # Unclosed tags inside this one are closed with it.
             position = len(names) - 1 - names[::-1].index(tag)
             del self.stack[position:]
 
     def handle_data(self, data: str) -> None:
-        """Records text that is not skipped."""
+        """Records text, unless it is inside a skipped element.
+
+        Args:
+            data: a piece of text between tags.
+
+        """
         if not self.skipping:
             self.parts.append(data)
 

@@ -1,56 +1,59 @@
-"""The study in "federal_appeals.ini", one step at a time.
+"""The study in "federal_appeals.ini", from Python.
 
-Each step can be run on its own, and each saves its work, so the slow steps
-(downloading and parsing) need to be run only once.
+`whole_study` runs the study as the settings file describes it: its wrangler's
+first technique, `load_court_listener`, collects, parses, and codes the cases.
+`step_by_step` does the same work one step at a time, which is useful for
+looking at the cases before analyzing them.
 """
 
 from __future__ import annotations
 
 import pathlib
 
-import amos
-
 import courtpy
 
-DATA = pathlib.Path('data')
-CASES = DATA / 'court_listener'
-TABLE = DATA / 'cases.csv'
+HERE = pathlib.Path(__file__).parent
+# The settings file's "files" section keeps the cases and the coded table in
+# "data" and the results in "results", in the folder of the project's clerk.
+CASES = HERE / 'data' / 'court_listener'
+TABLE = HERE / 'data' / 'cases.csv'
 
-# 1. Collect the cases.
-#
-# The bulk data needs no API key and has no limits, but its opinions file is
-# more than 50 GB, so extracting cases from it takes a few hours. The bulk
-# files are kept (outside this folder) so that they can be used again.
-if not CASES.exists():
+
+def whole_study() -> courtpy.Project:
+    """Runs the study described by "federal_appeals.ini".
+
+    The first run extracts the cases from CourtListener's bulk data, which
+    takes a few hours but needs no API key. Later runs reuse the coded table.
+
+    Returns:
+        The applied project.
+
+    """
+    project = courtpy.Project.create(
+        HERE / 'federal_appeals.ini', clerk = HERE)
+    print(project.report.contents)
+    project.export()
+    return project
+
+
+def step_by_step() -> None:
+    """Collects, parses, codes, and loads the cases one step at a time."""
+    # 1. Collect the cases from the bulk data (or, for a small or recent set
+    # of cases, with courtpy.CourtListener().download and your API key).
     courtpy.BulkData().extract(
         courts = 'federal_circuits',
         start_date = '2019-01-01',
         end_date = '2019-12-31',
         folder = CASES)
-
-# For a small or very recent set of cases, use the API instead. Store your key
-# once with "courtpy key set" (or courtpy.secrets.set_api_key) and it is found
-# automatically. A free account can make 125 requests a day, about 20 cases
-# each, and a download that is stopped by the limit resumes where it stopped.
-#
-#     courtpy.CourtListener().download(
-#         'ca1', '2026-09-01', '2026-09-30', CASES, max_cases = 100)
-
-# 2. Parse the cases into a table, using the rules in courtpy's
-# "instructions" folder (or your own CSV files of rules), and code the parties,
-# case types, and outcomes.
-if TABLE.exists():
-    table = courtpy.load_cases(TABLE)
-else:
-    table = courtpy.parse(CASES, rulebooks = 'federal', workers = 4)
-    table = courtpy.code(table).data
+    # 2. Parse them with the federal rules and code the outcomes.
+    table = courtpy.code(courtpy.parse(CASES, workers = 4)).data
     courtpy.save_cases(table, TABLE)
-print(table['outcome_reversal'].mean(), 'of the decisions reversed')
+    print(table['outcome_reversal'].mean(), 'of the decisions reversed')
+    # 3. Load the saved table as an amos dataset, ready for any amos technique.
+    dataset = courtpy.loaders.LoadCases().apply(
+        source = TABLE, label = 'outcome_reversal')
+    print(dataset)
 
-# 3. Analyze the cases with amos. The settings file's "cases" section is not
-# needed, because the table is passed as the item.
-project = courtpy.Project.create(
-    pathlib.Path(__file__).with_name('federal_appeals.ini'), item = table)
-print(project.report.contents)
-print(amos.evaluators.Scorecard.create(project.result).to_markdown())
-project.export()
+
+if __name__ == '__main__':
+    whole_study()

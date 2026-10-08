@@ -9,7 +9,6 @@ Contents:
     _API_URL: base address of the CourtListener REST API (version 4).
     _BULK_PREFIX: folder of the CourtListener bulk data in its bucket.
     _BULK_URL: address of the public bucket with CourtListener's bulk data.
-    _CASES_SECTION: section of a project's settings that describes the cases.
     _COURT_GROUPS: names for groups of CourtListener court ids.
     _DEFAULT_CODERS: techniques that code variables after cases are parsed.
     _DEFAULT_JURISDICTION: rulebooks used when none are named.
@@ -38,7 +37,6 @@ _API_URL: str = 'https://www.courtlistener.com/api/rest/v4/'
 _BULK_PREFIX: str = 'bulk-data/'
 _BULK_URL: str = (
     'https://com-courtlistener-storage.s3-us-west-2.amazonaws.com/')
-_CASES_SECTION: str = 'cases'
 # Names that can be used in place of a list of CourtListener court ids.
 _COURT_GROUPS: dict[str, tuple[str, ...]] = {
     'federal_appellate': (

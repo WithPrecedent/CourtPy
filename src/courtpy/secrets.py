@@ -36,6 +36,18 @@ Contents:
     mask: hides most of a key so that it can be shown.
     secrets_path: returns the path of the secrets file.
     set_api_key: stores the API key.
+    logger: the module's logger, which reports problems with the keyring and
+        the secrets file.
+    _FILE_SECTION: the section of the secrets file that holds the key.
+    _FILE_SETTING: the setting, in `_FILE_SECTION`, that holds the key.
+    _STORES: the places that `set_api_key` can store the key ("auto",
+        "keyring", or "file").
+    _keyring: returns the `keyring` module, if it has a usable backend.
+    _keyring_names: returns the service and user name of the key in the
+        keyring.
+    _read_dotenv: returns the settings in a `.env` file.
+    _read_file: returns the contents of the secrets file.
+    _write_file: writes the secrets file, readable only by its owner.
 
 """
 
@@ -53,9 +65,7 @@ from typing import Any
 from . import options, utilities
 
 logger = logging.getLogger(__name__)
-# Where `set_api_key` can store the key.
 _STORES: tuple[str, ...] = ('auto', 'keyring', 'file')
-# Section and setting of the secrets file that hold the key.
 _FILE_SECTION: str = 'court_listener'
 _FILE_SETTING: str = 'api_key'
 
@@ -241,6 +251,11 @@ def set_api_key(key: str, *, store: str = 'auto') -> str:
 def _keyring() -> Any:
     """Returns the `keyring` module, if it has a usable backend.
 
+    The module is imported here, rather than at the top of the module, so
+    that a problem with the keyring (which some systems lack) only matters
+    when the keyring is used. Any error while importing it or finding its
+    backend means that there is no usable keyring.
+
     Returns:
         The module, or `None` if it is not installed or has no backend that
             stores secrets (as on a Linux server without a Secret Service).
@@ -263,7 +278,16 @@ def _keyring() -> Any:
 
 
 def _keyring_names() -> tuple[str, str]:
-    """Returns the service and user name of the key in the keyring."""
+    """Returns the service and user name of the key in the keyring.
+
+    A keyring stores each password under a service and a user name. They are
+    read from `options` each time, so that a project can change them.
+
+    Returns:
+        `options._KEYRING_SERVICE` and `options._KEYRING_USERNAME`, in the
+            order the keyring's functions take them.
+
+    """
     return options._KEYRING_SERVICE, options._KEYRING_USERNAME
 
 

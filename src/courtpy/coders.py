@@ -2,10 +2,10 @@
 
 Each coder is an `amos.Cleaner`, so it is added to the `amos` (and
 `chrisjen`) library as soon as courtpy is imported, and it can be named in the
-settings of any `amos` worker. courtpy also runs the coders named in the
-"coders" setting of the "cases" section (by default, `code_parties`,
+settings of any `amos` worker. courtpy's loaders (see `courtpy.loaders`) also
+run the coders named in their "coders" parameter (by default, `code_parties`,
 `code_case_type`, and `code_outcome`, in that order) right after parsing, so
-that a label such as "outcome_reversal" exists before an analysis begins.
+that a label such as "outcome_reversal" exists when the data is loaded.
 
 The coders use the columns made by the federal rules (such as
 "party1_appellant" and "disposition_reverse"). With other rules, make columns
@@ -17,20 +17,31 @@ Contents:
         which side won.
     CodeParties: completes the roles of the parties.
     DropText: removes columns that models cannot use, such as text and lists.
+    code: applies coders (or other `amos` techniques) to parsed cases.
+    _NONE: names that mean "no coders" (such as "none"), in lower case.
+    _OPPOSITES: pairs of roles that are opposites: if one party is an
+        appellant, the other is an appellee, and so on.
+    _SIDES: each party with the other party, so that a coder can do the same
+        thing for both sides of a case.
+    _flags: returns a column as plain booleans.
+    _is_text: returns whether a column holds text, lists, or other objects.
+    _require: raises an error if columns a coder needs are missing.
 
 """
 
 from __future__ import annotations
 
 import dataclasses
-from collections.abc import Sequence
-from typing import Any
+from collections.abc import Hashable, Mapping, Sequence
+from typing import Any, cast
 
 import amos
+import chrisjen
 import pandas as pd
 
-# The roles in each pair are opposites: if one party is an appellant, the
-# other is an appellee, and so on.
+from . import options, utilities
+
+_NONE: frozenset[str] = frozenset({'', 'none', 'false', 'no', '0'})
 _OPPOSITES: tuple[tuple[str, str], ...] = (
     ('appellant', 'appellee'),
     ('petitioner', 'respondent'),
@@ -302,18 +313,56 @@ class DropText(amos.Cleaner):
             item, **{'label': item.label, 'groups': item.groups, **kwargs})
 
 
+def code(
+    data: pd.DataFrame | amos.Dataset,
+    coders: str | Sequence[str] | None = options._DEFAULT_CODERS,
+    *,
+    parameters: Mapping[str, Mapping[str, Any]] | None = None) -> amos.Dataset:
+    """Applies coders (or other `amos` techniques) to parsed cases.
+
+    Args:
+        data: the parsed cases, or a dataset of them (which is changed in
+            place).
+        coders: names of the techniques to apply, in order. Defaults to
+            `options._DEFAULT_CODERS`. "none" (or `None`) applies none.
+        parameters: parameters for the techniques, by their names. Defaults
+            to `None`.
+
+    Returns:
+        A dataset of the coded cases, whose history records each technique.
+
+    """
+    dataset = data if isinstance(data, amos.Dataset) else amos.Dataset(data)
+    for name in utilities.listify(coders):
+        if name.lower() in _NONE:
+            continue
+        kind = cast(
+            'type[amos.Operation]',
+            chrisjen.library.borrow(name, genre = 'operation'))
+        settings = dict((parameters or {}).get(name, {}))
+        technique = kind(parameters = cast('dict[Hashable, Any]', settings))
+        technique.apply(dataset)
+    return dataset
+
+
 """ Private Functions """
 
 
 def _flags(data: pd.DataFrame, column: str) -> pd.Series:
-    """Returns a column as booleans, with missing values (or columns) false.
+    """Returns a column as plain booleans.
+
+    The coders combine flags with `&` and `|`, which need plain booleans
+    without missing values. A missing value (or a missing column) is false.
+    Text (as in a table loaded from a CSV file) is true if it is "true", "t",
+    "1", or "yes" (in any case).
 
     Args:
         data: the cases.
         column: name of the column.
 
     Returns:
-        The column as plain booleans.
+        The column as plain booleans, or a column of false values if `data`
+            has no such column.
 
     """
     if column not in data.columns:
@@ -329,8 +378,15 @@ def _flags(data: pd.DataFrame, column: str) -> pd.Series:
 def _is_text(column: pd.Series) -> bool:
     """Returns whether a column holds text, lists, or other objects.
 
-    A column of `object` type that holds only booleans (and missing values)
-    is not text.
+    Categories, booleans, numbers, and dates are not text. Neither is a
+    column of `object` type that holds only booleans (and missing values),
+    which `pandas` makes when booleans are mixed with missing values.
+
+    Args:
+        column: a column of the cases.
+
+    Returns:
+        Whether models cannot use the column (so `DropText` removes it).
 
     """
     if isinstance(column.dtype, pd.CategoricalDtype):
