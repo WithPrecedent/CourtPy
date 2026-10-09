@@ -83,9 +83,13 @@ are), and `load_cases` loads it again.
 
 ## Coders
 
-The coders are `amos.Cleaner` techniques, so they can be named in the settings
-of any `amos` worker, and they record what they did in the dataset's
-`history`. They use the columns made by the federal rules.
+The coders are `amos` techniques, so they can be named in the settings of any
+`amos` worker, and they record what they did in the dataset's `history`.
+`code_parties`, `code_case_type`, and `code_outcome` are mungers (`amos.Munger`),
+which change and add columns without adding or removing rows, so the history
+lists the columns that each one changed and created. `drop_text` is a cleaner
+(`amos.Cleaner`), which removes columns. They use the columns made by the
+federal rules.
 
 | Coder | Adds |
 | --- | --- |
@@ -94,8 +98,10 @@ of any `amos` worker, and they record what they did in the dataset's
 | `code_outcome` | `outcome_reversal` (from the stated disposition, or else from the opinion's words), `outcome_party1_won` and `outcome_party2_won`, the winner by side (`outcome_criminal_defendant_won`, `outcome_prosecution_won`, `outcome_civil_plaintiff_won`, and `outcome_civil_defendant_won`), and `appeal_by_defendant`. Outcomes that cannot be known are missing. |
 | `drop_text` | Removes columns of text and lists (such as names and dates), which models cannot use. Its `keep` parameter names columns to keep. |
 
-To write your own, subclass `amos.Cleaner` and write `clean`. It is added to
-the library as soon as it is defined, so it can be named in settings:
+To write your own, subclass `amos.Munger` and write `munge` (or subclass
+`amos.Cleaner` and write `clean` for a coder that removes rows or columns). It
+is added to the library as soon as it is defined, so it can be named in
+settings:
 
 ```python
 import dataclasses
@@ -104,10 +110,10 @@ import amos
 
 
 @dataclasses.dataclass
-class CodeLongOpinion(amos.Cleaner):
+class CodeLongOpinion(amos.Munger):
     """Flags opinions longer than a number of words."""
 
-    def clean(self, data, words = 5000, **kwargs):
+    def munge(self, data, words = 5000, **kwargs):
         data["long_opinion"] = data["word_count"] > words
         return data
 ```
@@ -229,5 +235,5 @@ courtpy.options._COURT_GROUPS["new_england"] = ("ca1", "mad", "nhd", "med", "rid
 | `ValueError: ... row N: the pattern ... is not valid` | A rule's regular expression has an error. `courtpy rules file.csv` checks a file. |
 | `KeyError: 'code_outcome' needs the columns [...]` | A coder needs columns made by the federal rules. |
 | `ValueError: no court_listener cases were found in ...` | The loader's source folder has no saved cases. Set "download" or "source". |
-| `ModuleNotFoundError: No module named 'statsmodels'` | `logit` is the statsmodels model since `amos` 0.2.3. Use `sk_logit` for scikit-learn's, or `pip install amos[statistics]`. |
+| `ModuleNotFoundError: No module named 'statsmodels'` | `logit_sm` (and the other statsmodels models) need statsmodels. Use `logit` for scikit-learn's logistic regression, or `pip install amos[statistics]`. |
 | `KeyError: the label 'outcome_reversal' is not a column of the data` | The label is made by a coder that was not run. Check the "coders" setting. |

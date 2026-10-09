@@ -97,9 +97,10 @@ lists.
 ## 4. Analyze the table
 
 `courtpy.Project` is `amos.Project`, so an analysis is described with `amos`
-settings. This one predicts reversals from a few features. (`sk_logit` is
-scikit-learn's logistic regression; amos's `logit` is the statsmodels model,
-with a table of coefficients, which needs `pip install amos[statistics]`.)
+settings. This one predicts reversals from a few features. (`logit` is
+scikit-learn's logistic regression; amos's `logit_sm` is the statsmodels
+model, with a table of coefficients, which needs
+`pip install amos[statistics]`.)
 
 ```python
 settings = {
@@ -115,7 +116,7 @@ settings = {
         "criterion": "roc_auc",
         "steps": "split, model",
         "split_techniques": "stratified",
-        "model_techniques": "baseline, sk_logit"},
+        "model_techniques": "baseline, logit"},
     "critic": {"techniques": "scorecard"},
 }
 project = courtpy.Project.create(settings, item = coded)
@@ -158,7 +159,7 @@ reuse = true
 columns = year, published, type_criminal, dissents, word_count
 
 [analyst]
-techniques = stratified, sk_logit
+techniques = stratified, logit
 
 [critic]
 techniques = scorecard

@@ -221,7 +221,7 @@ design = experiment
 criterion = roc_auc
 steps = split, model
 split_techniques = stratified
-model_techniques = baseline, sk_logit, random_forest
+model_techniques = baseline, logit, random_forest
 
 [critic]
 techniques = scorecard

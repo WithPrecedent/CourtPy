@@ -31,7 +31,7 @@ query = type_criminal
 columns = outcome_criminal_defendant_won
 
 [analyst]
-techniques = stratified, sk_logit
+techniques = stratified, logit
 
 [critic]
 techniques = scorecard
@@ -61,6 +61,33 @@ table = courtpy.parse("court_listener", rulebooks = ["federal", "deference.csv"]
 or, in a settings file, `rulebooks = federal, deference.csv` in the loader's
 parameters (such as the "load_court_listener_parameters" section). Check the
 file first with `courtpy rules deference.csv`.
+
+For a quick look without a file of rules, keep the opinions' text and search
+it with `amos`'s mungers, such as `flag_patterns` and `count_patterns`, after
+the loader. Their "patterns" are a mapping, so the settings must be in a toml,
+json, or yaml file (or a Python `dict`), not an ini file. `drop_text` then
+removes the text before the analysis:
+
+```toml
+[wrangler]
+techniques = "load_court_listener, flag_patterns, count_patterns, drop_text"
+
+[load_court_listener_parameters]
+keep_text = true
+
+[flag_patterns_parameters]
+column = "opinion"
+ignorecase = true
+
+[flag_patterns_parameters.patterns]
+cites_loper_bright = 'Loper Bright'
+
+[count_patterns_parameters]
+column = "opinion"
+
+[count_patterns_parameters.patterns]
+chevron_mentions = '\bChevron\b'
+```
 
 ## Keep a set of recent cases up to date
 

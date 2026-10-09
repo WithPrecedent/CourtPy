@@ -1,8 +1,10 @@
 """Techniques that code variables from parsed cases.
 
-Each coder is an `amos.Cleaner`, so it is added to the `amos` (and
-`chrisjen`) library as soon as courtpy is imported, and it can be named in the
-settings of any `amos` worker. courtpy's loaders (see `courtpy.loaders`) also
+`code_parties`, `code_case_type`, and `code_outcome` are `amos.Munger`
+techniques, which change and add columns without adding or removing rows, and
+`drop_text` is an `amos.Cleaner`, which removes columns. Each is added to the
+`amos` (and `chrisjen`) library as soon as courtpy is imported, and it can be
+named in the settings of any `amos` worker. courtpy's loaders (see `courtpy.loaders`) also
 run the coders named in their "coders" parameter (by default, `code_parties`,
 `code_case_type`, and `code_outcome`, in that order) right after parsing, so
 that a label such as "outcome_reversal" exists when the data is loaded.
@@ -50,7 +52,7 @@ _SIDES: tuple[tuple[str, str], ...] = (('party1', 'party2'), ('party2', 'party1'
 
 
 @dataclasses.dataclass
-class CodeParties(amos.Cleaner):
+class CodeParties(amos.Munger):
     """Completes the roles of the parties and finds who brought the appeal.
 
     A caption often gives one party's role but not the other's ("United
@@ -69,7 +71,7 @@ class CodeParties(amos.Cleaner):
 
     """
 
-    def clean(self, data: pd.DataFrame, **kwargs: Any) -> pd.DataFrame:
+    def munge(self, data: pd.DataFrame, **kwargs: Any) -> pd.DataFrame:
         """Completes the roles of the parties.
 
         Args:
@@ -99,7 +101,7 @@ class CodeParties(amos.Cleaner):
 
 
 @dataclasses.dataclass
-class CodeCaseType(amos.Cleaner):
+class CodeCaseType(amos.Munger):
     """Decides whether each case is criminal or civil.
 
     A case is criminal ("type_criminal") if the United States is a party and
@@ -120,7 +122,7 @@ class CodeCaseType(amos.Cleaner):
 
     """
 
-    def clean(self, data: pd.DataFrame, **kwargs: Any) -> pd.DataFrame:
+    def munge(self, data: pd.DataFrame, **kwargs: Any) -> pd.DataFrame:
         """Codes each case as criminal or civil.
 
         Args:
@@ -162,7 +164,7 @@ class CodeCaseType(amos.Cleaner):
 
 
 @dataclasses.dataclass
-class CodeOutcome(amos.Cleaner):
+class CodeOutcome(amos.Munger):
     """Decides whether each decision reversed the court below, and who won.
 
     A decision is a reversal ("outcome_reversal") if it reversed, vacated, or
@@ -190,7 +192,7 @@ class CodeOutcome(amos.Cleaner):
 
     """
 
-    def clean(self, data: pd.DataFrame, **kwargs: Any) -> pd.DataFrame:
+    def munge(self, data: pd.DataFrame, **kwargs: Any) -> pd.DataFrame:
         """Codes the outcome of each decision.
 
         Args:

@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 
 <!-- insertion marker -->
 
+## 0.2.1
+
+Updated to [amos](https://github.com/WithPrecedent/amos) 0.2.5.
+
+### Changed
+
+* Requires amos 0.2.5.
+* `code_parties`, `code_case_type`, and `code_outcome` are now mungers
+  (`amos.Munger`, new in amos 0.2.4), since they change and add columns
+  without adding or removing rows. Their names in settings are unchanged, and
+  the dataset's history now lists the columns that each one changed and
+  created. `drop_text`, which removes columns, is still a cleaner.
+* The example study and the documentation use `logit` for scikit-learn's
+  logistic regression, which amos 0.2.4 renamed from `sk_logit`. (Its
+  statsmodels model is now `logit_sm`.) Settings that name `sk_logit` must use
+  `logit`.
+
+### Added
+
+* A recipe for searching the opinions' text with amos's `flag_patterns` and
+  `count_patterns` mungers, without a file of rules.
+
 ## 0.2.0
 
 Updated to [amos](https://github.com/WithPrecedent/amos) 0.2.3, whose loaders

@@ -75,6 +75,39 @@ def test_project_with_a_loader(court_listener_folder: pathlib.Path, tmp_path: pa
     assert set(result.tables) == {'summarize', 'label_balance'}
 
 
+def test_amos_mungers_search_kept_text(court_listener_folder: pathlib.Path, tmp_path: pathlib.Path) -> None:
+    folder = tmp_path / 'data' / 'court_listener'
+    folder.parent.mkdir()
+    court_listener_folder.rename(folder)
+    settings = tmp_path / 'coding.toml'
+    settings.write_text(
+        '[files]\n'
+        'input_folder = "data"\n'
+        '[coding_project]\n'
+        'coding_workers = "wrangler"\n'
+        '[wrangler]\n'
+        'techniques = "load_court_listener, flag_patterns, count_patterns, drop_text"\n'
+        '[load_court_listener_parameters]\n'
+        'keep_text = true\n'
+        '[flag_patterns_parameters]\n'
+        'column = "opinion"\n'
+        'ignorecase = true\n'
+        '[flag_patterns_parameters.patterns]\n'
+        "affirmed = 'we affirm'\n"
+        '[count_patterns_parameters]\n'
+        'column = "opinion"\n'
+        '[count_patterns_parameters.patterns]\n'
+        "title_vii = '\\bTitle VII\\b'\n",
+        encoding = 'utf-8')
+    result = courtpy.Project.create(settings, clerk = tmp_path).result
+    assert [e['technique'] for e in result.history] == [
+        'load_court_listener', 'code_parties', 'code_case_type', 'code_outcome',
+        'flag_patterns', 'count_patterns', 'drop_text']
+    assert result.data.loc['2', 'affirmed']
+    assert result.data.loc['2', 'title_vii'] == 1
+    assert 'opinion' not in result.data.columns
+
+
 def test_no_cases(tmp_path: pathlib.Path) -> None:
     with pytest.raises(ValueError, match = 'no court_listener cases were found'):
         loaders.LoadCourtListener().apply(source = tmp_path)

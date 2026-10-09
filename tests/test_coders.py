@@ -18,8 +18,16 @@ def coded(court_listener_folder: pathlib.Path) -> amos.Dataset:
 
 
 def test_coders_are_in_the_library() -> None:
-    for name in ('code_parties', 'code_case_type', 'code_outcome', 'drop_text'):
-        assert amos.library.classify(name) == 'cleaner'
+    for name in ('code_parties', 'code_case_type', 'code_outcome'):
+        assert amos.library.classify(name) == 'munger'
+    assert amos.library.classify('drop_text') == 'cleaner'
+
+
+def test_mungers_record_their_columns(coded: amos.Dataset) -> None:
+    parties, case_type, outcome = coded.history
+    assert {'party1_appealing', 'party2_defending'} <= set(parties['created'])
+    assert 'type_criminal' in case_type['created']
+    assert outcome['created'][0] == 'outcome_reversal'
 
 
 def test_code_parties(coded: amos.Dataset) -> None:
