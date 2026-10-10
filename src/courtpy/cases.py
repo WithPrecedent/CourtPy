@@ -71,7 +71,8 @@ def load_cases(path: pathlib.Path | str) -> pd.DataFrame:
 
     Returns:
         The table, labeled by "case_id". Columns that held lists are lists
-            again.
+            again, and the ids of cases are text, as they were (in the labels
+            and in a "case_id" column, which a table of judges' votes has).
 
     """
     path = pathlib.Path(path)
@@ -82,7 +83,8 @@ def load_cases(path: pathlib.Path | str) -> pd.DataFrame:
                 data[column] = data[column].map(
                     lambda v: list(v) if hasattr(v, 'tolist') else v)
         return data
-    data = pd.read_csv(path, index_col = 0, encoding = 'utf-8')
+    data = pd.read_csv(
+        path, index_col = 0, encoding = 'utf-8', dtype = {'case_id': str})
     data.index = data.index.astype(str)
     record = path.with_name(_LIST_COLUMNS_FILE.format(stem = path.stem))
     if record.is_file():

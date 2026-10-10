@@ -4,9 +4,9 @@
 
 site_name: CourtPy
 site_description: Accessible tools for collecting, parsing, and analyzing court opinions
-site_url: https://WithPrecedent.github.io/CourtPy
-repo_name: WithPrecedent/CourtPy
-repo_url: https://github.com/WithPrecedent/CourtPy
+site_url: https://WithPrecedent.github.io/courtpy
+repo_name: WithPrecedent/courtpy
+repo_url: https://github.com/WithPrecedent/courtpy
 edit_uri: edit/main/docs/
 watch: [
   mkdocs.yml,

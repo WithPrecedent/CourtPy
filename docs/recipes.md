@@ -42,6 +42,157 @@ Columns that record the outcome itself (such as `outcome_reversal`,
 drop them (with `drop_columns`) or name the features to keep (with
 `keep_columns`), as in the example study.
 
+## Study how judges vote
+
+To study judges rather than cases, first make a roster of judges, once (see
+[Judges and panels](advanced.md#judges-and-panels)):
+
+```python
+import courtpy
+
+courtpy.judges.Roster.from_fjc().save()
+```
+
+Then add `code_judges` and `judge_votes` to the loader's coders. `judge_votes`
+is a shaper, which changes what a row is: the table has one row for each
+judge on each case, and `vote_reversal` (whether the judge voted to reverse)
+can be the label. This is the heart of
+[examples/judge_votes.ini](https://github.com/WithPrecedent/courtpy/blob/main/examples/judge_votes.ini):
+
+```ini
+[general]
+seed = 43
+label = vote_reversal
+groups = case_id
+
+[votes_project]
+votes_workers = wrangler, analyst, critic
+
+[wrangler]
+techniques = load_court_listener, filter_rows, keep_columns, drop_missing
+
+[load_court_listener_parameters]
+source = court_listener
+coders = code_parties, code_case_type, code_outcome, code_judges, code_politics, judge_votes
+
+[filter_rows_parameters]
+query = type_criminal and panel_size == 3 and panel_found == 3
+
+[keep_columns_parameters]
+columns = court_num, year, politics_president_party, judge_party, judge_woman, judge_age, colleagues_party, colleagues_woman
+
+[analyst]
+techniques = group_split, logit
+
+[critic]
+techniques = scorecard
+
+[scorecard_parameters]
+metrics = roc_auc, accuracy, balanced_accuracy, f1
+```
+
+* The query keeps criminal appeals decided by three judges (so not by a court
+  sitting en banc) who were all found in the roster. Compare `panel_found`
+  with `panel_size` to see how many panels have a judge who was not found.
+* The judges of a case decide it together, so `groups = case_id` and
+  `group_split` keep them together when the data is split, and a model is
+  tested on cases that it has not seen.
+* A scorecard compares a model across a study's groups unless its metrics
+  are named. Here the groups are cases, so that comparison would mean nothing
+  (and it needs the optional fairlearn package).
+
+To study panels instead, use `code_judges` without `judge_votes`. The table
+keeps one row for each case, the label can stay `outcome_reversal`, and the
+composition of each panel (such as `panel_party` and `panel_woman`) can be
+among the features.
+
+## Add what is known about each opinion's author
+
+`merge_judges` is a merger: it adds the columns of the roster's row for the
+judge that each row names, and never adds or loses a row. To study whether
+the author of an opinion matters, name the column with the author's name and
+a prefix for the new columns:
+
+```ini
+[wrangler]
+techniques = load_court_listener, merge_judges, filter_rows, keep_columns
+
+[merge_judges_parameters]
+name = author
+prefix = author_
+indicator = author_found
+
+[filter_rows_parameters]
+query = type_criminal and author_found
+
+[keep_columns_parameters]
+columns = outcome_reversal, court_num, year, author_party, author_woman, author_age, author_prosecutor
+```
+
+The history of the study's result records how many cases' authors were
+found (its "matched"), which belongs in a description of the data.
+
+## Add the politics of each year
+
+`code_politics` adds the party of the president in each case's year. For the
+Supreme Court's Martin-Quinn scores and the median NOMINATE scores of the
+Senate and House too, make a table of years once (CourtPy downloads the
+scores from their sources), and name it as the technique's `source`:
+
+```python
+import courtpy
+
+courtpy.politics.build_table().to_csv("data/politics.csv", index = False)
+```
+
+```ini
+[files]
+input_folder = data
+
+[wrangler]
+techniques = load_court_listener, code_politics, drop_text
+
+[code_politics_parameters]
+source = politics.csv
+```
+
+The table is a CSV file with a "year" column, so measures of your own can be
+added to it in a spreadsheet. See
+[Political context](advanced.md#political-context).
+
+## Use the Supreme Court Database's coding
+
+For cases of the Supreme Court, `code_scdb` adds the
+[Supreme Court Database](https://scdb.la.psu.edu)'s coding of each case, with
+"scdb_" before the database's names for its variables. CourtPy downloads the
+latest release the first time:
+
+```ini
+[general]
+label = outcome_reversal
+
+[wrangler]
+techniques = load_court_listener, code_scdb, filter_rows, keep_columns
+
+[load_court_listener_parameters]
+source = court_listener
+download = bulk
+courts = scotus
+start_date = 2000-01-01
+
+[code_scdb_parameters]
+columns = issueArea, decisionDirection, lcDispositionDirection
+indicator = in_scdb
+
+[filter_rows_parameters]
+query = in_scdb
+
+[keep_columns_parameters]
+columns = outcome_reversal, year, scdb_issueArea, scdb_lcDispositionDirection
+```
+
+See [The Supreme Court Database](advanced.md#the-supreme-court-database).
+
 ## Add your own variables
 
 Write the rules in a CSV file (see [Writing Rules](rules.md)) and parse with

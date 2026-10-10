@@ -1,0 +1,7 @@
+target,variable,kind,pattern,value,ignorecase,dotall,note
+career,prosecutor,flag,U(\.|NITED) ?S(\.|TATES) ATTORNEY|DISTRICT ATTORNEY|PROSECUT|ATTORNEY GENERAL|STATE'?S ATTORNEY|COMMONWEALTH'?S ATTORNEY,,TRUE,FALSE,"A prosecutor's office, federal or state (an attorney general's office is counted, as it was in the earlier CourtPy, although some of its lawyers do civil work)"
+career,public_defender,flag,PUBLIC DEFENDER|FEDERAL DEFENDER,,TRUE,FALSE,
+career,law_clerk,flag,LAW CLERK,,TRUE,FALSE,A clerkship at any court
+career,supreme_court_clerk,flag,LAW CLERK.*SUPREME COURT OF THE UNITED STATES,,TRUE,FALSE,"A clerkship at the Supreme Court (each position is on its own line, and ""."" does not match a line break, so both must be in one position)"
+career,solicitor_general,flag,SOLICITOR GENERAL,,TRUE,FALSE,"The office of a solicitor general, federal or state"
+career,law_professor,flag,PROFESSOR,,TRUE,FALSE,

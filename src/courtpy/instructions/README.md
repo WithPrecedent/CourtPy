@@ -9,8 +9,9 @@ them to courtpy (`rulebooks = my_rules.csv` in a settings file, or
 | File | What it does |
 | --- | --- |
 | `lexis_nexis.csv` | Divides a Lexis-Nexis case into its header and opinions, and finds each part of the header (the parties, court, docket number, dates, history, counsel, disposition, citation, judges, and author). CourtListener cases do not need it, because CourtListener stores those parts separately. |
-| `federal/header.csv` | Finds variables in the parts of the header: the court's number, each party's role, the agency involved, the disposition, the counsel, publication, and the names of the judges. |
-| `federal/opinion.csv` | Finds variables in the text of the opinions: the legal issues discussed (civil, criminal, constitutional, procedural, and standards of review), the opinion's own disposition ("we reverse"), and citations to cases, statutes, regulations, and other sources. |
+| `federal/header.csv` | Finds variables in the parts of the header: the court's number, each party's role, the agency involved, the disposition, the counsel, publication, and the names of the judges. When a case has no roles or judges in its header (as recent CourtListener cases often do not), it reads them from the caption and the "Before ..." line at the start of the opinion. |
+| `federal/opinion.csv` | Finds variables in the text of the opinions: the legal issues discussed (civil, criminal, constitutional, procedural, and standards of review), the decision that the opinion states ("AFFIRMED." or "we reverse"), its words about dispositions anywhere, and citations to cases, statutes, regulations, and other sources. |
+| `judges.csv` | Not for opinions: it codes the careers of judges for a roster of them (see `courtpy.judges.build_roster`), as a prosecutor, public defender, law clerk, Supreme Court clerk, lawyer of a solicitor general's office, or law professor. Its rules search the section `career`, which has each position that a judge held (as the Federal Judicial Center reports it) on its own line. |
 
 The "federal" rulebook is both `federal` files, applied in that order.
 
@@ -57,6 +58,16 @@ The "federal" rulebook is both `federal` files, applied in that order.
 * **Missing sections are not errors.** If a case has no section for a rule's
   target (such as `future` in a CourtListener case), a flag is FALSE, a count
   is 0, a list is empty, and a label or section is blank.
+* **A `section` rule does not replace a section made by a rule above it.** So
+  two `section` rules for one variable are a first choice and a fallback: the
+  `federal` rules make `panel_text` from the opinion's "Before ..." line,
+  and only otherwise from the header's judges.
+* **Three sets of variables record the disposition.** `disposition_...` come
+  from the header's disposition, `decision_...` from the decision that the
+  opinion states ("AFFIRMED.", "VACATED AND REMANDED.", or "we reverse"),
+  and `opinion_...` from those words anywhere in the opinion, which may be
+  about an earlier decision or a standard of review ("we will reverse only
+  if"). The `code_outcome` coder uses the first of the three that a case has.
 * **Check your rules** with `courtpy rules my_rules.csv` in a terminal. It
   reports any row that is not a valid rule, by its row number, and lists the
   variables the rules make.
@@ -85,3 +96,14 @@ These sections can be targets in the `federal` rules (and your own):
 | `concurring_lines`, `dissenting_lines` | Lines about concurrences and dissents. | The authors of concurrences and dissents. |
 | `posture`, `syllabus` | (None.) | CourtListener's posture and syllabus. |
 | `opinion` | Everything after the line "OPINION". | The text of every opinion, the majority first. |
+
+The `federal` rules make these sections from the opinion, which your own
+rules (below them) can search too:
+
+| Section | Holds |
+| --- | --- |
+| `opening_lines` | The first 4,000 characters of the opinion (not kept in the table). |
+| `caption` | The header's caption, if it names an appellant or appellee. Otherwise, the caption in the opinion's opening, from the first party's role through the second's (such as "Plaintiff-Appellee, v. JOHN DOE, Defendant-Appellant"). |
+| `caption1`, `caption2` | The caption before and after "v.", in the order of `party1` and `party2`. |
+| `panel_text` | The panel as the opinion's opening names it ("Before SMITH, JONES, and BROWN, Circuit Judges"). Otherwise, the `judges` section. |
+| `decision` | The decision as the opinion states it. |

@@ -7,7 +7,7 @@ authors = [{name = "Corey Rayburn Yung", email = "coreyrayburnyung@gmail.com"}]
 license = {text = "Apache Software License 2.0"}
 readme = "README.md"
 requires-python = ">=3.11"
-version = "0.2.1"
+version = "0.2.2"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Environment :: Console",
@@ -32,7 +32,7 @@ keywords = [
     "lexis",
     "text parsing"]
 dependencies = [
-    "amos>=0.2.5",
+    "amos>=0.2.6",
     "chrisjen>=0.2.0",
     "keyring>=24",
     "nagata>=0.2.0",
@@ -49,11 +49,11 @@ analysis = ["amos[all]"]
 courtpy = "courtpy.cli:main"
 
 [project.urls]
-Documentation = "https://WithPrecedent.github.io/CourtPy"
-Repository = "https://github.com/WithPrecedent/CourtPy"
-Homepage = "https://github.com/WithPrecedent/CourtPy"
-Issues = "https://github.com/WithPrecedent/CourtPy/issues"
-Changelog = "https://WithPrecedent.github.io/CourtPy/changelog"
+Documentation = "https://WithPrecedent.github.io/courtpy"
+Repository = "https://github.com/WithPrecedent/courtpy"
+Homepage = "https://github.com/WithPrecedent/courtpy"
+Issues = "https://github.com/WithPrecedent/courtpy/issues"
+Changelog = "https://WithPrecedent.github.io/courtpy/changelog"
 
 [dependency-groups]
 dev = [

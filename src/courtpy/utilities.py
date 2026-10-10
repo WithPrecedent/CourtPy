@@ -3,16 +3,23 @@
 Contents:
     config_folder: returns the folder for courtpy's settings and secrets.
     data_folder: returns the folder for large downloads, such as bulk data.
+    download_file: downloads a file, unless it was downloaded before.
     expand_courts: turns court ids and group names into court ids.
     html_to_text: converts the HTML or XML of an opinion to plain text.
     listify: returns a setting as a list of names.
+    locate: returns a file named in settings, found as a clerk finds files.
     normalize: collapses all whitespace in text into single spaces.
+    open_session: returns a session that identifies courtpy to servers.
+    page_links: returns the links on a web page.
     parse_date: returns an ISO date (YYYY-MM-DD) from a date in text.
+    read_csv: loads a CSV file that is in UTF-8 or Windows-1252.
     to_bool: converts a setting or a CSV cell to a boolean.
+    logger: the module's logger, which reports the files that are downloaded.
     _BLOCKS: HTML and XML tags that start a new line when markup is converted
         to text.
     _ISO_DATE: pattern for a date written as YYYY-MM-DD, with the year, month,
         and day as its groups.
+    _LinkExtractor: collects the links of a web page for `page_links`.
     _MONTHS: the number of each month, by the first three letters of its name
         in capitals.
     _SKIPPED: tags whose contents are page numbers or code rather than words
@@ -32,14 +39,21 @@ from __future__ import annotations
 
 import datetime
 import html.parser
+import logging
 import os
 import pathlib
 import re
 import sys
+import urllib.parse
 from collections.abc import Iterable
 from typing import Any
 
+import pandas as pd
+import requests
+
 from . import options
+
+logger = logging.getLogger(__name__)
 
 # Tags that start a new line when HTML or XML is converted to text.
 _BLOCKS: frozenset[str] = frozenset({
@@ -152,6 +166,65 @@ class _TextExtractor(html.parser.HTMLParser):
             self.parts.append(data)
 
 
+class _LinkExtractor(html.parser.HTMLParser):
+    """Collects the links of a web page, with the words of each.
+
+    `html.parser.HTMLParser` reads the markup and calls the `handle_...`
+    methods for each tag and piece of text, which this class records. Feed it
+    markup with `feed`, call `close`, and read `links`.
+
+    Attributes:
+        links: the address ("href") and the words of each link found so far,
+            in the order of the page. The words are a `list` of the pieces
+            of text in the link.
+        open: whether the parser is inside a link, so that text belongs to
+            the last of `links`.
+
+    """
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs = True)
+        self.links: list[tuple[str, list[str]]] = []
+        self.open: bool = False
+
+    def handle_starttag(
+        self,
+        tag: str,
+        attrs: list[tuple[str, str | None]]) -> None:
+        """Starts a link at an "a" tag that has an address.
+
+        Args:
+            tag: name of the tag, in lower case.
+            attrs: the tag's attributes, as pairs of names and values.
+
+        """
+        if tag == 'a':
+            address = dict(attrs).get('href')
+            self.open = bool(address)
+            if address:
+                self.links.append((address, []))
+
+    def handle_endtag(self, tag: str) -> None:
+        """Ends a link at the closing "a" tag.
+
+        Args:
+            tag: name of the tag, in lower case.
+
+        """
+        if tag == 'a':
+            self.open = False
+
+    def handle_data(self, data: str) -> None:
+        """Records text that is inside a link.
+
+        Args:
+            data: text between tags.
+
+        """
+        if self.open:
+            self.links[-1][1].append(data)
+
+
 def config_folder() -> pathlib.Path:
     """Returns the folder for courtpy's settings and secrets.
 
@@ -199,6 +272,40 @@ def data_folder() -> pathlib.Path:
         return pathlib.Path(base) / 'courtpy'
     base = os.environ.get('XDG_DATA_HOME') or pathlib.Path.home() / '.local' / 'share'
     return pathlib.Path(base) / 'courtpy'
+
+
+def download_file(
+    url: str,
+    path: pathlib.Path | str,
+    *,
+    overwrite: bool = False,
+    session: Any = None) -> pathlib.Path:
+    """Downloads a file, unless it was downloaded before.
+
+    Args:
+        url: the address of the file.
+        path: where to save it. Its folder is created if needed.
+        overwrite: whether to download the file even if there is one at
+            `path`. Defaults to `False`.
+        session: an object with a `get` method like a `requests.Session`.
+            Defaults to `None`, in which case a `requests.Session` that
+            identifies courtpy is made.
+
+    Raises:
+        requests.HTTPError: if the file cannot be downloaded.
+
+    Returns:
+        `path`.
+
+    """
+    path = pathlib.Path(path)
+    if overwrite or not path.is_file():
+        response = open_session(session).get(url, timeout = options._TIMEOUT)
+        response.raise_for_status()
+        path.parent.mkdir(parents = True, exist_ok = True)
+        path.write_bytes(response.content)
+        logger.info('downloaded %s to %s', path.name, path.parent)
+    return path
 
 
 def expand_courts(courts: str | Iterable[str] | None) -> list[str]:
@@ -272,6 +379,26 @@ def listify(item: Any) -> list[str]:
     return [str(name).strip() for name in item if str(name).strip()]
 
 
+def locate(path: pathlib.Path | str, clerk: Any = None) -> pathlib.Path:
+    """Returns a file named in settings, found as a clerk finds files.
+
+    Args:
+        path: a path, which may begin with "~" for the user's home folder.
+        clerk: the file manager of a project (a `nagata.FileManager`).
+            Defaults to `None`.
+
+    Returns:
+        `path` itself if it is absolute, exists in the current folder, or
+            there is no `clerk`, and otherwise `path` in the clerk's input
+            folder.
+
+    """
+    resolved = pathlib.Path(str(path)).expanduser()
+    if clerk is None or resolved.is_absolute() or resolved.exists():
+        return resolved
+    return pathlib.Path(clerk.input_folder) / resolved
+
+
 def normalize(text: str | None) -> str:
     """Collapses all whitespace in `text` into single spaces.
 
@@ -283,6 +410,51 @@ def normalize(text: str | None) -> str:
 
     """
     return ' '.join(text.split()) if text else ''
+
+
+def open_session(session: Any = None) -> Any:
+    """Returns a session that identifies courtpy to servers.
+
+    Args:
+        session: an object with a `get` method like a `requests.Session`.
+            Defaults to `None`.
+
+    Returns:
+        `session`, or a new `requests.Session` with courtpy's user agent if
+            it is `None`.
+
+    """
+    if session is None:
+        session = requests.Session()
+        session.headers.update({'User-Agent': options._USER_AGENT})
+    return session
+
+
+def page_links(url: str, *, session: Any = None) -> list[tuple[str, str]]:
+    """Returns the links on a web page.
+
+    Args:
+        url: the address of the page.
+        session: an object with a `get` method like a `requests.Session`.
+            Defaults to `None`, in which case a `requests.Session` that
+            identifies courtpy is made.
+
+    Raises:
+        requests.HTTPError: if the page cannot be downloaded.
+
+    Returns:
+        The full address and the words of each link, in the order of the
+            page. The words are on one line, with single spaces.
+
+    """
+    response = open_session(session).get(url, timeout = options._TIMEOUT)
+    response.raise_for_status()
+    extractor = _LinkExtractor()
+    extractor.feed(response.text)
+    extractor.close()
+    return [
+        (urllib.parse.urljoin(url, address), normalize(' '.join(words)))
+        for address, words in extractor.links]
 
 
 def parse_date(text: str | None) -> str | None:
@@ -311,6 +483,30 @@ def parse_date(text: str | None) -> str | None:
         return datetime.date(year, month, day).isoformat()
     except ValueError:
         return None
+
+
+def read_csv(path: pathlib.Path | str, **kwargs: Any) -> pd.DataFrame:
+    """Loads a CSV file that is in UTF-8 or Windows-1252.
+
+    The files of other researchers' data are not all in UTF-8, and some have
+    been in one encoding in one year and another in the next.
+
+    Args:
+        path: the path of the file, which may begin with "~" for the user's
+            home folder. A zip archive of one CSV file is read as that file.
+        **kwargs: arguments for `pandas.read_csv`.
+
+    Returns:
+        The table.
+
+    """
+    path = pathlib.Path(path).expanduser()
+    table: pd.DataFrame
+    try:
+        table = pd.read_csv(path, encoding = 'utf-8-sig', **kwargs)
+    except UnicodeDecodeError:
+        table = pd.read_csv(path, encoding = 'cp1252', **kwargs)
+    return table
 
 
 def to_bool(value: Any) -> bool:

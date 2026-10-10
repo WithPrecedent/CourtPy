@@ -26,6 +26,7 @@ Contents:
     _SIDES: each party with the other party, so that a coder can do the same
         thing for both sides of a case.
     _flags: returns a column as plain booleans.
+    _has_text: returns whether each case has text in a column.
     _is_text: returns whether a column holds text, lists, or other objects.
     _require: raises an error if columns a coder needs are missing.
 
@@ -170,7 +171,11 @@ class CodeOutcome(amos.Munger):
     A decision is a reversal ("outcome_reversal") if it reversed, vacated, or
     remanded. The disposition in the header (or in CourtListener's data) is
     used when there is one, because the opinion may mention reversals that are
-    not its own. Otherwise, the opinion's own words ("we reverse") are used.
+    not its own. Otherwise, the decision that the opinion states ("AFFIRMED."
+    or "we reverse", which the federal rules find as "decision") is used.
+    Only when there is neither are the opinion's words anywhere ("reverse",
+    "vacate", or "remand") used, which may be about an earlier decision or a
+    standard of review ("we will reverse only if").
 
     Then, for each party whose role is known (see `CodeParties`), the party
     won ("outcome_party1_won") if it brought the appeal and the decision was
@@ -187,8 +192,10 @@ class CodeOutcome(amos.Munger):
     example, with the `filter_rows` technique and the query "type_criminal").
 
     Needs "disposition_reverse", "disposition_vacate", "disposition_remand",
-    "opinion_reverse", "opinion_vacate", and "opinion_remand". Uses the
-    columns made by `CodeParties` and `CodeCaseType` if they exist.
+    "opinion_reverse", "opinion_vacate", and "opinion_remand". Uses
+    "disposition", "decision", "decision_reverse", "decision_vacate", and
+    "decision_remand", and the columns made by `CodeParties` and
+    `CodeCaseType`, if they exist.
 
     """
 
@@ -209,15 +216,15 @@ class CodeOutcome(amos.Munger):
             [f'{p}_{r}' for p in ('disposition', 'opinion') for r in rulings],
             self.name)
         header = pd.Series(False, index = data.index)
+        decision = pd.Series(False, index = data.index)
         opinion = pd.Series(False, index = data.index)
         for ruling in rulings:
             header |= _flags(data, f'disposition_{ruling}')
+            decision |= _flags(data, f'decision_{ruling}')
             opinion |= _flags(data, f'opinion_{ruling}')
-        if 'disposition' in data.columns:
-            stated = data['disposition'].fillna('').astype(str).str.strip() != ''
-        else:
-            stated = pd.Series(False, index = data.index)
-        reversal = header.where(stated, opinion)
+        reversal = header.where(
+            _has_text(data, 'disposition'),
+            decision.where(_has_text(data, 'decision'), opinion))
         data['outcome_reversal'] = reversal
         if not {'party1_appealing', 'party2_appealing'} <= set(data.columns):
             return data
@@ -375,6 +382,23 @@ def _flags(data: pd.DataFrame, column: str) -> pd.Series:
             lambda v: str(v).strip().lower() in {'true', 't', '1', 'yes'}
             if isinstance(v, str) else bool(v) if pd.notna(v) else False)
     return values.astype('boolean').fillna(False).astype(bool)
+
+
+def _has_text(data: pd.DataFrame, column: str) -> pd.Series:
+    """Returns whether each case has text in a column.
+
+    Args:
+        data: the cases.
+        column: name of the column.
+
+    Returns:
+        Whether each case's value is text that is not blank, or a column of
+            false values if `data` has no such column.
+
+    """
+    if column not in data.columns:
+        return pd.Series(False, index = data.index)
+    return data[column].fillna('').astype(str).str.strip() != ''
 
 
 def _is_text(column: pd.Series) -> bool:

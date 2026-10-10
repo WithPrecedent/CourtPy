@@ -233,6 +233,12 @@ opinion,opinion_vacate,flag,(VACATE|[Ww]e (will )?vacate| is vacated),,FALSE,FAL
 opinion,opinion_remand,flag,(REMAND|[Ww]e (will )?remand| is remanded),,FALSE,FALSE,
 opinion,opinion_dismiss,flag,(DISMISS|[Ww]e (will )?[Dd]ismiss| is dismissed),,FALSE,FALSE,
 opinion,opinion_enforce,flag,Order of the National Labor Relations Board enforced,,FALSE,FALSE,
+opinion,decision,section,"\b(?:AFFIRM(?:ED)?|REVERSED?|VACATED?|REMAND(?:ED)?|DISMISS(?:ED)?)\b(?! (?:our|its|the court's) (?:prior|previous|earlier|original) opinion)(?:[ ,;]+(?:IN PART|in part|AS MODIFIED|as modified|AND|and|AFFIRM(?:ED)?|REVERSED?|VACATED?|REMAND(?:ED)?|DISMISS(?:ED)?)\b)*|\b(?:Affirmed|Reversed|Vacated|Dismissed)\b[^.]{0,80}? by (?:published|unpublished) (?:per curiam )?opinion|\b[Ww]e (?:therefore |thus |accordingly |now |hereby |will |must )?(?:affirm|reverse|vacate|dismiss)\b(?! (?:our|its) (?:prior|previous|earlier|original) opinion)(?![^.]{0,150}\b(?:only|if|unless|where|when|absent)\b)[^.]{0,150}\.",,FALSE,FALSE,"The decision as the opinion states it: ""AFFIRMED."", ""VACATED AND REMANDED."", ""Affirmed by unpublished per curiam opinion"", or ""we affirm"" and the like (but not a standard of review, such as ""we will reverse only if"")"
+decision,decision_affirm,flag,AFFIRM,,TRUE,TRUE,
+decision,decision_reverse,flag,REVERSE,,TRUE,TRUE,
+decision,decision_vacate,flag,VACATE,,TRUE,TRUE,
+decision,decision_remand,flag,REMAND,,TRUE,TRUE,
+decision,decision_dismiss,flag,DISMISS,,TRUE,TRUE,
 opinion,procedure_pro_se,flag,pro se ,,FALSE,FALSE,
 opinion,procedure_indigent,flag,in\sforma pauperis,,TRUE,FALSE,
 opinion,procedure_mandamus,flag,[Mm]andamus,,FALSE,FALSE,

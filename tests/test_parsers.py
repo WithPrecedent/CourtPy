@@ -99,3 +99,24 @@ def test_parser_metadata_wins(court_listener_folder: pathlib.Path) -> None:
     assert row['court_num'] == 99
     assert row['agency'] is None
     assert row['word_count'] == 0
+
+
+def test_parse_recent_court_listener(recent_folder: pathlib.Path) -> None:
+    # CourtListener has no full case name, judges, or disposition for the
+    # case, so they are read from its opinion.
+    table = courtpy.parse(recent_folder)
+    doe = table.loc['4']
+    assert pd.isna(doe['judges']) and pd.isna(doe['disposition'])
+    assert doe['caption'] == 'Appellee, versus JOHN DOE, Defendant-Appellant'
+    assert doe['party2_appellant'] and doe['party1_appellee']
+    assert not doe['party1_appellant'] and not doe['party2_appellee']
+    assert doe['panel_judges'] == ['LYNCH', 'HOWARD', 'R THOMPSON']
+    assert doe['panel_size'] == 3
+    assert doe['decision'] == 'AFFIRMED'
+    assert doe['decision_affirm'] and not doe['decision_reverse']
+    assert doe['opinion_reverse'] and not doe['disposition_affirm']
+    assert 'opening_lines' not in table.columns
+    coded = courtpy.code(table).data.loc['4']
+    assert coded['type_criminal'] and coded['appeal_by_defendant']
+    assert not coded['outcome_reversal']
+    assert not coded['outcome_criminal_defendant_won']

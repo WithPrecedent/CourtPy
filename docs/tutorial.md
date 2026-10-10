@@ -65,7 +65,8 @@ print(table[["case_name", "court_num", "panel_judges", "disposition"]].head())
 Each row is labeled by the case's CourtListener id. Among the columns are the
 parties (`party1` and `party2`) and their roles (`party1_appellant`,
 `party2_united_states`, and so on), the judges (`panel_judges`, `author`,
-`dissenting`), the disposition (`disposition_reverse` and others), the issues
+`dissenting`), the disposition (`disposition_reverse`, `decision_reverse`, and
+others), the issues
 the opinions discuss (`criminal_firearm`, `civil_titlevii`,
 `general_amend4`, and many more), and the citations in the opinions
 (`references_case` and others).
@@ -174,5 +175,5 @@ courtpy run study.ini --export
 The first run downloads, parses, and codes the cases and saves the table in
 `cases.csv`. Later runs reuse that file (because of `reuse = true`) and only
 repeat the analysis. The project's history records the loader and each
-coder, so the export shows exactly how the data was made. See [examples/federal_appeals.ini](https://github.com/WithPrecedent/CourtPy/blob/main/examples/federal_appeals.ini)
+coder, so the export shows exactly how the data was made. See [examples/federal_appeals.ini](https://github.com/WithPrecedent/courtpy/blob/main/examples/federal_appeals.ini)
 for a fuller study.

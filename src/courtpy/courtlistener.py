@@ -811,6 +811,10 @@ def read_case(path: pathlib.Path | str) -> cases.Case:
             cluster.get('nature_of_suit'), docket.get('nature_of_suit'))
             or None,
         'url': _url(cluster)}
+    # Only cases of the Supreme Court have an id in the Supreme Court
+    # Database, so other tables of cases get no column for it.
+    if _first(cluster.get('scdb_id')):
+        metadata['scdb_id'] = _first(cluster.get('scdb_id'))
     return cases.Case(
         id = str(cluster.get('id') or path.stem),
         source = 'court_listener',

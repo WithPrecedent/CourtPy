@@ -138,6 +138,34 @@ def court_listener_folder(tmp_path: pathlib.Path) -> pathlib.Path:
         [make_opinion(31, 3, plain_text = 'We vacate the judgment.', html_with_citations = '')])
     return folder
 
+@pytest.fixture
+def recent_folder(tmp_path: pathlib.Path) -> pathlib.Path:
+    """Returns a folder with a case like CourtListener's recent ones.
+
+    CourtListener has no full case name, judges, or disposition for it: the
+    caption, the panel, and the decision are only in the opinion's text.
+
+    """
+    folder = tmp_path / 'recent'
+    write_case(
+        folder,
+        make_cluster(
+            4, case_name_full = '', judges = '', panel = [], disposition = '',
+            attorneys = ''),
+        [make_opinion(41, 4, author_str = '', per_curiam = True, html_with_citations = (
+            '<p>[DO NOT PUBLISH] In the United States Court of Appeals For the '
+            'First Circuit ____ No. 23-1234 ____</p>'
+            '<p>UNITED STATES OF AMERICA, Plaintiﬀ-Appellee, versus JOHN DOE, '
+            'Defendant-Appellant.</p>'
+            '<p>Appeal from the United States District Court ____</p>'
+            '<p>Before LYNCH, Chief Judge, and HOWARD and R. THOMPSON, Circuit '
+            'Judges.</p>'
+            '<p>PER CURIAM: John Doe appeals his sentence for possession of a '
+            'firearm. We will reverse only if the district court abused its '
+            'discretion. It did not.</p><p>AFFIRMED.</p>'))])
+    return folder
+
+
 
 @pytest.fixture
 def lexis_folder(tmp_path: pathlib.Path) -> pathlib.Path:
@@ -177,3 +205,49 @@ class FakeSession:
         """Records the request and returns the handler's response."""
         self.calls.append((url, params))
         return self.handler(url, params)
+
+
+class Reply:
+    """The response of a web site to a request for a page or a file."""
+
+    def __init__(self, content: bytes, status: int = 200) -> None:
+        self.content = content
+        self.status = status
+
+    @property
+    def text(self) -> str:
+        """Returns the content as text."""
+        return self.content.decode('utf-8')
+
+    def raise_for_status(self) -> None:
+        """Raises an error for a response that failed."""
+        if self.status >= 400:
+            raise RuntimeError(f'status {self.status}')
+
+
+class Site:
+    """A session that serves pages and files by their addresses."""
+
+    def __init__(self, pages: dict[str, bytes | str], status: int = 200) -> None:
+        self.pages = pages
+        self.status = status
+        self.headers: dict[str, str] = {}
+        self.urls: list[str] = []
+
+    def get(self, url: str, **kwargs: Any) -> Reply:
+        """Records the request and returns the page or file at an address."""
+        self.urls.append(url)
+        if url not in self.pages:
+            return Reply(b'', 404)
+        page = self.pages[url]
+        return Reply(page.encode('utf-8') if isinstance(page, str) else page, self.status)
+
+
+@pytest.fixture(autouse = True)
+def no_network(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Stops a test from downloading anything from a real site."""
+
+    def refuse(self: Any, method: str, url: str, **kwargs: Any) -> None:
+        raise AssertionError(f'a test asked the network for {url}')
+
+    monkeypatch.setattr(courtpy.utilities.requests.Session, 'request', refuse)

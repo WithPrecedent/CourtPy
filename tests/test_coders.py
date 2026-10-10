@@ -93,3 +93,24 @@ def test_drop_text_keeps_label() -> None:
 def test_missing_columns() -> None:
     with pytest.raises(KeyError, match = 'federal rules'):
         coders.CodeOutcome().apply(amos.Dataset(pd.DataFrame({'x': [1]})))
+
+
+def test_code_outcome_prefers_stated_decisions() -> None:
+    # The header's disposition, then the decision that the opinion states,
+    # and only then "reverse", "vacate", or "remand" anywhere in the opinion.
+    data = pd.DataFrame({
+        'disposition': ['Affirmed.', None, None, None],
+        'decision': ['we reverse.', 'AFFIRMED', 'VACATED AND REMANDED', None],
+        'decision_reverse': [True, False, False, False],
+        'decision_vacate': [False, False, True, False],
+        'decision_remand': [False, False, True, False],
+        'opinion_reverse': [True, True, False, True]})
+    for column in ('disposition_reverse', 'disposition_vacate', 'disposition_remand',
+                   'opinion_vacate', 'opinion_remand'):
+        data[column] = False
+    result = coders.CodeOutcome().apply(amos.Dataset(data)).data
+    assert list(result['outcome_reversal']) == [False, False, True, True]
+    # Rules that find no "decision" leave the opinion's words.
+    result = coders.CodeOutcome().apply(amos.Dataset(
+        data.drop(columns = [c for c in data.columns if c.startswith('decision')]))).data
+    assert list(result['outcome_reversal']) == [False, True, False, True]

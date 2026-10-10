@@ -42,7 +42,7 @@ License: Apache-2.0
 
 from __future__ import annotations
 
-__version__ = '0.2.1'
+__version__ = '0.2.2'
 
 __author__: str = 'Corey Rayburn Yung'
 
@@ -57,19 +57,23 @@ __all__: list[str] = [
     'Rulebook',
     'code',
     'coders',
+    'judges',
     'load_cases',
     'loaders',
     'parse',
+    'politics',
     'save_cases',
+    'scdb',
     'secrets',
 ]
 
 # A study is an `amos.Project`, which courtpy offers under the same name.
 from amos import Project
 
-# Importing `coders` and `loaders` adds their techniques to the `amos`
-# library, so they can be named in settings as soon as courtpy is imported.
-from . import coders, loaders, secrets
+# Importing `coders`, `judges`, `loaders`, `politics`, and `scdb` adds their
+# techniques to the `amos` library, so they can be named in settings as soon
+# as courtpy is imported.
+from . import coders, judges, loaders, politics, scdb, secrets
 from .bulk import BulkData
 from .cases import Case, load_cases, save_cases
 from .coders import code

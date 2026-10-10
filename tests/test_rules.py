@@ -185,3 +185,132 @@ def test_built_in_rulebooks_are_valid() -> None:
         'judges', 'opinion_by', 'concurring_lines', 'dissenting_lines']
     combined = federal + lexis
     assert len(combined) == len(federal) + len(lexis)
+
+
+@pytest.mark.parametrize(('judges', 'expected'), [
+    # A middle initial "J." is not "Justice".
+    ('PRESENT: DENNIS JACOBS, SARAH A. L. MERRIAM, Circuit Judges, LAWRENCE '
+     'J. VILARDO, District Judge.',
+     ['DENNIS JACOBS', 'SARAH A L MERRIAM', 'LAWRENCE J VILARDO']),
+    # "JR." after a name is a suffix, and "S.R." before one is initials.
+    ('Present: JOHN M. WALKER, JR., PIERRE N. LEVAL, MICHAEL H. PARK, Circuit '
+     'Judges.', ['JOHN M WALKER', 'PIERRE N LEVAL', 'MICHAEL H PARK']),
+    ('Before: S.R. THOMAS, BRESS, and DE ALBA, Circuit Judges.',
+     ['SR THOMAS', 'BRESS', 'DE ALBA']),
+    # "J." and "JJ." after names are still titles.
+    ('ROBERTS, C. J., delivered the opinion of the Court, in which SCALIA, '
+     'KENNEDY, and THOMAS, JJ., joined. GINSBURG, J., filed a dissenting '
+     'opinion.', ['ROBERTS', 'SCALIA', 'KENNEDY', 'THOMAS', 'GINSBURG'])])
+def test_federal_rules_split_judges(judges: str, expected: list[str]) -> None:
+    found = rules.Rulebook.load('federal').apply({'judges': judges})
+    assert found['panel_judges'] == expected
+
+
+@pytest.mark.parametrize(('opening', 'expected'), [
+    ('Before JORDAN, ROSENBAUM, and ABUDU, Circuit Judges. PER CURIAM: Doe '
+     'appeals.', ['JORDAN', 'ROSENBAUM', 'ABUDU']),
+    # A chief judge in the middle, an accent, and a judge by designation.
+    ('Before Barron, Chief Judge, Gelpí and Montecalvo, Circuit Judges. Jane '
+     'Roe, Assistant Federal Public Defender, for appellant.',
+     ['BARRON', 'GELPÍ', 'MONTECALVO']),
+    ('Before: PAEZ and OWENS, Circuit Judges, and SEEBORG,* Chief District '
+     'Judge. Following a trial', ['PAEZ', 'OWENS', 'SEEBORG']),
+    ('Before SYKES, Chief Judge, and BRENNAN and ST. EVE, Cir- cuit Judges. '
+     'BRENNAN, Circuit Judge. Police stopped', ['SYKES', 'BRENNAN', 'ST EVE']),
+    # Not a panel.
+    ('Before April 25, 2016, Sabaini made deposits of over $2,000.', []),
+    ('LYNCH, Circuit Judge. Before trial, Doe moved to suppress.', [])])
+def test_federal_rules_find_the_panel_in_the_opinion(
+    opening: str,
+    expected: list[str]) -> None:
+    found = rules.Rulebook.load('federal').apply({'opinion': opening})
+    assert found['panel_judges'] == expected
+
+
+def test_federal_rules_prefer_the_panel_in_the_opinion() -> None:
+    # CourtListener's "judges" may name only the author.
+    found = rules.Rulebook.load('federal').apply({
+        'judges': 'Brennan',
+        'opinion': 'Before SYKES, Chief Judge, and BRENNAN and ST. EVE, Circuit '
+                   'Judges. BRENNAN, Circuit Judge.'})
+    assert found['panel_judges'] == ['SYKES', 'BRENNAN', 'ST EVE']
+
+
+@pytest.mark.parametrize(('opening', 'roles'), [
+    # (party1 appellant, party1 appellee, party2 appellant, party2 appellee)
+    ('In the United States Court of Appeals For the Eleventh Circuit ____ No. '
+     '23-12565 ____ UNITED STATES OF AMERICA, Plaintiﬀ-Appellee, versus JOHN '
+     'DOE, Defendant-Appellant. ____ Appeal from the United States District '
+     'Court', (False, True, True, False)),
+    # The government's appeal, with dashes around "v.".
+    ('UNITED STATES OF AMERICA, Appellant, –v.– JOHN DOE, Defendant-Appellee. '
+     'Before: LYNCH and PARK, Circuit Judges.', (True, False, False, True)),
+    # A short title before the caption.
+    ('22-1481 (L) United States v. Doe UNITED STATES COURT OF APPEALS FOR THE '
+     'SECOND CIRCUIT August Term 2023 Docket No. 22-1481 UNITED STATES OF '
+     'AMERICA, Appellee, v. JOHN DOE, AKA J. DOE, Defendant-Appellant.',
+     (False, True, True, False)),
+    # Docket numbers from another column between the role and "v.".
+    ('UNITED STATES OF AMERICA, No. 23-481 D.C. No. Plaintiff - Appellee, '
+     '3:18-cr-00136-SLG-1 v. MEMORANDUM* JOHN DOE, Jr., Defendant - '
+     'Appellant. Appeal from', (False, True, True, False)),
+    # One role, as the Third Circuit writes captions.
+    ('NOT PRECEDENTIAL UNITED STATES COURT OF APPEALS FOR THE THIRD CIRCUIT '
+     '____ No. 24-1625 ____ UNITED STATES OF AMERICA v. JOHN DOE, a/k/a '
+     'Johnny, Appellant ____ Appeal from the United States District Court',
+     (False, False, True, False)),
+    # A citation and a party in the opinion's words are not a caption.
+    ('LYNCH, Circuit Judge. Under United States v. Booker, 543 U.S. 220 '
+     '(2005), the guidelines are advisory. The appellant argues that the '
+     'district court erred. Appellee United States disagrees.',
+     (False, False, False, False))])
+def test_federal_rules_find_the_caption_in_the_opinion(
+    opening: str,
+    roles: tuple[bool, bool, bool, bool]) -> None:
+    found = rules.Rulebook.load('federal').apply({
+        'party': 'United States v. Doe', 'opinion': opening})
+    assert (
+        found['party1_appellant'], found['party1_appellee'],
+        found['party2_appellant'], found['party2_appellee']) == roles
+    assert (found['caption'] is None) == (roles == (False, False, False, False))
+
+
+def test_federal_rules_keep_the_caption_of_the_header() -> None:
+    found = rules.Rulebook.load('federal').apply({
+        'party': 'Mary SMITH, Plaintiff-Appellant, v. ACME CORP., Defendant-Appellee',
+        'opinion': 'ACME CORP., Plaintiff-Appellee, v. MARY SMITH, Defendant-Appellant.'})
+    assert found['caption'].startswith('Mary SMITH')
+    assert found['party1_appellant'] and found['party2_appellee']
+    assert not found['party1_appellee'] and not found['party2_appellant']
+
+
+@pytest.mark.parametrize(('opinion', 'decision', 'rulings'), [
+    # (affirm, reverse, vacate, remand, dismiss)
+    ('We review de novo and will reverse only if the error was plain. The '
+     'district court did not err. AFFIRMED.', 'AFFIRMED',
+     (True, False, False, False, False)),
+    ('Affirmed in part, vacated in part, and remanded by unpublished per '
+     'curiam opinion. Doe appeals.',
+     'Affirmed in part, vacated in part, and remanded by unpublished per '
+     'curiam opinion', (True, False, True, True, False)),
+    ('In Smith, we vacated a similar sentence. For these reasons, we vacate '
+     'the sentence and remand for resentencing.',
+     'we vacate the sentence and remand for resentencing.',
+     (False, False, True, True, False)),
+    ('We GRANT the petition for rehearing and VACATE our prior opinion. The '
+     'evidence was sufficient. We affirm.', 'We affirm.',
+     (True, False, False, False, False)),
+    ('The appeal is DISMISSED.', 'DISMISSED',
+     (False, False, False, False, True)),
+    # An earlier decision is not this one.
+    ('The court reversed the conviction in an earlier appeal.', None,
+     (False, False, False, False, False))])
+def test_federal_rules_find_the_stated_decision(
+    opinion: str,
+    decision: str | None,
+    rulings: tuple[bool, ...]) -> None:
+    found = rules.Rulebook.load('federal').apply({'opinion': opinion})
+    assert found['decision'] == decision
+    assert tuple(
+        found[f'decision_{r}']
+        for r in ('affirm', 'reverse', 'vacate', 'remand', 'dismiss')) == rulings
