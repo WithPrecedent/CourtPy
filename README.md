@@ -1,22 +1,26 @@
-# CourtPy
+# courtpy
 
 | | |
 | --- | --- |
-| Version | [![PyPI Latest Release](https://img.shields.io/pypi/v/courtpy.svg?style=flat-square&color=cornflowerblue&label=PyPI&logo=PyPI&logoColor=yellow)](https://pypi.org/project/courtpy/) [![GitHub Latest Release](https://img.shields.io/github/v/tag/WithPrecedent/courtpy?style=flat-square&color=forestgreen&label=GitHub&logo=github)](https://github.com/WithPrecedent/courtpy/releases) |
-| Status | [![Build Status](https://img.shields.io/github/actions/workflow/status/WithPrecedent/courtpy/ci.yml?branch=main&style=flat-square&color=cadetblue&label=Tests&logo=pytest)](https://github.com/WithPrecedent/courtpy/actions/workflows/ci.yml?query=branch%3Amain) [![Development Status](https://img.shields.io/badge/Development-Active-seagreen?style=flat-square&logo=git)](https://www.repostatus.org/#active) [![Project Stability](https://img.shields.io/pypi/status/courtpy?style=flat-square&logo=pypi&label=Stability&logoColor=yellow)](https://pypi.org/project/courtpy/) |
-| Documentation | [![Hosted By](https://img.shields.io/badge/Hosted_by-Github_Pages-blue?style=flat-square&color=forestgreen&logo=github)](https://WithPrecedent.github.io/courtpy) |
-| Tools | [![Documentation](https://img.shields.io/badge/MkDocs-magenta?style=flat-square&color=deepskyblue&logo=markdown&labelColor=gray)](https://squidfunk.github.io/mkdocs-material/) [![Linter](https://img.shields.io/endpoint?style=flat-square&url=https://raw.githubusercontent.com/charliermarsh/Ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/Ruff) [![Dependency Manager](https://img.shields.io/badge/uv-mediumpurple?style=flat-square&logo=uv&labelColor=gray)](https://docs.astral.sh/uv/) [![Pre-commit](https://img.shields.io/badge/pre--commit-darkolivegreen?style=flat-square&logo=pre-commit&logoColor=white&labelColor=gray)](https://github.com/TezRomacH/python-package-template/blob/master/.pre-commit-config.yaml) [![CI](https://img.shields.io/badge/GitHub_Actions-forestgreen?style=flat-square&logo=githubactions&labelColor=gray&logoColor=white)](https://github.com/features/actions) [![Editor Settings](https://img.shields.io/badge/Editor_Config-paleturquoise?style=flat-square&logo=editorconfig&labelColor=gray)](https://editorconfig.org/) [![Repository Template](https://img.shields.io/badge/snickerdoodle-bisque?style=flat-square&logo=cookiecutter&labelColor=gray)](https://www.github.com/WithPrecedent/snickerdoodle) [![Dependency Maintainer](https://img.shields.io/badge/dependabot-forestgreen?style=flat-square&logo=dependabot&logoColor=white&labelColor=gray)](https://github.com/dependabot) |
-| Compatibility | [![Compatible Python Versions](https://img.shields.io/pypi/pyversions/courtpy?style=flat-square&color=cornflowerblue&label=Python&logo=python&logoColor=yellow)](https://pypi.python.org/pypi/courtpy/) [![Linux](https://img.shields.io/badge/Linux-lightseagreen?style=flat-square&logo=linux&labelColor=gray&logoColor=white)](https://www.linux.org/) [![MacOS](https://img.shields.io/badge/MacOS-antiquewhite?style=flat-square&logo=apple&labelColor=gray)](https://www.apple.com/macos/)  [![Windows](https://img.shields.io/badge/Windows-blue?style=flat-square)](https://www.microsoft.com/en-us/windows?r=1) |
-| Stats | [![PyPI Download Rate (per month)](https://img.shields.io/pypi/dm/courtpy?style=flat-square&color=cornflowerblue&label=Downloads%20💾&logo=pypi&logoColor=yellow)](https://pypi.org/project/courtpy) [![GitHub Stars](https://img.shields.io/github/stars/WithPrecedent/courtpy?style=flat-square&color=forestgreen&label=Stars%20⭐&logo=github)](https://github.com/WithPrecedent/courtpy/stargazers) [![GitHub Contributors](https://img.shields.io/github/contributors/WithPrecedent/courtpy?style=flat-square&color=forestgreen&label=Contributors%20🙋&logo=github)](https://github.com/WithPrecedent/courtpy/graphs/contributors) [![GitHub Issues](https://img.shields.io/github/issues/WithPrecedent/courtpy?style=flat-square&color=forestgreen&label=Issues%20📘&logo=github)](https://github.com/WithPrecedent/courtpy/graphs/contributors) [![GitHub Forks](https://img.shields.io/github/forks/WithPrecedent/courtpy?style=flat-square&color=forestgreen&label=Forks%20🍴&logo=github)](https://github.com/WithPrecedent/courtpy/forks) |
+| Version | [![PyPI Latest Release](https://img.shields.io/pypi/v/courtpy.svg?style=for-the-badge&color=cornflowerblue&label=PyPI&logo=PyPI&logoColor=yellow)](https://pypi.org/project/courtpy/) [![GitHub Latest Release](https://img.shields.io/github/v/tag/WithPrecedent/courtpy?style=for-the-badge&color=forestgreen&label=GitHub&logo=github)](https://github.com/WithPrecedent/courtpy/releases) |
+| Status | [![Build Status](https://img.shields.io/github/actions/workflow/status/WithPrecedent/courtpy/ci.yml?branch=main&style=for-the-badge&color=cadetblue&label=Tests&logo=pytest)](https://github.com/WithPrecedent/courtpy/actions/workflows/ci.yml?query=branch%3Amain) [![Development Status](https://img.shields.io/badge/Development-Active-seagreen?style=for-the-badge&logo=git)](https://www.repostatus.org/#active) [![Project Stability](https://img.shields.io/pypi/status/courtpy?style=for-the-badge&logo=pypi&label=Stability&logoColor=yellow)](https://pypi.org/project/courtpy/) |
+| Documentation | [![Hosted By](https://img.shields.io/badge/Hosted_by-Github_Pages-blue?style=for-the-badge&color=forestgreen&logo=github)](https://WithPrecedent.github.io/courtpy) |
+| Tools | [![Documentation](https://img.shields.io/badge/MkDocs-magenta?style=for-the-badge&color=deepskyblue&logo=markdown&labelColor=gray)](https://squidfunk.github.io/mkdocs-material/) [![Linter](https://img.shields.io/endpoint?style=for-the-badge&url=https://raw.githubusercontent.com/charliermarsh/Ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/Ruff) [![Dependency Manager](https://img.shields.io/badge/uv-mediumpurple?style=for-the-badge&logo=uv&labelColor=gray)](https://docs.astral.sh/uv/) [![Pre-commit](https://img.shields.io/badge/pre--commit-darkolivegreen?style=for-the-badge&logo=pre-commit&logoColor=white&labelColor=gray)](https://github.com/TezRomacH/python-package-template/blob/master/.pre-commit-config.yaml) [![CI](https://img.shields.io/badge/GitHub_Actions-forestgreen?style=for-the-badge&logo=githubactions&labelColor=gray&logoColor=white)](https://github.com/features/actions) [![Editor Settings](https://img.shields.io/badge/Editor_Config-paleturquoise?style=for-the-badge&logo=editorconfig&labelColor=gray)](https://editorconfig.org/) [![Repository Template](https://img.shields.io/badge/snickerdoodle-bisque?style=for-the-badge&logo=cookiecutter&labelColor=gray)](https://www.github.com/WithPrecedent/snickerdoodle) [![Dependency Maintainer](https://img.shields.io/badge/dependabot-forestgreen?style=for-the-badge&logo=dependabot&logoColor=white&labelColor=gray)](https://github.com/dependabot) |
+| Compatibility | [![Compatible Python Versions](https://img.shields.io/pypi/pyversions/courtpy?style=for-the-badge&color=cornflowerblue&label=Python&logo=python&logoColor=yellow)](https://pypi.python.org/pypi/courtpy/) [![Linux](https://img.shields.io/badge/Linux-lightseagreen?style=for-the-badge&logo=linux&labelColor=gray&logoColor=white)](https://www.linux.org/) [![MacOS](https://img.shields.io/badge/MacOS-antiquewhite?style=for-the-badge&logo=apple&labelColor=gray)](https://www.apple.com/macos/)  [![Windows](https://img.shields.io/badge/Windows-blue?style=for-the-badge)](https://www.microsoft.com/en-us/windows?r=1) |
+| Stats | [![PyPI Download Rate (per month)](https://img.shields.io/pypi/dm/courtpy?style=for-the-badge&color=cornflowerblue&label=Downloads%20💾&logo=pypi&logoColor=yellow)](https://pypi.org/project/courtpy) [![GitHub Stars](https://img.shields.io/github/stars/WithPrecedent/courtpy?style=for-the-badge&color=forestgreen&label=Stars%20⭐&logo=github)](https://github.com/WithPrecedent/courtpy/stargazers) [![GitHub Contributors](https://img.shields.io/github/contributors/WithPrecedent/courtpy?style=for-the-badge&color=forestgreen&label=Contributors%20🙋&logo=github)](https://github.com/WithPrecedent/courtpy/graphs/contributors) [![GitHub Issues](https://img.shields.io/github/issues/WithPrecedent/courtpy?style=for-the-badge&color=forestgreen&label=Issues%20📘&logo=github)](https://github.com/WithPrecedent/courtpy/graphs/contributors) [![GitHub Forks](https://img.shields.io/github/forks/WithPrecedent/courtpy?style=for-the-badge&color=forestgreen&label=Forks%20🍴&logo=github)](https://github.com/WithPrecedent/courtpy/forks) |
 | | |
 
 -----
 
-## What is CourtPy?
+## What is courtpy?
 
-CourtPy collects court opinions, turns them into data, and analyzes them. It
+`courtpy` collects court opinions, turns them into data, and analyzes them. It
 is designed for empirical legal research, where the data has to be explained
-and the results reproduced, and for researchers who do not write much code.
+and the results reproduced. You don't need to know how to code to use `courtpy`.
+Everything is described in a simple settings files and parsing instructions are
+located in CSV files (of which many are included out of the box). But if you do
+code, `courtpy` is highly extensible to allow easy data munging, creation of
+new fields, and wrapping custom tools.
 
 * **Collect** opinions from [CourtListener](https://www.courtlistener.com),
   from its free bulk data or its API, or use opinions you downloaded from
@@ -25,44 +29,28 @@ and the results reproduced, and for researchers who do not write much code.
   spreadsheets (CSV files) that anyone can read and change: the parties and
   their roles, the court, the judges, the disposition, the issues discussed,
   the citations, and more.
-* **Code** derived variables, such as whether a case is criminal, whether the
-  decision reversed the court below, and which side won.
-* **Identify** the judges on each case, with what the Federal Judicial Center
-  reports about them, to study the composition of panels or how each judge
-  voted.
-* **Merge** other researchers' data into the cases: the Supreme Court's
-  Martin-Quinn scores, the NOMINATE scores of Congress, and the Supreme Court
-  Database, each downloaded from its source.
-* **Analyze** the table with [amos](https://github.com/WithPrecedent/amos),
+* **Study** the judges on each case, with integration of the Federal Judicial Center's
+  biographical data and Judicial Common Space Scores. Data about the overall
+  political and judicial context can also be easily added, including Martin-Quinn scores, NOMINATE scores of Congress, the Supreme Court Database, and the Federal Judicial Center's Integrated Database of appeals.
+* **Analyze** the data with [amos](https://github.com/WithPrecedent/amos) (which is built into `courtpy`),
   which compares models, preprocessing, and statistical methods, and records
   everything needed to reproduce the results.
 
-## Why use CourtPy?
+## Why use courtpy?
 
-* **Transparent.** What CourtPy finds in an opinion comes from rules in CSV
+* **Transparent.** What `courtpy` finds in an opinion comes from rules in CSV
   files, not from code, so a study's methods can be read, reported, and
   changed by anyone who can use a spreadsheet. The rules are part of the
   study, so others can check them.
-* **Free data at scale.** CourtPy reads CourtListener's bulk data, which covers
-  millions of opinions, needs no account, and has no limits on downloads. Its
-  API client handles CourtListener's rate limits by waiting and resuming.
 * **Reproducible.** A whole study (which cases, how they were parsed and coded,
   and how they were analyzed) fits in one settings file, and `amos` records
   every step and the version of every package.
-* **Safe with secrets.** Your CourtListener API key is kept in your computer's
-  keyring (or a private file in your user folder), never in a project, so it
-  cannot be shared or committed by accident.
-
-CourtPy is not a citation extractor or a legal research tool. For finding and
-resolving citations in text, see [eyecite](https://github.com/freelawproject/eyecite).
 
 ## Getting started
 
 ### Requirements
 
-CourtPy requires Python 3.11 or later. It runs on Linux, macOS, and Windows.
-It is built on [amos](https://github.com/WithPrecedent/amos), `pandas`, and
-`requests`, which are installed automatically.
+`courtpy` requires Python 3.11 or later. It runs on Linux, macOS, and Windows.
 
 Extracting cases from CourtListener's bulk data needs a good connection and
 room for the bulk files (about 63 GB for the opinions, clusters, and dockets),
@@ -71,7 +59,7 @@ account.
 
 ### Installation
 
-To install `CourtPy`, use `pip`:
+To install `courtpy`, use `pip`:
 
 ```sh
 pip install courtpy
@@ -83,14 +71,14 @@ To install the latest development version from GitHub instead:
 pip install git+https://github.com/WithPrecedent/courtpy
 ```
 
-To work on CourtPy itself, see the
+To work on `courtpy` itself, see the
 [contribution guide](https://github.com/WithPrecedent/courtpy/blob/main/CONTRIBUTING.md).
 
 ### Usage
 
 #### Collecting opinions from CourtListener
 
-CourtListener offers its opinions in two ways, and CourtPy uses both. Both save
+CourtListener offers its opinions in two ways, and `courtpy` uses both. Both save
 each case as a JSON file in a folder named for its court (such as
 `court_listener/ca1/4567890.json`), and the parser reads them the same way.
 
@@ -113,7 +101,7 @@ courtpy.BulkData().extract(
 **The API** is best for small or very recent sets of cases. It needs an API
 key: sign in to CourtListener and open the "API" page of your profile. A free
 account can make 5 requests a minute, 50 an hour, and 125 a day (as of 2026).
-CourtPy asks for 20 cases at a time, waits when CourtListener asks it to, and
+`courtpy` asks for 20 cases at a time, waits when CourtListener asks it to, and
 saves its place, so a download stopped by the daily limit resumes where it
 stopped when it is run again:
 
@@ -127,7 +115,7 @@ and `scotus`) or by groups: `federal_appellate`, `federal_circuits`, and
 
 #### Keeping your API key secret
 
-Your API key is never written in a project's files or in CourtPy itself.
+Your API key, if you use one, is never written in a project's files or in `courtpy` itself.
 Store it once:
 
 ```sh
@@ -137,10 +125,10 @@ courtpy key set
 That asks for the key (without showing it) and stores it in your computer's
 keyring (Windows Credential Manager, the macOS Keychain, or the Secret Service
 on Linux), or, if there is none, in a private file in your user folder. From
-then on, CourtPy finds it whenever it is needed. `courtpy key show` says where
+then on, `courtpy` finds it whenever it is needed. `courtpy key show` says where
 it was found (with most of it hidden), and `courtpy key delete` removes it.
 
-CourtPy looks for the key in this order: the `COURTLISTENER_API_KEY`
+`courtpy` looks for the key in this order: the `COURTLISTENER_API_KEY`
 environment variable, the keyring, the private file, and a `.env` file in the
 current folder (with a line such as `COURTLISTENER_API_KEY=your-key`; keep
 such a file out of version control). In Python, use
@@ -167,7 +155,7 @@ dataset = courtpy.code(table)  # parties, case types, and outcomes
 courtpy.save_cases(dataset.data, "cases.csv")
 ```
 
-The rules are in the CSV files in CourtPy's
+The rules are in the CSV files in `courtpy`'s
 [instructions folder](https://github.com/WithPrecedent/courtpy/tree/main/src/courtpy/instructions),
 with a guide to writing your own. The "federal" rules make more than 250
 variables, including:
@@ -194,7 +182,7 @@ the outcomes: `outcome_reversal`, `outcome_party1_won`,
 The rules find the judges' names as an opinion writes them ("LYNCH"). To
 study the judges, make a roster once from the Federal Judicial Center's
 [biographical directory](https://www.fjc.gov/history/judges/biographical-directory-article-iii-federal-judges-export)
-(three small files, which CourtPy downloads), and more coders can use it:
+(three small files, which `courtpy` downloads), and more coders can use it:
 
 ```python
 courtpy.judges.Roster.from_fjc().save()
@@ -216,8 +204,9 @@ adding or losing a row, and records how many rows it matched.
 | `judge_votes` | A table with one row for each judge on each case, with the judge's attributes (`judge_party`, ...), the other judges' (`colleagues_party`, ...), and the judge's vote (`vote_reversal`, the outcome or its opposite for a judge who dissented). |
 | `code_politics` | The party of the president in the case's year (`politics_president_party`) and, from a table that `courtpy.politics.build_table` makes, the Supreme Court's [Martin-Quinn scores](https://mqscores.wustl.edu/measures.php) and the median [NOMINATE](https://voteview.com/data) scores of the Senate and House. |
 | `code_scdb` | For cases of the Supreme Court, the coding of the [Supreme Court Database](https://scdb.la.psu.edu/data/), such as `scdb_issueArea`, `scdb_decisionDirection`, and `scdb_partyWinning`. |
+| `code_idb` | For cases of the courts of appeals, the record of the appeal in the Federal Judicial Center's [Integrated Database](https://www.fjc.gov/research/idb), which [fjc-idb](https://github.com/WithPrecedent/fjc_idb) reads, such as `idb_appeal_type`, `idb_judgment_date`, `idb_pro_se_party`, and `idb_district_judge` (and, if asked, the district court's record of the case appealed). |
 
-CourtPy downloads the scores and the database from their sources the first
+`courtpy` downloads the scores and the databases from their sources the first
 time they are needed. See
 [examples/judge_votes.ini](https://github.com/WithPrecedent/courtpy/blob/main/examples/judge_votes.ini)
 for a study of judges' votes.
@@ -225,7 +214,7 @@ for a study of judges' votes.
 #### Describing a whole study in one file
 
 A study is an [amos](https://github.com/WithPrecedent/amos) project, described
-in one settings file. CourtPy adds loaders to amos: `load_court_listener`,
+in one settings file. `courtpy` adds loaders to amos: `load_court_listener`,
 `load_lexis_nexis`, and `load_cases`. Named first in the wrangler, a loader
 collects the cases (downloading them, if asked), parses them, and codes them,
 so the project needs no other data. See
@@ -309,8 +298,25 @@ Contributors are always welcome. Feel free to grab an [issue](https://www.github
   finds and resolves legal citations in text) and
   [juriscraper](https://github.com/freelawproject/juriscraper) (which collects
   opinions from court websites).
-* [amos](https://github.com/WithPrecedent/amos), which CourtPy uses to analyze
+* [amos](https://github.com/WithPrecedent/amos), which `courtpy` uses to analyze
   the cases it parses.
+
+## Citation
+
+If you use `courtpy` in your research, please cite it. GitHub's "Cite this
+repository" button reads the same information from
+[`CITATION.cff`](https://www.github.com/WithPrecedent/courtpy/blob/main/CITATION.cff).
+
+```bibtex
+@software{yung_courtpy,
+  author  = {Yung, Corey Rayburn},
+  title   = {courtpy: Accessible tools for collecting, parsing, and analyzing court opinions},
+  version = {0.2.3},
+  year    = {2026},
+  url     = {https://github.com/WithPrecedent/courtpy},
+  license = {Apache-2.0}
+}
+```
 
 ## License
 

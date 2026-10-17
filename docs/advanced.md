@@ -1,7 +1,7 @@
 # Advanced User Guide
 
 The [tutorial](tutorial.md) shows how to build a study. This guide describes
-how CourtPy works and everything you can configure.
+how courtpy works and everything you can configure.
 
 ## How the pieces fit together
 
@@ -24,7 +24,9 @@ In a project, a loader (such as `load_court_listener`) does every step before
 | `courtpy.coders` | The coders, which are `amos` techniques, and `code`, which applies them. |
 | `courtpy.judges` | `Roster`, which matches the names in opinions to judges, and the `merge_judges`, `code_judges`, and `judge_votes` techniques. |
 | `courtpy.politics` | `build_table`, which makes a table of each year's political context from the sources' current files, and the `code_politics` technique. |
+| `courtpy.jcs` | `judges`, `justices`, and `medians`, which load the Judicial Common Space scores of judges, justices, and courts, and `download`. |
 | `courtpy.scdb` | `cases` and `votes`, which load the Supreme Court Database, and the `code_scdb` technique. |
+| `courtpy.fjc_idb` | `appeals` and `download`, which load and download the Federal Judicial Center's Integrated Database with fjc-idb, and the `code_idb` technique. |
 | `courtpy.loaders` | The loaders, which are `amos` techniques that collect, parse, and code cases in a project. |
 | `courtpy.cases` | `Case`, and `save_cases` and `load_cases` for case tables. |
 | `courtpy.secrets` | Storing and finding the CourtListener API key. |
@@ -40,7 +42,7 @@ for its cluster id, in a folder named for its court. Its keys are:
 | `source` | "court_listener". |
 | `court` | The court's `id`, `full_name`, `short_name`, `citation_string`, and `jurisdiction`. |
 | `cluster` | CourtListener's opinion cluster: the case name, date filed, judges, attorneys, disposition, precedential status, and so on. |
-| `docket` | The docket (with the docket number and date argued), from the bulk data, or from the API if "dockets" was asked for. Otherwise `null`. |
+| `docket` | CourtListener's whole docket (the docket number, the dates it was filed, argued, and terminated, the court appealed from, the PACER case id, the type of appeal, and so on, without the fields in `options._DOCKET_SKIPPED`), from the bulk data, or from the API if "dockets" was asked for. Otherwise `null`. |
 | `citations` | The case's citations as text, such as "950 F.3d 12". |
 | `opinions` | Each opinion: its type (such as "010combined" or "040dissent"), author, and one field of text (the first of `options._TEXT_FIELDS` that is not blank, which CourtListener recommends be "html_with_citations"). |
 | `bulk_date` | For cases from the bulk data, the date of the files. |
@@ -146,7 +148,7 @@ the president who made the appointment and that president's party, the
 American Bar Association's rating, the Senate's vote, the judge's sex, race or
 ethnicity, and year of birth, and flags for the judge's career (see
 `courtpy.judges.build_roster` for every column). `save` writes it as
-"roster.csv" in "judges" in CourtPy's data folder, outside of any project,
+"roster.csv" in "judges" in courtpy's data folder, outside of any project,
 where the techniques below look for it. Their `roster` parameter names another.
 
 The roster is a CSV file, so you can change it in a spreadsheet:
@@ -154,7 +156,9 @@ The roster is a CSV file, so you can change it in a spreadsheet:
 * Add a judge, or another name that opinions use for a judge (as "First
   Middle Last" in the `aliases` column, with semicolons between names).
 * Add a column of your own, such as a score of each judge's ideology (or pass
-  `scores`, a table with the judges' `nid` numbers, to `from_fjc`). Every
+  `scores`, a table with the judges' `nid` numbers, to `from_fjc`, or
+  `jcs = True` for the judges' Judicial Common Space scores; see
+  [below](#the-judicial-common-space)). Every
   column of numbers or booleans that does not identify or date a judge's
   service is an attribute of the judge, which the techniques use.
 * Change how careers are coded with rules of your own (the `rulebook`
@@ -178,7 +182,7 @@ and later) joins such tables with
 add the columns of another table to the rows that they match without ever
 adding or losing a row, and
 [shapers](https://WithPrecedent.github.io/amos/advanced/#reshaping-data),
-which change what a row is. CourtPy's three techniques for judges are built
+which change what a row is. courtpy's three techniques for judges are built
 from them:
 
 | Technique | Adds |
@@ -246,7 +250,7 @@ sources:
 
 Higher scores are more conservative. `build_table` downloads the sources'
 current files (about 6 megabytes) the first time, and keeps them in
-"politics" in CourtPy's data folder.
+"politics" in courtpy's data folder.
 `courtpy.politics.download(overwrite = True)` downloads them again, for the
 terms and votes since. To use files of your own instead, pass their paths,
 or `False` to leave a source out:
@@ -283,6 +287,46 @@ president.
 each term, from the "justices.csv" file of the same page, for studies of the
 Supreme Court (see below).
 
+## The Judicial Common Space
+
+The [Judicial Common Space](https://epstein.wustl.edu/jcs) (Epstein, Martin,
+Segal, and Westerland, 2007) puts judges of the courts of appeals, justices,
+members of Congress, and presidents on one scale of ideology, on which higher
+scores are more conservative. `courtpy.jcs` downloads its authors' current
+archive of scores (about 100 kilobytes) the first time it is needed, and
+keeps its CSV files in "jcs" in courtpy's data folder
+(`courtpy.jcs.download(overwrite = True)` downloads it again):
+
+| Function | Returns | File |
+| --- | --- | --- |
+| `judges` | Each judge of a court of appeals, with the judge's `name` and `circuit` as the file has them, the Federal Judicial Center's `nid` for the judge, and `jcs`. | "judges.csv" |
+| `justices` | Each justice in each term: `term`, `justiceName` (the Supreme Court Database's name, such as "ACBarrett"), and `jcs`. | "justices.csv" |
+| `medians` | Each year: `jcs_president`, `jcs_house_median`, `jcs_senate_median`, `jcs_supreme_court_median`, and `jcs_circuit{n}_median` and `jcs_circuit{n}_sd` for each court of appeals (numbered as `court_num` numbers them). | "medians.csv" |
+
+The file of judges has only their names and circuits, so `judges` finds each
+judge in a roster among the judges of that court of appeals: by full name,
+then by first and last names, then by last name, and then by suffix (for
+judges of one court with the same name). Accents are ignored, and the few
+names and circuits that the 2024 file has wrong (or that judges have changed)
+are corrected first. Every judge in the 2024 file is found in the Federal
+Judicial Center's roster. A judge whose `nid` is missing was not found.
+
+The scores of judges become an attribute of a roster, so the judge techniques
+use them like any other: `code_judges` adds `panel_jcs` (the mean score of
+each panel), and `merge_judges` and `judge_votes` add `judge_jcs` (and
+`colleagues_jcs`):
+
+```python
+roster = courtpy.judges.Roster.from_fjc(jcs = True)
+roster.save()
+```
+
+`medians` has a row for each year, so it can be the table of `code_politics`,
+or a part of `build_table` (`build_table(common_space = True)`), whose
+columns already start with "jcs_". `justices` can be added to the Supreme
+Court Database's votes as the Martin-Quinn scores are (see below), by
+`["term", "justiceName"]`.
+
 ## The Supreme Court Database
 
 The [Supreme Court Database](https://scdb.la.psu.edu) codes every case that
@@ -308,7 +352,7 @@ used.
 
 The latest release is downloaded from the database's
 [data page](https://scdb.la.psu.edu/data/) the first time, and kept in "scdb"
-in CourtPy's data folder (`courtpy.scdb.download(overwrite = True)` looks for
+in courtpy's data folder (`courtpy.scdb.download(overwrite = True)` looks for
 a newer one). As a technique of the wrangler, `code_scdb` takes a merger's
 parameters: `source` (a file of the database that you downloaded yourself),
 `columns` (such as "issueArea, decisionDirection, partyWinning"), `prefix`,
@@ -334,11 +378,88 @@ print(votes.data[["caseName", "justiceName", "vote", "martin_quinn"]].head())
 print(votes.history[-1]["matched"])
 ```
 
+## The Federal Judicial Center's Integrated Database
+
+The Federal Judicial Center's [Integrated Database](https://www.fjc.gov/research/idb)
+(IDB) has a record of each appeal in the federal courts of appeals since the
+2008 fiscal year, taken from the courts' own dockets: the type of appeal, the
+parties, the court and judge appealed from, the dates of each step (docketed,
+briefed, heard, decided), the judges of the panel and the opinions each
+wrote, how the appeal ended, whether the decision was published, and whether
+a party was pro se, among much else. It covers the twelve regional circuits,
+not the Federal Circuit. courtpy reads it with
+[fjc-idb](https://github.com/WithPrecedent/fjc_idb), whose
+[codebooks](https://WithPrecedent.github.io/fjc_idb) explain each column.
+
+`code_idb` (a merger) adds the database's record of each appeal to its case,
+with "idb_" before fjc-idb's names for the columns. Use it as a technique of
+the wrangler, after the loader:
+
+```ini
+[wrangler]
+techniques = load_court_listener, code_idb
+
+[code_idb_parameters]
+columns = appeal_type, pro_se_party, in_forma_pauperis, appeal_date, judgment_date, notice_to_judgment
+indicator = in_idb
+```
+
+A case is matched by its circuit (the `court_num` column that the federal
+rules make, or else CourtListener's court id in `court`) and its docket
+number (`docket_numbers`, or else `docket_number`), so cases from
+Lexis-Nexis are matched too. "17-1234-cv", "No. 17-1234", and "17-01234" are
+the same docket. A case with several docket numbers (consolidated appeals) is
+matched by the first one that the database has. An appeal that was reopened,
+or remanded by the Supreme Court, has a record for each time it ended under
+the same docket number, so the record whose judgment is nearest the date of
+the decision is used, and never the record of an appeal docketed after the
+decision. Cases of other courts, and of years before 2008, are not matched.
+
+Without a `source`, the records are those of the years of the cases: from
+the year of the earliest decision to the year after the latest, since the
+database's years are fiscal years that end on September 30. `start_year` and
+`stop_year` set others. The yearly files that are missing are downloaded
+from the Federal Judicial Center (about 10 to 20 MB a year) and kept in
+"fjc_idb" in courtpy's data folder, in fjc-idb's layout. Set `folder` to use
+files you already have, or `download = false` to download nothing.
+`district = true` also adds the district court's record of the case that
+was appealed (in columns that begin with "idb_district_", which fjc-idb's
+`merge_district` finds), from the district courts' files of civil cases and
+criminal defendants, which are about 400 MB a year.
+
+Reading the yearly files takes a few seconds a year. To read them once, save
+the table and name the file as the `source` (a parquet file, as here, needs
+`pip install courtpy[parquet]`):
+
+```python
+import courtpy
+
+courtpy.fjc_idb.appeals(2008, 2026).to_parquet("data/appeals.parquet")
+```
+
+```ini
+[code_idb_parameters]
+source = appeals.parquet
+```
+
+The CSV file that the `fjc-idb` command makes is a `source` too:
+
+```bash
+fjc-idb appellate --start-year 2008 --download --data-folder data/fjc_idb
+```
+
+In Python, `courtpy.fjc_idb.appeals` returns the database's table of appeals
+for a range of years, and `courtpy.fjc_idb.download` downloads the yearly
+files that are missing (with `overwrite = True`, the current year's file
+again, which the Federal Judicial Center updates during the year). fjc-idb's
+own functions (such as `fjc_idb.run` and `fjc_idb.merge_district`) work on
+the same folder.
+
 ## Loaders
 
 `amos` (0.2.3 and later) loads a project's data with loaders, the first
 techniques of the wrangler, so a project with a loader needs no `item`.
-CourtPy's loaders are a genre of `amos` loaders, `CaseLoader`:
+courtpy's loaders are a genre of `amos` loaders, `CaseLoader`:
 
 | Loader | Source | Does |
 | --- | --- | --- |
@@ -406,11 +527,12 @@ CourtListener publishes its whole database every three months, at
 `BulkData.extract` reads five files, in this order: courts, dockets (about 5 GB),
 opinion clusters (about 2.5 GB), citations, and opinions (about 55 GB). It keeps
 only the cases of the courts and dates asked for, so it needs little memory,
-but reading the opinions file takes hours. Extract every court and year you may
+but reading the opinions file takes hours. The dockets file is read a second
+time after the opinion clusters, to save each case with its whole docket. Extract every court and year you may
 need at once.
 
 By default, the files are downloaded (resuming an interrupted download) and
-kept in "bulk" in CourtPy's data folder, outside of any project, so they can
+kept in "bulk" in courtpy's data folder, outside of any project, so they can
 be used again. Set `folder` to keep them elsewhere, `date` to use older files
 (`available()` lists the dates), or `stream = True` to read them from
 CourtListener without saving them.
@@ -426,7 +548,7 @@ secrets file otherwise (or where its `store` argument says).
 | Folder | Holds | Default | Changed with |
 | --- | --- | --- | --- |
 | Configuration | The secrets file. | "courtpy" in `%APPDATA%` (Windows) or `~/.config` | `COURTPY_CONFIG_DIR` |
-| Data | Bulk data files, the roster of judges and the files it is made from, and the files of Martin-Quinn scores, NOMINATE scores, and the Supreme Court Database. | "courtpy" in `%LOCALAPPDATA%` (Windows) or `~/.local/share` | `COURTPY_DATA_DIR` |
+| Data | Bulk data files, the roster of judges and the files it is made from, and the files of Martin-Quinn scores, NOMINATE scores, Judicial Common Space scores, and the Supreme Court Database. | From courtpy's repository, "data/courts" two folders above it (`courtpy.options._DATA_FOLDER`, beside the folder of code projects, where fjc-idb keeps its files too). From an installed package, "courtpy" in `%LOCALAPPDATA%` (Windows) or `~/.local/share` | `COURTPY_DATA_DIR` |
 
 ## Options
 

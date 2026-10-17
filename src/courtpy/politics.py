@@ -1,8 +1,6 @@
 """Adds the political context of each year to parsed cases.
 
-Courts do not decide in isolation, so a study of their decisions may need to
-account for who held the other branches of government (and the Supreme Court)
-when each case was decided. `build_table` makes a table of years from three
+`build_table` makes a table of years from three
 sources:
 
 | Columns | Meaning | Source |
@@ -68,7 +66,7 @@ from typing import Any
 import amos
 import pandas as pd
 
-from . import options, utilities
+from . import jcs, options, utilities
 
 _CHAMBERS: dict[str, str] = {
     'Senate': 'senate_median', 'House': 'house_median'}
@@ -159,7 +157,9 @@ def build_table(
     supreme_court: pd.DataFrame | pathlib.Path | str | bool | None = None,
     congress: pd.DataFrame | pathlib.Path | str | bool | None = None,
     *,
-    score: str = 'nominate_dim1') -> pd.DataFrame:
+    score: str = "nominate_dim1",
+    common_space: pd.DataFrame | pathlib.Path | str | bool = False) -> (
+        pd.DataFrame):
     """Makes a table of the political context of each year.
 
     Args:
@@ -174,11 +174,16 @@ def build_table(
             leaves the scores of Congress out of the table.
         score: the column of `congress` with the score to use. Defaults to
             "nominate_dim1".
+        common_space: the file of Judicial Common Space medians (see
+            `courtpy.jcs.medians`). Defaults to `False`, which leaves them out
+            of the table. `True` uses the current file, which is downloaded
+            unless it was before.
 
     Returns:
         A table with a "year" column and the columns of `presidents`,
-            `martin_quinn`, and `nominate`, for every year that any of them
-            has. A year that a source lacks has missing values for it.
+            `martin_quinn`, `nominate`, and (with `common_space`)
+            `courtpy.jcs.medians`, for every year that any of them has. A
+            year that a source lacks has missing values for it.
 
     """
     tables = [presidents()]
@@ -188,6 +193,9 @@ def build_table(
     if congress is not False:
         tables.append(nominate(
             None if congress is True else congress, score = score))
+    if common_space is not False:
+        tables.append(jcs.medians(
+            None if common_space is True else common_space))
     years = sorted(set().union(*(table['year'].tolist() for table in tables)))
     context = amos.Dataset(pd.DataFrame({'year': years}))
     merger = amos.mergers.MergeKeys()

@@ -136,7 +136,7 @@ found (its "matched"), which belongs in a description of the data.
 
 `code_politics` adds the party of the president in each case's year. For the
 Supreme Court's Martin-Quinn scores and the median NOMINATE scores of the
-Senate and House too, make a table of years once (CourtPy downloads the
+Senate and House too, make a table of years once (courtpy downloads the
 scores from their sources), and name it as the technique's `source`:
 
 ```python
@@ -164,7 +164,7 @@ added to it in a spreadsheet. See
 
 For cases of the Supreme Court, `code_scdb` adds the
 [Supreme Court Database](https://scdb.la.psu.edu)'s coding of each case, with
-"scdb_" before the database's names for its variables. CourtPy downloads the
+"scdb_" before the database's names for its variables. courtpy downloads the
 latest release the first time:
 
 ```ini
@@ -192,6 +192,45 @@ columns = outcome_reversal, year, scdb_issueArea, scdb_lcDispositionDirection
 ```
 
 See [The Supreme Court Database](advanced.md#the-supreme-court-database).
+
+## Add the Federal Judicial Center's record of each appeal
+
+For cases of the courts of appeals, `code_idb` adds the record of each appeal
+in the Federal Judicial Center's
+[Integrated Database](https://www.fjc.gov/research/idb), which comes from the
+courts' dockets: what an opinion does not say, such as whether a party was
+pro se and how long the appeal took. courtpy downloads the years of the cases
+the first time:
+
+```ini
+[general]
+label = outcome_reversal
+
+[wrangler]
+techniques = load_court_listener, code_idb, filter_rows, keep_columns, drop_missing
+
+[load_court_listener_parameters]
+source = court_listener
+download = bulk
+courts = federal_circuits
+start_date = 2015-01-01
+end_date = 2019-12-31
+
+[code_idb_parameters]
+columns = pro_se_party, notice_to_judgment, criminal_direct_appeal, civil_us_party
+indicator = in_idb
+
+[filter_rows_parameters]
+query = in_idb
+
+[keep_columns_parameters]
+columns = outcome_reversal, year, court_num, idb_pro_se_party, idb_notice_to_judgment, idb_criminal_direct_appeal, idb_civil_us_party
+```
+
+`idb_notice_to_judgment` is the number of days from the notice of appeal to
+the judgment. See
+[The Federal Judicial Center's Integrated Database](advanced.md#the-federal-judicial-centers-integrated-database)
+for how cases are matched and how to use files you already have.
 
 ## Add your own variables
 

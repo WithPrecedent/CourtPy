@@ -920,6 +920,7 @@ source = { editable = "." }
 dependencies = [
     { name = "amos" },
     { name = "chrisjen" },
+    { name = "fjc-idb" },
     { name = "keyring" },
     { name = "nagata" },
     { name = "pandas" },
@@ -972,6 +973,7 @@ requires-dist = [
     { name = "amos", specifier = ">=0.2.6" },
     { name = "amos", extras = ["all"], marker = "extra == 'analysis'" },
     { name = "chrisjen", specifier = ">=0.2.0" },
+    { name = "fjc-idb", specifier = ">=0.0.3" },
     { name = "keyring", specifier = ">=24" },
     { name = "nagata", specifier = ">=0.2.0" },
     { name = "pandas", specifier = ">=3.0" },
@@ -1429,6 +1431,19 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/53/e4/34efcb869715cf299e47d1ac7b2624d2bcb6f2d3dffc2f0abe8417f65ab2/filelock-4.0.12.tar.gz", hash = "sha256:cf42711a7ac791818b299fab0332a088c65aeeefa36290de98db92c434303b0c", size = 253880, upload-time = "2026-10-05T13:17:43.677Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/da/a1/b047e1c486a2c66283633b7dbb73872ca16ca1ce6a426f70d4d037fc8e1c/filelock-4.0.12-py3-none-any.whl", hash = "sha256:5f17ee83ecee8a6f3e389c75822fb70a1c2f0506b99438a6dffa1d56793588c8", size = 111732, upload-time = "2026-10-05T13:17:42.361Z" },
+]
+
+[[package]]
+name = "fjc-idb"
+version = "0.0.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "camina" },
+    { name = "pandas" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/42/60/c0607a658a81ed360bb3288467bbade32291948bb619206df3e86449e603/fjc_idb-0.0.3.tar.gz", hash = "sha256:ecb7fff919b501a9780e96e5d39667a6df8d107df9e2f5971fcac2117614081d", size = 193081, upload-time = "2026-10-15T20:56:09.349Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2b/63/abc8eff724754b1eef1ac1b4087c32b627d7af1fdd67df83e98fc0839d3a/fjc_idb-0.0.3-py3-none-any.whl", hash = "sha256:cfc5a5db9d8046ce60af18f9fe2a45eadd70518673a820337635011a6fe018ab", size = 43867, upload-time = "2026-10-15T20:56:08.097Z" },
 ]
 
 [[package]]

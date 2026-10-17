@@ -69,6 +69,11 @@ def test_folders_follow_environment(tmp_path: pathlib.Path, monkeypatch: pytest.
     assert utilities.data_folder() == tmp_path / 'd'
     monkeypatch.delenv(courtpy.options._ENV_CONFIG)
     assert utilities.config_folder().name == 'courtpy'
+    # From the repository, the data folder is beside the folder of projects.
+    monkeypatch.delenv(courtpy.options._ENV_DATA)
+    repository = pathlib.Path(utilities.__file__).parents[2]
+    assert utilities.data_folder() == repository.parents[1] / 'data' / 'courts'
+    assert utilities.data_folder() == courtpy.options._DATA_FOLDER
 
 
 def test_download_file(tmp_path: pathlib.Path, monkeypatch: pytest.MonkeyPatch) -> None:

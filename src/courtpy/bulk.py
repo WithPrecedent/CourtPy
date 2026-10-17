@@ -17,9 +17,12 @@ Four files hold what courtpy needs:
 
 `BulkData.extract` reads them in that order, keeps the cases of the courts and
 dates asked for, and saves each case in the same form as the API client does
-(see `courtpy.courtlistener`), so the same parser reads both. Reading the
-opinions file takes hours, so it is worth extracting every court and year you
-may need at once.
+(see `courtpy.courtlistener`), so the same parser reads both. Every case is
+saved with its whole docket (all of its fields but those in
+`options._DOCKET_SKIPPED`), so the dockets file is read twice: first to find
+which dockets belong to the courts, and again, once the cases are known, to
+keep the dockets of those cases alone. Reading the opinions file takes hours,
+so it is worth extracting every court and year you may need at once.
 
 By default, the files are downloaded first (to a folder outside of any
 project, see `courtpy.utilities.data_folder`) and kept, so that they can be
@@ -87,10 +90,14 @@ _CHUNK: int = 8 * 1024 * 1024
 _REPORT_EVERY: int = 1_000_000
 _BUFFER_BYTES: int = 200 * 1024 * 1024
 _DATE: re.Pattern[str] = re.compile(r'(\d{4}-\d{2}-\d{2})\.csv\.bz2$')
+# "source" is left out because it is a number in the dockets file but letters
+# in the opinion clusters file.
 _INTEGERS: frozenset[str] = frozenset({
     'id', 'cluster_id', 'docket_id', 'author_id', 'citation_count',
     'ordering_key', 'page_count', 'scdb_decision_direction',
-    'scdb_votes_majority', 'scdb_votes_minority'})
+    "scdb_votes_majority", "scdb_votes_minority", "assigned_to_id",
+    "referred_to_id", "idb_data_id", "originating_court_information_id",
+    "parent_docket_id", "federal_defendant_number"})
 _BOOLEANS: frozenset[str] = frozenset({
     'per_curiam', 'blocked', 'date_filed_is_approximate', 'extracted_by_ocr'})
 _CLUSTER_SKIPPED: frozenset[str] = frozenset({
@@ -196,13 +203,16 @@ class BulkData:
         date = self.resolve_date()
         logger.info('extracting cases from the bulk data of %s', date)
         court_records = self._courts(wanted)
-        dockets = self._dockets(set(wanted))
-        clusters = self._clusters(dockets, start_date, end_date, max_cases)
+        docket_courts = self._docket_courts(set(wanted))
+        clusters = self._clusters(
+            docket_courts, start_date, end_date, max_cases)
+        dockets = self._dockets(
+            {int(c["docket_id"]) for c in clusters.values()})
         citations = self._citations(set(clusters))
         paths: dict[int, pathlib.Path] = {}
         for cluster_id, cluster in clusters.items():
             docket = dockets[int(cluster['docket_id'])]
-            court = str(docket.get('court_id'))
+            court = docket_courts[int(cluster["docket_id"])]
             path = courtlistener.case_path(folder, court, cluster_id)
             if not overwrite and courtlistener.is_complete(path):
                 continue
@@ -358,7 +368,8 @@ class BulkData:
         as text, which works because they are written as YYYY-MM-DD.
 
         Args:
-            dockets: the dockets of the courts being extracted, by their ids.
+            dockets: the dockets of the courts being extracted, by their ids
+                (only the ids are used).
             start_date: earliest date filed, as YYYY-MM-DD, or `None` for no
                 earliest date.
             end_date: latest date filed, as YYYY-MM-DD, or `None` for no latest
@@ -413,25 +424,59 @@ class BulkData:
             logger.warning('these courts are not in the bulk data: %s', missing)
         return found
 
-    def _dockets(self, wanted: set[str]) -> dict[int, dict[str, Any]]:
-        """Returns the dockets of the courts in `wanted`.
+    def _docket_courts(self, wanted: set[str]) -> dict[int, str]:
+        """Returns the court of each docket of the courts in `wanted`.
 
-        Only the columns in `options._DOCKET_FIELDS` are kept, which keeps the
-        dockets of large courts small enough to hold in memory.
+        Only the court is kept, because a court has far more dockets than
+        cases with opinions, and all of their fields would not fit in memory
+        for large courts. `_dockets` reads the fields of the dockets that are
+        needed once the cases are known.
 
         Args:
             wanted: CourtListener court ids.
 
         Returns:
-            Each docket of those courts (converted with `_convert`), by its id.
+            The court id of each docket of those courts, by the docket's id.
+
+        """
+        found: dict[int, str] = {}
+        for row in self.rows("dockets"):
+            court = row.get("court_id")
+            docket_id = _integer(row.get("id"))
+            if court in wanted and docket_id is not None:
+                # One `str` is shared by every docket of a court.
+                found[docket_id] = sys.intern(court)
+        logger.info("found %d dockets", len(found))
+        return found
+
+    def _dockets(self, docket_ids: set[int]) -> dict[int, dict[str, Any]]:
+        """Returns the dockets in `docket_ids`.
+
+        The dockets file is read only if there are dockets to look for, and
+        reading stops once they are all found.
+
+        Args:
+            docket_ids: ids of the dockets of the cases being extracted.
+
+        Returns:
+            Each docket (converted with `_convert`, without the columns in
+                `options._DOCKET_SKIPPED`), by its id.
 
         """
         found: dict[int, dict[str, Any]] = {}
+        if not docket_ids:
+            return found
         for row in self.rows('dockets'):
-            if row.get('court_id') in wanted:
-                docket = _convert({k: row.get(k, '') for k in options._DOCKET_FIELDS})
-                found[int(docket['id'])] = docket
-        logger.info('found %d dockets', len(found))
+            docket_id = _integer(row.get("id"))
+            if docket_id not in docket_ids:
+                continue
+            docket = _convert(row)
+            for column in options._DOCKET_SKIPPED:
+                docket.pop(column, None)
+            found[docket_id] = docket
+            if len(found) == len(docket_ids):
+                break
+        logger.info("read %d dockets", len(found))
         return found
 
     def _list(self, prefix: str) -> list[str]:

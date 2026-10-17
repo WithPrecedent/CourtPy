@@ -4,6 +4,57 @@ All notable changes to this project will be documented in this file.
 
 <!-- insertion marker -->
 
+## Unreleased
+
+### Added
+
+* A `fjc_idb` module, which adds the Federal Judicial Center's Integrated
+  Database (IDB) to cases with the
+  [fjc-idb](https://github.com/WithPrecedent/fjc_idb) package, now a
+  dependency. `code_idb` (an amos merger) adds the database's record of each
+  appeal to its case in the courts of appeals, with "idb_" before fjc-idb's
+  names for the columns. A case is matched by its circuit (`court_num`, or
+  CourtListener's court id) and the first of its docket numbers that the
+  database has, and an appeal that ended more than once (because it was
+  reopened or remanded) is matched by the record whose judgment is nearest
+  the decision. Without a `source`, it reads the years of the cases from the
+  database's yearly files, which are downloaded if they are missing, and with
+  `district = true` it also adds the district court's record of the case
+  that was appealed (with fjc-idb's `merge_district`). `appeals` returns the
+  database's table of appeals for a range of years, and `download` downloads
+  its yearly files.
+* A `jcs` module, which downloads the Judicial Common Space scores from
+  https://epstein.wustl.edu/jcs (into "jcs" in the data folder) and reads
+  them: `judges` (each judge of a court of appeals, matched to the Federal
+  Judicial Center's `nid` by name and circuit), `justices` (by term and the
+  Supreme Court Database's `justiceName`), and `medians` (by year).
+  `Roster.from_fjc(jcs = True)` adds each judge's score as the "jcs"
+  attribute, and `politics.build_table(common_space = True)` adds the
+  medians.
+* A `CITATION.cff` file and a citation section in the README.
+
+### Changed
+
+* Every case from the bulk data is saved with CourtListener's whole docket
+  (such as `docket_number_core`, `pacer_case_id`, `appeal_from_id`,
+  `appellate_case_type_information`, `appellate_fee_status`, and
+  `idb_data_id`) instead of twelve of its fields. `BulkData.extract` reads
+  the dockets file a second time to do so, and holds only the court of each
+  docket in memory until the cases are known. The API client's "dockets"
+  option saves the whole docket too.
+* `options._DOCKET_FIELDS` (the fields that were kept) is replaced by
+  `options._DOCKET_SKIPPED` (the fields that are not).
+* `judges.clean_name` leaves out accents, so "Gelpí" in one source matches
+  "Gelpi" in another.
+* The Judicial Common Space file of the earlier version
+  (`reference/biographies/federal/jcs.csv`) is moved out of the repository,
+  to "jcs" in the data folder.
+* When courtpy runs from its repository, its data folder is
+  `options._DATA_FOLDER`, "data/courts" two folders above the repository (as
+  fjc-idb's is), so the IDB's yearly files that fjc-idb downloads are shared.
+  An installed courtpy still uses "courtpy" in the user's local application
+  data folder, and `COURTPY_DATA_DIR` still overrides both.
+
 ## 0.2.3
 
 * Updated to the `snickerdoodle` 0.4.0 template
@@ -12,7 +63,7 @@ All notable changes to this project will be documented in this file.
 ## 0.2.2
 
 Updated to [amos](https://github.com/WithPrecedent/amos) 0.2.6, whose mergers
-and shapers join tables whose rows are different things. CourtPy uses them to
+and shapers join tables whose rows are different things. courtpy uses them to
 add judges, the politics of each year, and the Supreme Court Database to
 cases, and downloads other researchers' data from its sources.
 
@@ -39,7 +90,7 @@ judges in 99%.
   code `decision_affirm`, `decision_reverse`, `decision_vacate`,
   `decision_remand`, and `decision_dismiss` from it.
 * `courtpy.judges` identifies the judges on each case, which the earlier,
-  unreleased CourtPy did and this version had not rebuilt. A `Roster`
+  unreleased courtpy did and this version had not rebuilt. A `Roster`
   (`Roster.from_fjc()`) is made from the Federal Judicial Center's files of
   judges' service, demographics, and careers, which `download` gets, and
   matches a name in an opinion to a judge of the case's court, or else of a
@@ -191,7 +242,7 @@ replace the "cases" section of a project's settings. Settings written for
 ## 0.1.0
 
 The first release, and the first on PyPI. It is a complete rewrite of the
-earlier, unreleased CourtPy, which was built on siMpLify. The analysis is now
+earlier, unreleased courtpy, which was built on siMpLify. The analysis is now
 done with [amos](https://github.com/WithPrecedent/amos) (and its workflows
 with [chrisjen](https://github.com/WithPrecedent/chrisjen)). The changes below
 are from that earlier code.

@@ -243,9 +243,11 @@ class CourtListener:
             folder: folder to save the cases in. Defaults to "court_listener".
             max_cases: most cases to save in each court in this run. Defaults
                 to `None` (every case).
-            dockets: whether to also download each case's docket (with its
-                docket number and date argued). This takes one more request
-                for each case. Defaults to `False`.
+            dockets: whether to also download each case's docket (every
+                field but those in `options._DOCKET_SKIPPED`, such as its
+                docket number, dates, and the court appealed from). This
+                takes one more request for each case. Defaults to `False`.
+                The bulk data always includes the docket.
             overwrite: whether to download cases that were already saved.
                 Defaults to `False`.
 
@@ -553,7 +555,8 @@ class CourtListener:
         from `court` or, if that is `None`, from the docket. A case whose court
         cannot be found is saved in a folder named "unknown". The cluster's
         list of opinion addresses ("sub_opinions") is not kept, because the
-        opinions themselves are.
+        opinions themselves are. Every field of the docket is kept but those
+        in `options._DOCKET_SKIPPED`.
 
         Args:
             cluster: the opinion cluster, from the API.
@@ -574,9 +577,9 @@ class CourtListener:
         docket_id = cluster.get('docket_id') or _id_from_url(
             cluster.get('docket'))
         if docket and docket_id:
-            docket_record = self.get(
-                f'dockets/{docket_id}/',
-                {'fields': ','.join(options._DOCKET_FIELDS)})
+            docket_record = {
+                k: v for k, v in self.get(f"dockets/{docket_id}/").items()
+                if k not in options._DOCKET_SKIPPED}
         court_id = (
             (court or {}).get('id') or (docket_record or {}).get('court_id'))
         if court is None and docket_record and docket_record.get('court_id'):

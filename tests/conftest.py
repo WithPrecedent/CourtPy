@@ -9,6 +9,7 @@ from collections.abc import Iterator
 from typing import Any
 
 import chrisjen
+import fjc_idb.downloader
 import pytest
 
 import courtpy
@@ -250,4 +251,9 @@ def no_network(monkeypatch: pytest.MonkeyPatch) -> None:
     def refuse(self: Any, method: str, url: str, **kwargs: Any) -> None:
         raise AssertionError(f'a test asked the network for {url}')
 
+    def refuse_fjc(url: str) -> None:
+        raise AssertionError(f'a test asked the network for {url}')
+
     monkeypatch.setattr(courtpy.utilities.requests.Session, 'request', refuse)
+    # fjc-idb downloads with urllib rather than requests.
+    monkeypatch.setattr(fjc_idb.downloader, '_open', refuse_fjc)

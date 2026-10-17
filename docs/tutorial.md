@@ -131,7 +131,7 @@ the run, so the study can be reported and reproduced.
 
 ## 5. Describe the whole study in one file
 
-Steps 1 to 3 can be part of the study itself. CourtPy's loaders are `amos`
+Steps 1 to 3 can be part of the study itself. courtpy's loaders are `amos`
 techniques that collect, parse, and code cases, so a project whose wrangler
 starts with one needs no other data. Save this as `study.ini`:
 

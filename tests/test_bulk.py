@@ -64,10 +64,13 @@ def bucket(tmp_path: pathlib.Path) -> pathlib.Path:
     write_bulk(folder, 'courts', ['id', 'full_name', 'short_name', 'citation_string', 'jurisdiction', 'notes'], [
         ['ca1', 'Court of Appeals for the First Circuit', 'First Circuit', '1st Cir.', 'F', ''],
         ['ca2', 'Court of Appeals for the Second Circuit', 'Second Circuit', '2d Cir.', 'F', '']])
-    write_bulk(folder, 'dockets', ['id', 'court_id', 'docket_number', 'case_name_full', 'date_argued', 'cause', 'blocked'], [
-        [10, 'ca1', '19-1234', 'United States v. Doe', '2020-01-15', '', 'f'],
-        [20, 'ca2', '19-9999', 'Other v. Case', '', '', 'f'],
-        [30, 'ca1', '18-0001', 'Old v. Case', '', '', 'f']])
+    write_bulk(folder, 'dockets', [
+        'id', 'date_modified', 'court_id', 'docket_number', 'docket_number_core', 'case_name_full',
+        'date_argued', 'cause', 'blocked', 'idb_data_id', 'appeal_from_id', 'view_count'], [
+        [10, '2026-01-01 10:00:00+00', 'ca1', '19-1234', '1901234', 'United States v. Doe',
+         '2020-01-15', '', 'f', 77, 'mad', 5],
+        [20, '', 'ca2', '19-9999', '1909999', 'Other v. Case', '', '', 'f', '', '', 0],
+        [30, '', 'ca1', '18-0001', '1800001', 'Old v. Case', '', '', 'f', '', '', 0]])
     write_bulk(folder, 'opinion-clusters', [
         'id', 'judges', 'date_filed', 'case_name', 'case_name_full', 'attorneys', 'disposition',
         'precedential_status', 'docket_id', 'citation_count', 'blocked', 'date_created'], [
@@ -108,7 +111,10 @@ def test_extract(bucket: pathlib.Path, tmp_path: pathlib.Path) -> None:
     record = json.loads(saved[0].read_text(encoding = 'utf-8'))
     assert record['bulk_date'] == DATE
     assert record['court']['citation_string'] == '1st Cir.'
-    assert record['docket']['docket_number'] == '19-1234'
+    assert record['docket'] == {
+        'id': 10, 'court_id': 'ca1', 'docket_number': '19-1234', 'docket_number_core': '1901234',
+        'case_name_full': 'United States v. Doe', 'date_argued': '2020-01-15', 'cause': None,
+        'blocked': False, 'idb_data_id': 77, 'appeal_from_id': 'mad'}
     assert record['citations'] == ['950 F.3d 12']
     assert record['cluster']['citation_count'] == 3
     assert record['cluster']['blocked'] is False
@@ -156,7 +162,7 @@ class _Context:
     def __enter__(self) -> Any:
         return self.response
 
-    def __exit__(self, *args: Any) -> None:
+    def __exit__(self, *args: object) -> None:
         return None
 
 

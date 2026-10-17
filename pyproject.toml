@@ -34,6 +34,7 @@ keywords = [
 dependencies = [
     "amos>=0.2.6",
     "chrisjen>=0.2.0",
+    "fjc-idb>=0.0.3",
     "keyring>=24",
     "nagata>=0.2.0",
     "pandas>=3.0",
@@ -132,6 +133,7 @@ module = [
     "bobbie.*",
     "camina.*",
     "chrisjen.*",
+    "fjc_idb.*",
     "holden.*",
     "keyring.*",
     "miller.*",

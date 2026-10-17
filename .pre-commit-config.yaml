@@ -1,5 +1,5 @@
 # The reference data (large CSV files kept from the earlier, unreleased
-# CourtPy) is left exactly as it is.
+# courtpy) is left exactly as it is.
 exclude: ^reference/
 
 repos:

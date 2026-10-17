@@ -117,6 +117,7 @@ from __future__ import annotations
 import dataclasses
 import pathlib
 import re
+import unicodedata
 from collections.abc import Iterable, Mapping, Sequence
 from typing import Any
 
@@ -125,6 +126,7 @@ import numpy as np
 import pandas as pd
 
 from . import cases, coders, options, rules, utilities
+from . import jcs as common_space
 
 _ABA_RATINGS: dict[str, int] = {
     'Exceptionally Well Qualified': 4,
@@ -326,6 +328,7 @@ class Roster:
         *,
         update: bool = False,
         scores: pd.DataFrame | pathlib.Path | str | None = None,
+        jcs: bool = False,
         rulebook: rules.Rulebook | pathlib.Path | str = 'judges') -> Roster:
         """Returns a roster made from the Federal Judicial Center's files.
 
@@ -340,6 +343,10 @@ class Roster:
                 downloaded. Defaults to `False`.
             scores: scores of the judges to add (see `build_roster`). Defaults
                 to `None`.
+            jcs: whether to add each judge's Judicial Common Space score as
+                "jcs" (see `courtpy.jcs.judges`), which is downloaded unless
+                it was before (or again, with `update`). Only judges of the
+                courts of appeals have scores. Defaults to `False`.
             rulebook: the rules that code the judges' careers (see
                 `build_roster`). Defaults to "judges".
 
@@ -348,9 +355,18 @@ class Roster:
 
         """
         files = download(folder, overwrite = update)
-        return cls(build_roster(
+        table = build_roster(
             files['service'], files['demographics'], files['career'],
-            scores = scores, rulebook = rulebook))
+            scores = scores, rulebook = rulebook)
+        if jcs:
+            common_space.download(overwrite = update)
+            found = common_space.judges(roster = cls(table))
+            table = amos.mergers.MergeKeys().apply(
+                table,
+                source = found.dropna(subset = ["nid"])[["nid", "jcs"]],
+                on = "nid",
+                duplicates = "first").data
+        return cls(table)
 
     @classmethod
     def load(cls, path: pathlib.Path | str | None = None) -> Roster:
@@ -1073,12 +1089,17 @@ def clean_name(name: str) -> str:
             "O'Scannlain".
 
     Returns:
-        The name in capital letters, without periods, commas, brackets, or
-            apostrophes, and with single spaces (as the `names` rules of a
-            rulebook write the names they find).
+        The name in capital letters, without accents, periods, commas,
+            brackets, or apostrophes, and with single spaces (as the `names`
+            rules of a rulebook write the names they find). Accents are left
+            out because sources differ in whether they write them (so a name
+            with an accented letter matches the same name without it).
 
     """
-    return ' '.join(_NAME_PUNCTUATION.sub('', name.upper()).split())
+    letters = "".join(
+        character for character in unicodedata.normalize("NFKD", name)
+        if not unicodedata.combining(character))
+    return " ".join(_NAME_PUNCTUATION.sub("", letters.upper()).split())
 
 
 def download(

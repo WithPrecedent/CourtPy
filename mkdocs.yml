@@ -2,7 +2,7 @@
 
 # Project Information
 
-site_name: CourtPy
+site_name: courtpy
 site_description: Accessible tools for collecting, parsing, and analyzing court opinions
 site_url: https://WithPrecedent.github.io/courtpy
 repo_name: WithPrecedent/courtpy
@@ -146,7 +146,7 @@ plugins:
           heading_level: 1
           # members_order: alphabetical
           merge_init_into_class: true
-          # Lets griffe see the fields that CourtPy classes inherit.
+          # Lets griffe see the fields that courtpy classes inherit.
           preload_modules: [amos, chrisjen, holden]
           separate_signature: false
           show_signature_annotations: false

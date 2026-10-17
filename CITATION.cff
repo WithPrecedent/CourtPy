@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: "If you use courtpy in your research, please cite it as below."
+type: software
+title: "courtpy: Accessible tools for collecting, parsing, and analyzing court opinions"
+abstract: >-
+  A Python package that collects court opinions (from CourtListener and
+  Lexis-Nexis), turns them into data by parsing and coding them, adds the
+  judges and the politics of the day, and analyzes the results, designed for
+  reproducible empirical legal research.
+authors:
+  - given-names: Corey Rayburn
+    family-names: Yung
+    email: coreyrayburnyung@gmail.com
+    orcid: "https://orcid.org/0000-0001-6524-9956"
+version: 0.2.3
+date-released: 2026-10-17
+license: Apache-2.0
+repository-code: "https://github.com/WithPrecedent/courtpy"
+url: "https://WithPrecedent.github.io/courtpy"
+keywords:
+  - court opinions
+  - courtlistener
+  - empirical legal studies
+  - judges
+  - law
+  - open science
+  - reproducibility
+  - text parsing

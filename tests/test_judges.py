@@ -225,6 +225,7 @@ def test_name_forms() -> None:
     assert 'F OSCANNLAIN' not in judges.name_forms('Diarmuid', 'F.', "O'Scannlain")
     assert judges.name_forms('John', '', '') == []
     assert judges.clean_name(" N.R.  Smith, Jr. ") == 'NR SMITH JR'
+    assert judges.clean_name('Gelpí') == judges.clean_name('Gelpi') == 'GELPI'
 
 
 def test_match_prefers_the_court(roster: judges.Roster) -> None:

@@ -253,12 +253,14 @@ def data_folder() -> pathlib.Path:
     """Returns the folder for large downloads, such as bulk data.
 
     Bulk data files are very large (the opinions alone are more than 50 GB),
-    so they are kept outside of projects (which are often in folders that are
-    backed up or synced to the cloud). The folder is the one named by the
-    `COURTPY_DATA_DIR` environment variable, if it is set. Otherwise, it is
-    "courtpy" in the user's local application data folder on Windows
-    ("%LOCALAPPDATA%"), or in "~/.local/share" (or "$XDG_DATA_HOME") on other
-    systems.
+    so they are kept outside of projects. The folder is the one named by the
+    `COURTPY_DATA_DIR` environment variable, if it is set. Otherwise, when
+    courtpy runs from its repository, it is `options._DATA_FOLDER`: "data/
+    courts" two folders above the repository, beside the folder of code
+    projects (where fjc-idb keeps its files as well). When courtpy is
+    installed as a package, it is "courtpy" in the user's local application
+    data folder on Windows ("%LOCALAPPDATA%"), or in "~/.local/share" (or
+    "$XDG_DATA_HOME") on other systems.
 
     Returns:
         The path of the folder. It is not created.
@@ -267,6 +269,8 @@ def data_folder() -> pathlib.Path:
     named = os.environ.get(options._ENV_DATA)
     if named:
         return pathlib.Path(named).expanduser()
+    if (pathlib.Path(__file__).parents[2] / "pyproject.toml").is_file():
+        return options._DATA_FOLDER
     if sys.platform == 'win32':
         base = os.environ.get('LOCALAPPDATA') or pathlib.Path.home() / 'AppData' / 'Local'
         return pathlib.Path(base) / 'courtpy'

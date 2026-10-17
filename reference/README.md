@@ -1,6 +1,6 @@
 # Reference data
 
-These files were used by the earlier, unreleased CourtPy (built on siMpLify)
+These files were used by the earlier, unreleased courtpy (built on siMpLify)
 to add information about judges and the political context to court cases.
 They are kept here, unchanged, as that version left them. They are not part
 of the installed package.
@@ -14,9 +14,9 @@ against it.
 
 | Folder | Contents | Source | Now |
 | --- | --- | --- | --- |
-| `biographies/federal` | The Federal Judicial Center's files of judges' service, demographics, and careers as of 2019 (`fjc_jud_serv.csv`, `fjc_demo.csv`, and `fjc_career.csv`), the earlier version's table of judges from 1980 to 2016 (`fjc_bios.csv`), their names in every form for each year (`fjc_names.csv`), and Judicial Common Space scores (`jcs.csv`, with the judges' `nid` numbers as `keys` and the scores as `values`). | Federal Judicial Center; Epstein et al. | `courtpy.judges.build_roster` makes a roster from the three raw files (or `Roster.from_fjc` from today's), and its `scores` argument adds the scores. |
-| `biographies` | The earlier version's patterns for coding judges' careers (`employ_hist.csv`). | CourtPy | The rules in `src/courtpy/instructions/judges.csv`. |
-| `courts/federal` | Names and numbers of federal appellate and trial courts. | CourtPy | The numbers of appellate courts come from the federal rules, and a district court's circuit from its state. |
+| `biographies/federal` | The Federal Judicial Center's files of judges' service, demographics, and careers as of 2019 (`fjc_jud_serv.csv`, `fjc_demo.csv`, and `fjc_career.csv`), the earlier version's table of judges from 1980 to 2016 (`fjc_bios.csv`), and their names in every form for each year (`fjc_names.csv`). The earlier version's Judicial Common Space scores (`jcs.csv`, with the judges' `nid` numbers as `keys` and the scores as `values`) were moved to "jcs" in courtpy's data folder (`courtpy.utilities.data_folder()`). | Federal Judicial Center; Epstein et al. | `courtpy.judges.build_roster` makes a roster from the three raw files (or `Roster.from_fjc` from today's), and its `scores` argument adds scores. `courtpy.jcs` downloads the current Judicial Common Space scores, and `Roster.from_fjc(jcs = True)` adds them. |
+| `biographies` | The earlier version's patterns for coding judges' careers (`employ_hist.csv`). | courtpy | The rules in `src/courtpy/instructions/judges.csv`. |
+| `courts/federal` | Names and numbers of federal appellate and trial courts. | courtpy | The numbers of appellate courts come from the federal rules, and a district court's circuit from its state. |
 | `executive/federal` | The president's party by year (`president.csv`). | | `courtpy.politics.presidents`. |
 | `judiciary/federal` | Martin-Quinn scores of the Supreme Court by term (`martin_quinn_raw.csv`) and by year from 1980 to 2016 (`martin_quinn.csv`). | mqscores.wustl.edu (then mqscores.lsa.umich.edu) | `courtpy.politics.martin_quinn`, which downloads the current file unless it is given one. |
 | `legislature/federal` | DW-NOMINATE scores of every member of Congress (`nominate_raw.csv`) and the medians of each chamber by year from 1980 to 2016 (`nominate.csv`). | voteview.com | `courtpy.politics.nominate`, which downloads the current file unless it is given one. |
@@ -29,7 +29,8 @@ import pandas as pd
 import courtpy
 
 folder = "reference/biographies/federal"
-scores = pd.read_csv(f"{folder}/jcs.csv").rename(
+jcs = courtpy.utilities.data_folder() / "jcs" / "jcs.csv"
+scores = pd.read_csv(jcs).rename(
     columns = {"keys": "nid", "values": "jcs"})[["nid", "jcs"]]
 roster = courtpy.judges.Roster(courtpy.judges.build_roster(
     f"{folder}/fjc_jud_serv.csv", f"{folder}/fjc_demo.csv",
@@ -50,11 +51,15 @@ where the earlier version was mistaken:
   version gave a name that several judges shared to whichever of them came
   last in the file.
 * `martin_quinn.csv` has 2005 twice, for the two parts of that term.
+* `jcs.csv` (now in the data folder) gives six judges the `nid` of another
+  judge with a similar name: Rhesa Barksdale, John Marshall Harlan II, John
+  W. Peck II, Albert Lee Stephens, Sr., Kara Stoll, and Robert Wilkins.
+  `courtpy.jcs.judges` finds the right ones.
 
 Most of these sources are updated regularly, so the files here end years ago.
 CourtListener's own judge database (with data from the Federal Judicial
 Center) can also identify the judges in CourtListener cases: see the
-"panel_ids" and "author_id" columns that CourtPy makes, and CourtListener's
+"panel_ids" and "author_id" columns that courtpy makes, and CourtListener's
 "people" bulk files.
 
 The earlier version itself is in this repository's history (the last commit

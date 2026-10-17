@@ -45,7 +45,9 @@ class FakeAPI:
         if path.startswith('courts/'):
             return FakeResponse({'id': 'ca1', 'full_name': 'Court of Appeals for the First Circuit'})
         if path.startswith('dockets/'):
-            return FakeResponse({'id': 10, 'court_id': 'ca1', 'docket_number': '19-1234'})
+            return FakeResponse({
+                'id': 10, 'court_id': 'ca1', 'docket_number': '19-1234', 'pacer_case_id': '44',
+                'view_count': 3})
         if path == 'clusters/':
             return self._page('clusters/', self.clusters, query)
         if path == 'opinions/':

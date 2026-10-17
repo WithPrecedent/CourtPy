@@ -5,7 +5,7 @@ Every little bit helps, and credit will always be given.
 
 ## Environment Setup
 
-CourtPy uses [uv](https://docs.astral.sh/uv/) to manage its environment. After
+courtpy uses [uv](https://docs.astral.sh/uv/) to manage its environment. After
 cloning the repository, install every dependency and the pre-commit hooks:
 
 ```bash
@@ -47,7 +47,7 @@ Don't bother updating the changelog, we will take care of this.
 
 ## Changing the rules
 
-Most of what CourtPy finds in an opinion comes from the CSV files in
+Most of what courtpy finds in an opinion comes from the CSV files in
 `src/courtpy/instructions`, not from its code, so many improvements need no
 Python at all:
 
