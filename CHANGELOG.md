@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 <!-- insertion marker -->
 
+## 0.2.3
+
+* Updated to the `snickerdoodle` 0.4.0 template
+* Made `ruff` prefer single quotes
+
 ## 0.2.2
 
 Updated to [amos](https://github.com/WithPrecedent/amos) 0.2.6, whose mergers
