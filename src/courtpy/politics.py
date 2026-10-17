@@ -281,7 +281,7 @@ def justices(
     names = ['term', 'justice', 'justiceName']
     _require(
         scores, [*names, *_JUSTICES],
-        'the file of the justices\' Martin-Quinn scores')
+        "the file of the justices' Martin-Quinn scores")
     return scores[[*names, *_JUSTICES]].rename(columns = _JUSTICES)
 
 

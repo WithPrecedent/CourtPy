@@ -182,7 +182,7 @@ class CodeScdb(amos.Merger):
         if on not in data.columns and citations not in data.columns:
             message = (
                 f'{self.name!r} needs the column {on!r} (the Supreme Court '
-                f'Database\'s id of each case, which CourtListener records '
+                f"Database's id of each case, which CourtListener records "
                 f'for cases of the Supreme Court) or {citations!r} (the '
                 f'citations of each case), and the cases have neither'
             )
