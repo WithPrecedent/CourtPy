@@ -12,8 +12,8 @@ sources:
 The sources' current files are downloaded when they are first needed (see
 `download`), and kept outside of projects (in "politics" in
 `courtpy.utilities.data_folder()`). The tables are combined by their years
-with the `merge_keys` technique of `amos` (0.2.6 and later), which adds the
-columns of another table's row that has the same keys.
+with the `merge_keys` technique of `amos`, which adds the columns of another
+table's row that has the same keys.
 
 `code_politics` (an `amos.Merger`, which is added to the `amos` library as
 soon as courtpy is imported) is that technique with the year of each case as

@@ -176,8 +176,8 @@ as in "M. SMITH" and "N.R. SMITH"), and neither is a name on a case of a court
 that has no judges in the roster, such as a bankruptcy appellate panel.
 
 Cases and judges are different things: a case table has a row for each case,
-and a roster a row for each court that each judge has served on. `amos` (0.2.6
-and later) joins such tables with
+and a roster a row for each court that each judge has served on. `amos`
+joins such tables with
 [mergers](https://WithPrecedent.github.io/amos/advanced/#merging-data), which
 add the columns of another table to the rows that they match without ever
 adding or losing a row, and
@@ -457,9 +457,9 @@ the same folder.
 
 ## Loaders
 
-`amos` (0.2.3 and later) loads a project's data with loaders, the first
-techniques of the wrangler, so a project with a loader needs no `item`.
-courtpy's loaders are a genre of `amos` loaders, `CaseLoader`:
+`amos` loads a project's data with loaders, the first techniques of the
+wrangler, so a project with a loader needs no `item`. courtpy's loaders are a
+genre of `amos` loaders, `CaseLoader`:
 
 | Loader | Source | Does |
 | --- | --- | --- |

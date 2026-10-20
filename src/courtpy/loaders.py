@@ -1,8 +1,8 @@
 """Techniques that load court cases into an `amos` project.
 
-Loaders (from `amos` 0.2.3) make a project's data from a source named in its
-settings, so a project with a loader needs no `item`. They are usually the
-first step of the wrangler, and they work through the project's clerk (its
+Loaders make a project's data from a source named in its settings, so a
+project with a loader needs no `item`. They are usually the first step of the
+wrangler, and they work through the project's clerk (its
 `nagata.FileManager`): a folder or file named by a relative path is looked
 for in the current folder and then in the clerk's input folder (the
 "input_folder" of the "files" section), and downloads are saved in the input

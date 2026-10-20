@@ -4,7 +4,13 @@ All notable changes to this project will be documented in this file.
 
 <!-- insertion marker -->
 
-## Unreleased
+## 0.3.0
+
+Updated to [amos](https://github.com/WithPrecedent/amos) 0.4.0, whose
+techniques write `apply` instead of `implement`. courtpy now adds the Federal
+Judicial Center's Integrated Database to cases of the courts of appeals, and
+the Judicial Common Space scores to judges, justices, and courts. Every case
+from the bulk data keeps CourtListener's whole docket.
 
 ### Added
 
@@ -42,7 +48,10 @@ All notable changes to this project will be documented in this file.
   `CodePolitics`, and `CodeScdb`) do too. Calling `apply` works as before,
   except that its item is now required: a loader called outside a project
   takes `None` to start a new dataset (`LoadCourtListener().apply(None,
-  source = ...)`).
+  source = ...)`). amos now declares the item of `apply` as a `Dataset`, so
+  courtpy passes its tables to mergers as datasets.
+* Module docstrings no longer list private names, which the API reference
+  leaves out.
 * Every case from the bulk data is saved with CourtListener's whole docket
   (such as `docket_number_core`, `pacer_case_id`, `appeal_from_id`,
   `appellate_case_type_information`, `appellate_fee_status`, and

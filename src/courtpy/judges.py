@@ -31,8 +31,7 @@ attribute of the judge, which the techniques use.
 Three techniques use a roster. They are added to the `amos` library as soon
 as courtpy is imported, so they can be named in settings. Cases and judges
 are different things, so the techniques are built from the mergers and
-shapers of `amos` (0.2.6 and later), which join tables whose rows are not the
-same:
+shapers of `amos`, which join tables whose rows are not the same:
 
 * `merge_judges` (an `amos.Merger`) adds what the roster says about the judge
   that each row names, such as the author of each opinion.
