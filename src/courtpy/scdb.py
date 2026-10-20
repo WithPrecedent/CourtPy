@@ -40,12 +40,6 @@ Contents:
         table of parsed cases.
     _SYMBOLS: pattern for everything in a citation other than letters and
         digits, which `_cite` removes.
-    _cite: returns a citation the way that citations are compared.
-    _cited: returns the row of the database for each citation that one row
-        has.
-    _folder: returns the folder where the database is kept.
-    _read: returns a table from a table or a file, or one of the database's.
-    _release: finds the latest release of the database and its files.
 
 """
 

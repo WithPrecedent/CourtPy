@@ -31,29 +31,6 @@ Contents:
     slim_opinion: keeps one field of an opinion's text, to save space.
     logger: the module's logger, which reports the progress of downloads and
         pauses asked for by CourtListener.
-    _OPINION_KEPT: the fields of an opinion that are kept in a saved case,
-        besides one field of text (see `slim_opinion`).
-    _RETRIES: most times a request is tried again after a temporary error
-        (see `_TEMPORARY`) or a failed connection.
-    _ROLES: pairs of a fragment of an opinion's type (as CourtListener names
-        types, such as "010combined" and "040dissent") and the role of
-        opinions whose types contain it, in the order they are checked. Types
-        that contain none of them (such as "050addendum") have the role
-        "other" (see `opinion_role`).
-    _SITE: the address of CourtListener's website, which begins the address
-        of each case.
-    _TEMPORARY: HTTP status codes of temporary server errors, after which a
-        request is tried again.
-    _cluster_id: returns the cluster id of an opinion.
-    _detail: returns the explanation in an error response.
-    _first: returns the first value that is not blank, as text.
-    _id_from_url: returns the id at the end of an API address.
-    _load_json: returns the contents of a JSON file.
-    _retry_after: returns how many seconds a 429 response asks to wait.
-    _save_json: saves a JSON file, creating its folder if needed.
-    _texts: returns the values that are not blank, as text.
-    _true: returns whether a value from the API or bulk data is true.
-    _url: returns the address of a case on CourtListener.
 
 """
 
@@ -120,8 +97,7 @@ class RateLimitError(CourtListenerError):
             f'CourtListener asked courtpy to wait {hours:.1f} hours before '
             f"making more requests (the account's limit was reached). Run "
             f'the same download again later: it resumes where it stopped. '
-            f'The bulk data (courtpy.bulk) has no limits.'
-        )
+            f'The bulk data (courtpy.bulk) has no limits.')
         super().__init__(message)
 
 

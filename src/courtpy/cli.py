@@ -20,15 +20,6 @@ command's name to its function.
 
 Contents:
     main: runs a command.
-    _download: downloads cases from CourtListener ("download").
-    _key_delete: removes the stored API key ("key delete").
-    _key_set: stores the API key ("key set").
-    _key_show: shows where the API key is found ("key show").
-    _parse: parses saved cases into a table ("parse").
-    _parser: returns the parser of the command line arguments.
-    _rules: checks a rulebook and lists its variables ("rules").
-    _run: runs a study from a settings file ("run").
-    _split: divides Lexis-Nexis files of many cases ("split").
 
 """
 
@@ -222,7 +213,8 @@ def _parse(arguments: argparse.Namespace) -> int:
         limit = arguments.limit,
         workers = arguments.workers)
     if data.empty:
-        print(f'courtpy: no {arguments.source} cases in {arguments.folder}', file = sys.stderr)
+        print(f'courtpy: no {arguments.source} cases in {arguments.folder}',
+              file = sys.stderr)
         return 1
     if not arguments.no_code:
         data = coders.code(data).data
@@ -290,7 +282,9 @@ def _split(arguments: argparse.Namespace) -> int:
 
     """
     files = [pathlib.Path(f) for f in arguments.files]
-    expanded = [p for f in files for p in (sorted(f.glob('*.txt')) if f.is_dir() else [f])]
+    expanded = [
+        p for f in files for p in (sorted(f.glob('*.txt'))
+        if f.is_dir() else [f])]
     saved = lexis.split(expanded, arguments.folder)
     print(f'{len(saved)} cases saved in {arguments.folder}')
     return 0

@@ -20,15 +20,6 @@ Contents:
     CodeParties: completes the roles of the parties.
     DropText: removes columns that models cannot use, such as text and lists.
     code: applies coders (or other `amos` techniques) to parsed cases.
-    _NONE: names that mean "no coders" (such as "none"), in lower case.
-    _OPPOSITES: pairs of roles that are opposites: if one party is an
-        appellant, the other is an appellee, and so on.
-    _SIDES: each party with the other party, so that a coder can do the same
-        thing for both sides of a case.
-    _flags: returns a column as plain booleans.
-    _has_text: returns whether each case has text in a column.
-    _is_text: returns whether a column holds text, lists, or other objects.
-    _require: raises an error if columns a coder needs are missing.
 
 """
 
@@ -49,7 +40,8 @@ _OPPOSITES: tuple[tuple[str, str], ...] = (
     ('appellant', 'appellee'),
     ('petitioner', 'respondent'),
     ('plaintiff', 'defendant'))
-_SIDES: tuple[tuple[str, str], ...] = (('party1', 'party2'), ('party2', 'party1'))
+_SIDES: tuple[tuple[str, str], ...] = (
+    ('party1', 'party2'), ('party2', 'party1'))
 
 
 @dataclasses.dataclass

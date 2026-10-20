@@ -34,31 +34,6 @@ Contents:
     BulkData: lists, downloads, and extracts cases from the bulk data.
     logger: the module's logger, which reports the progress of downloads and
         of reading the files.
-    _BOOLEANS: columns of the bulk files that hold booleans, written as "t"
-        and "f".
-    _BUFFER_BYTES: how many bytes of opinion text are held in memory before
-        the opinions are written to their saved cases.
-    _CHUNK: how many bytes of a bulk file are downloaded at a time.
-    _CLUSTER_SKIPPED: columns of the opinion clusters file that are not kept
-        with a saved case (dates the record changed and the paths of files
-        stored by CourtListener).
-    _DATE: pattern for the date in the name of a bulk file, such as
-        "opinions-2026-09-30.csv.bz2", with the date as its group.
-    _DIALECT: settings for the `csv` module to read the bulk files, which
-        PostgreSQL writes with a backslash before quotes in values (instead of
-        doubling them).
-    _FIELD_LIMIT: the longest value (in characters) that the `csv` module
-        reads, which is raised because opinions are longer than its default.
-        It is at most 2 ** 31 - 1, because a C `long` is 32 bits on Windows.
-    _INTEGERS: columns of the bulk files that hold whole numbers.
-    _KINDS: the bulk files that `BulkData` uses, in the order `extract` reads
-        them.
-    _REPORT_EVERY: how many rows of a bulk file are read between progress
-        messages.
-    _convert: returns a row of a bulk file with numbers, booleans, and missing
-        values.
-    _flush: writes buffered opinions to their saved cases.
-    _integer: returns a value as an `int`, if it is a whole number.
 
 """
 
@@ -167,7 +142,8 @@ class BulkData:
             match = _DATE.search(key)
             # Skips files whose kind only starts with `kind` (such as
             # "opinions-cited" for "opinions").
-            if match and key == f'{options._BULK_PREFIX}{kind}-{match.group(1)}.csv.bz2':
+            if match and key == (
+                f'{options._BULK_PREFIX}{kind}-{match.group(1)}.csv.bz2'):
                 dates.append(match.group(1))
         return sorted(set(dates))
 
@@ -212,7 +188,7 @@ class BulkData:
         paths: dict[int, pathlib.Path] = {}
         for cluster_id, cluster in clusters.items():
             docket = dockets[int(cluster['docket_id'])]
-            court = docket_courts[int(cluster["docket_id"])]
+            court = docket_courts[int(cluster['docket_id'])]
             path = courtlistener.case_path(folder, court, cluster_id)
             if not overwrite and courtlistener.is_complete(path):
                 continue
@@ -415,7 +391,8 @@ class BulkData:
                 "jurisdiction" of each court that was found, by its id.
 
         """
-        kept =('id', 'full_name', 'short_name', 'citation_string', 'jurisdiction')
+        kept = (
+            'id', 'full_name', 'short_name', 'citation_string', 'jurisdiction')
         found = {
             row['id']: {k: row.get(k) for k in kept}
             for row in self.rows('courts') if row.get('id') in wanted}
@@ -440,13 +417,13 @@ class BulkData:
 
         """
         found: dict[int, str] = {}
-        for row in self.rows("dockets"):
-            court = row.get("court_id")
-            docket_id = _integer(row.get("id"))
+        for row in self.rows('dockets'):
+            court = row.get('court_id')
+            docket_id = _integer(row.get('id'))
             if court in wanted and docket_id is not None:
                 # One `str` is shared by every docket of a court.
                 found[docket_id] = sys.intern(court)
-        logger.info("found %d dockets", len(found))
+        logger.info('found %d dockets', len(found))
         return found
 
     def _dockets(self, docket_ids: set[int]) -> dict[int, dict[str, Any]]:
@@ -467,7 +444,7 @@ class BulkData:
         if not docket_ids:
             return found
         for row in self.rows('dockets'):
-            docket_id = _integer(row.get("id"))
+            docket_id = _integer(row.get('id'))
             if docket_id not in docket_ids:
                 continue
             docket = _convert(row)
@@ -476,7 +453,7 @@ class BulkData:
             found[docket_id] = docket
             if len(found) == len(docket_ids):
                 break
-        logger.info("read %d dockets", len(found))
+        logger.info('read %d dockets', len(found))
         return found
 
     def _list(self, prefix: str) -> list[str]:
@@ -554,10 +531,14 @@ class BulkData:
         """
         if self.stream:
             url = f'{self.base_url}{options._BULK_PREFIX}{self._name(kind)}'
-            response = self.session.get(url, stream = True, timeout = self.timeout)
+            response = self.session.get(
+                url, stream = True, timeout = self.timeout)
             response.raise_for_status()
             try:
-                with bz2.open(response.raw, 'rt', encoding = 'utf-8', newline = '') as text:
+                with bz2.open(
+                    response.raw,
+                    'rt', encoding = 'utf-8',
+                    newline = '') as text:
                     yield text
             finally:
                 response.close()

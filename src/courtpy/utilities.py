@@ -19,7 +19,6 @@ Contents:
         to text.
     _ISO_DATE: pattern for a date written as YYYY-MM-DD, with the year, month,
         and day as its groups.
-    _LinkExtractor: collects the links of a web page for `page_links`.
     _MONTHS: the number of each month, by the first three letters of its name
         in capitals.
     _SKIPPED: tags whose contents are page numbers or code rather than words
@@ -27,7 +26,6 @@ Contents:
     _SKIPPED_CLASSES: values of an element's "class" attribute that mark its
         contents as page numbers inserted by a publisher (star pagination), so
         its text is left out.
-    _TextExtractor: collects the text of HTML or XML for `html_to_text`.
     _VOID: tags that never have a closing tag (such as "br").
     _WRITTEN_DATE: pattern for a date written out, such as "January 5, 2010",
         "Jan. 5, 2010", or "Sept. 5 2010", with the month, day, and year as

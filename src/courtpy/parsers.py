@@ -22,8 +22,6 @@ Contents:
     parse: parses a folder of saved cases into a table.
     logger: the module's logger, which reports parsing progress and cases
         that could not be parsed.
-    _derive: adds columns that summarize others to a parsed case.
-    _parse_all: parses each saved case, in one process or several.
 
 """
 

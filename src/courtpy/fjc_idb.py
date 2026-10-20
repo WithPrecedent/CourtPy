@@ -41,31 +41,6 @@ Contents:
     download: downloads the database's yearly files that are missing.
     logger: the module's logger, which reports the files that are
         downloaded.
-    _COURTS: the columns of a table of cases with the court of each case,
-        in the order in which they are tried.
-    _COURT_NUMBERS: the database's code for the circuit of each number that
-        the federal rules give a court of appeals ("court_num").
-    _DATES: the columns of a table of cases with the date of each decision
-        (or its year), in the order in which they are tried.
-    _DOCKET: pattern for a docket number of a court of appeals, such as
-        "17-1234" (the year it was docketed and its number that year).
-    _DOCKETS: the columns of a table of cases with its docket numbers, in
-        the order in which they are tried.
-    _KINDS: the kinds of the database's files that fjc-idb reads: appeals,
-        and the civil cases and criminal defendants of the district courts.
-    _TEXT_COLUMNS: columns of the database's table that are kept as text
-        when it is read from a CSV file, since they are codes or docket
-        numbers that may begin with 0.
-    _circuit: returns the database's code for the circuit of a court.
-    _circuits: returns the database's code for the circuit of each case.
-    _decided: returns the date of each decision.
-    _download: downloads the database's yearly files that are missing.
-    _folder: returns the folder where the database's files are kept.
-    _keys: returns the circuit, year, and number of each docket number of a
-        case.
-    _records: returns the database's records of each docket.
-    _span: returns the first and last years of the database to use.
-    _years: returns the years of the database that cover a table of cases.
 
 """
 

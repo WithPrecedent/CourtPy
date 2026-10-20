@@ -56,59 +56,6 @@ Contents:
     download: downloads the Federal Judicial Center's files about judges.
     name_forms: returns the ways that an opinion may write a judge's name.
     vote_table: returns a table with one row for each judge on each case.
-    _ABA_RATINGS: the number for each rating of a nominee by the American
-        Bar Association, from 1 (not qualified) to 4.
-    _ALIASES: other names that opinions use for judges, by the id of the
-        judge ("nid") in the Federal Judicial Center's files.
-    _APPELLATE: the Federal Judicial Center's types of courts whose numbers
-        the federal rules give to cases.
-    _APPOINTMENT: columns of the service file that describe an appointment,
-        which a judge keeps when reassigned to another court.
-    _CASE: name of the column, in a table with a row for each judge on each
-        case, with the position of the case in the table of cases.
-    _CIRCUITS: the number of the circuit that the district courts of each
-        state or territory belong to.
-    _DISTRICT: pattern for the state or territory in the name of a district
-        court, which is its group.
-    _DISTRICT_COURT: the Federal Judicial Center's type of a district court.
-    _FOUND: name of the column, in such a table, that says whether the judge
-        was found in the roster (or how many of a case's judges were).
-    _IDENTIFIERS: columns of numbers in a roster that identify or date a
-        judge's service rather than describe the judge.
-    _NAME: name of the column, in such a table, with the judge's name as the
-        opinion writes it.
-    _NAME_PUNCTUATION: pattern for the punctuation that `clean_name` removes.
-    _NEEDED: columns that every roster must have.
-    _OTHER: name of the column, in a table that pairs the judges of a case,
-        with the place of the other judge.
-    _PARTIES: the number for the party of an appointing president.
-    _PERSONAL: columns that the demographics file must have.
-    _PLACE: name of the column, in such a table, with the place of the judge
-        among the judges of the case.
-    _RELATIVE: attributes of a judge that depend on the case: its year and
-        court.
-    _ROLES: the columns of a case table that name the judges who wrote or
-        joined each kind of opinion, with the column of a table of votes
-        that says whether a judge is one of them.
-    _ROSTER_FILE: the name of the file that a roster is saved to.
-    _SERVICE: columns that the service file must have.
-    _TEXT: columns of text in a roster, which are never attributes, even if
-        every cell of one is blank.
-    _VOTES: pattern for a roll call vote, such as "96/2", with the ayes and
-        nays as its groups.
-    _career_flags: codes the careers of judges with a rulebook.
-    _circuit: returns the number of the circuit of a district court.
-    _colleagues: returns the means of columns among the other judges of each
-        judge's case.
-    _folder: returns the folder where a roster and its sources are kept.
-    _named: finds the judges that a column of the cases names.
-    _number_courts: returns the numbers that the federal rules give courts.
-    _read: returns a file of the Federal Judicial Center as a table of text.
-    _require: raises an error if a table lacks columns.
-    _summarize: returns summaries of the judges of each case.
-    _vote_share: returns the share of senators who voted to confirm a judge.
-    _whole: returns a value as a whole number, or `None` if it is missing.
-    _year: returns the years in a column of dates.
 
 """
 

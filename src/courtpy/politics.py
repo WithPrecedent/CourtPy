@@ -48,11 +48,6 @@ Contents:
         in the file of the justices' scores.
     _PRESIDENTS: each year in which the party of the president changed, with
         the party that took office (-1 for Democratic and 1 for Republican).
-    _address: returns the address of one of the sources' files.
-    _folder: returns the folder where the sources' files are kept.
-    _read: returns a table from a table or a CSV file, or one of the
-        sources' files.
-    _require: raises an error if a table lacks columns.
 
 """
 

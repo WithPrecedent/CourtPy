@@ -42,12 +42,6 @@ Contents:
     _FILE_SETTING: the setting, in `_FILE_SECTION`, that holds the key.
     _STORES: the places that `set_api_key` can store the key ("auto",
         "keyring", or "file").
-    _keyring: returns the `keyring` module, if it has a usable backend.
-    _keyring_names: returns the service and user name of the key in the
-        keyring.
-    _read_dotenv: returns the settings in a `.env` file.
-    _read_file: returns the contents of the secrets file.
-    _write_file: writes the secrets file, readable only by its owner.
 
 """
 

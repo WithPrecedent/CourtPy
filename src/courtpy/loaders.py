@@ -52,11 +52,6 @@ Contents:
     LoadCases: loads a table of cases saved by `courtpy.save_cases`.
     LoadCourtListener: collects, parses, and codes CourtListener cases.
     LoadLexisNexis: divides, parses, and codes Lexis-Nexis cases.
-    _NONE: settings that mean "none" (such as "download = none" or
-        "coders = none"), in lower case.
-    _date: returns a date setting as YYYY-MM-DD text.
-    _integer: returns a whole-number setting.
-    _parse: parses a folder of saved cases with settings that may be text.
 
 """
 

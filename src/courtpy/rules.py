@@ -48,9 +48,6 @@ Contents:
         are optional.
     _SECTION_KINDS: kinds of rules that make new sections of text, which later
         rules can search.
-    _convert: returns a cell of a CSV file as a number if it is one.
-    _read: returns the rules in a CSV file.
-    _unique: returns names in order, without repeats.
 
 """
 

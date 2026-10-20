@@ -15,12 +15,6 @@ Contents:
     read_case: reads a Lexis-Nexis case for parsing.
     split: divides files of many cases into one file for each case.
     logger: the module's logger, which reports how many cases each file held.
-    _DATE_KINDS: words in a line of dates that say what each date is (such
-        as "Argued" in "March 3, 2009, Argued"), in capitals. Each becomes a
-        column such as "date_argued".
-    _DIVIDER: pattern for the line that Lexis-Nexis puts before each case in
-        a file of many cases, such as "3 of 250 DOCUMENTS".
-    _read_text: returns the text of a file in UTF-8 or Windows-1252.
 
 """
 

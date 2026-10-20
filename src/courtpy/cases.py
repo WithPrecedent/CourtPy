@@ -5,16 +5,6 @@ Contents:
     load_cases: loads a table of parsed cases.
     save_cases: saves a table of parsed cases.
     tidy: gives columns with missing values the right type.
-    _LIST_COLUMNS_FILE: the name of the file, saved beside a CSV file of
-        cases, that lists the columns that held lists, so that `load_cases`
-        can restore them. "{stem}" is replaced with the name of the CSV file
-        without its extension.
-    _SEPARATOR: the text between the items of a list when a table is saved as
-        a CSV file.
-    _WHOLE_NUMBERS: columns of whole numbers that may be missing for some
-        cases, which `tidy` gives the "Int64" type.
-    _is_list: returns whether a value is a `list` or `tuple`.
-    _unjoin: returns text saved by `save_cases` as a list again.
 
 """
 

@@ -41,18 +41,6 @@ Contents:
     justices: returns the score of each justice in each term.
     medians: returns the scores of the president and of the medians of
         Congress and the courts in each year.
-    _CORRECTIONS: the name and circuit of the judge that a row of the file
-        of judges means, where the file misspells the name or the circuit,
-        or gives a name that the Federal Judicial Center does not use.
-    _MEDIANS: the columns that `medians` makes, by their names in the file
-        of medians.
-    _SUFFIXES: the parts of names that are suffixes, as `judges.clean_name`
-        writes them.
-    _address: returns the address of the archive of scores.
-    _folder: returns the folder where the files are kept.
-    _match: returns the row of a roster for a judge in the file of judges.
-    _read: returns a table from a table or a CSV file, or one of the files.
-    _require: raises an error if a table lacks columns.
 
 """
 
