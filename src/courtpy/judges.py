@@ -777,7 +777,7 @@ class MergeJudges(amos.Merger):
 
     """ Public Methods """
 
-    def implement(
+    def apply(
         self,
         item: amos.Dataset,
         *,

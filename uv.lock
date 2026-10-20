@@ -40,7 +40,7 @@ wheels = [
 
 [[package]]
 name = "amos"
-version = "0.2.6"
+version = "0.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "camina" },
@@ -53,9 +53,9 @@ dependencies = [
     { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "scipy", version = "1.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/47/41/1991d53bc17cc2fd5460cc32320432b521e6191a502b6ddaa87e680e8fd0/amos-0.2.6.tar.gz", hash = "sha256:167f725e4c74a4ee5a966a5e4a37ab4df893a97efa89b035d99a7620e69e4152", size = 1062597, upload-time = "2026-10-10T18:42:02.396Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f1/a3/d58724adf0632422e36f09e4702c751285f0ef3c6b06285a97e7287f3745/amos-0.4.0.tar.gz", hash = "sha256:42263259860334584f02c76030abdda3c30888fddc6754e784d02ed48058124a", size = 1771199, upload-time = "2026-10-20T18:06:31.829Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/15/38/66ad9d1be0f168cb4708856004c9802dc415125bae97222760422ff968c4/amos-0.2.6-py3-none-any.whl", hash = "sha256:94d7824852ea535bcdb7b466fddbf377a2d253448243f234b43fc2e75fc26639", size = 182387, upload-time = "2026-10-10T18:42:00.609Z" },
+    { url = "https://files.pythonhosted.org/packages/e6/59/b705d4b8a414c1730cc0f96e400213c7e9006aae547e18d8b11b3cf30d49/amos-0.4.0-py3-none-any.whl", hash = "sha256:6cf9404a8430618f8cbbf2235bc148746b404a7495e7acc9a68a9e8f4d2e1ce6", size = 222437, upload-time = "2026-10-20T18:06:30.202Z" },
 ]
 
 [package.optional-dependencies]
@@ -655,7 +655,7 @@ wheels = [
 
 [[package]]
 name = "chrisjen"
-version = "0.2.0"
+version = "0.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "bobbie" },
@@ -665,9 +665,9 @@ dependencies = [
     { name = "nagata" },
     { name = "wonka" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/3a/78/54fd890b2803f06f32b2ad5fc73bcab0d2333b62629334fc1fb88d4a8c59/chrisjen-0.2.0.tar.gz", hash = "sha256:afe20dafcd84f8385c255a3138aa524d4e6c95e144cc9e765eac578faca1b9d6", size = 146890, upload-time = "2026-10-06T02:27:08.512Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/48/63/9e05d28d912b6d5f15b3f9d793b9757c3b7a4c031524a419d38d207a3646/chrisjen-0.3.0.tar.gz", hash = "sha256:49f9427687d239f1ab287d25e297d5d94d7e5d371782ed725c68d23b1730f441", size = 148447, upload-time = "2026-10-20T17:13:42.881Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/73/2e/c9f49e6ae58e5fb1421ee057cd1c3188cf24cae818d33510a3343950c131/chrisjen-0.2.0-py3-none-any.whl", hash = "sha256:8957f432ea7615bdb210f79ace132e73f5402915106eb1e1d3093c17d903af1e", size = 30349, upload-time = "2026-10-06T02:27:07.524Z" },
+    { url = "https://files.pythonhosted.org/packages/ab/d4/4d3289a41d196975270305c8ebc36de1e1c3a39ac70dc8ae9792f6b21b2e/chrisjen-0.3.0-py3-none-any.whl", hash = "sha256:3ba5e1123ba79a1c7552788978c9a87db3dbd58268c4cc3c22da7d228c327a40", size = 30972, upload-time = "2026-10-20T17:13:41.662Z" },
 ]
 
 [[package]]
@@ -970,9 +970,9 @@ tests = [
 
 [package.metadata]
 requires-dist = [
-    { name = "amos", specifier = ">=0.2.6" },
+    { name = "amos", specifier = ">=0.4.0" },
     { name = "amos", extras = ["all"], marker = "extra == 'analysis'" },
-    { name = "chrisjen", specifier = ">=0.2.0" },
+    { name = "chrisjen", specifier = ">=0.3.0" },
     { name = "fjc-idb", specifier = ">=0.0.3" },
     { name = "keyring", specifier = ">=24" },
     { name = "nagata", specifier = ">=0.2.0" },

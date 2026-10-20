@@ -104,7 +104,7 @@ class CodeScdb(amos.Merger):
 
     """ Public Methods """
 
-    def implement(
+    def apply(
         self,
         item: amos.Dataset,
         *,
@@ -140,7 +140,7 @@ class CodeScdb(amos.Merger):
         """
         if source is None:
             source = download(kinds = 'cases')['cases']
-        return super().implement(
+        return super().apply(
             item,
             source = source,
             columns = None if columns is None else utilities.listify(columns),

@@ -539,7 +539,7 @@ def test_judge_votes_in_a_loader(court_listener_folder: pathlib.Path, roster: ju
     # the judges' votes, and a vote can be the label of a study.
     roster.save()
     dataset = loaders.LoadCourtListener().apply(
-        source = court_listener_folder,
+        None, source = court_listener_folder,
         coders = 'code_parties, code_case_type, code_outcome, code_judges, judge_votes',
         label = 'vote_reversal', groups = 'case_id')
     assert dataset.label == 'vote_reversal'

@@ -149,7 +149,7 @@ class CodeIdb(amos.Merger):
 
     """ Public Methods """
 
-    def implement(
+    def apply(
         self,
         item: amos.Dataset,
         *,
@@ -227,7 +227,7 @@ class CodeIdb(amos.Merger):
         chosen = (
             list(table.columns) if columns is None
             else utilities.listify(columns))
-        dataset = super().implement(
+        dataset = super().apply(
             item, source = table, columns = chosen, prefix = prefix, **kwargs)
         dataset.history[-1]["source"] = described
         return dataset

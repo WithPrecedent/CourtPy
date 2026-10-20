@@ -35,6 +35,14 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+* Updated to [amos](https://github.com/WithPrecedent/amos) 0.4.0 and
+  `chrisjen` 0.3.0, the oldest versions that courtpy now accepts. A technique
+  of either writes `apply` instead of `implement`, so courtpy's loaders,
+  coders, and mergers (`CaseLoader`, `DropText`, `CodeIdb`, `MergeJudges`,
+  `CodePolitics`, and `CodeScdb`) do too. Calling `apply` works as before,
+  except that its item is now required: a loader called outside a project
+  takes `None` to start a new dataset (`LoadCourtListener().apply(None,
+  source = ...)`).
 * Every case from the bulk data is saved with CourtListener's whole docket
   (such as `docket_number_core`, `pacer_case_id`, `appeal_from_id`,
   `appellate_case_type_information`, `appellate_fee_status`, and

@@ -232,7 +232,7 @@ def test_code_scdb_with_court_listener(
     # downloads, and the history records the release.
     monkeypatch.setattr(courtpy.utilities.requests, 'Session', lambda: site)
     dataset = courtpy.loaders.LoadCourtListener().apply(
-        source = folder, coders = 'code_outcome, code_scdb', label = 'outcome_reversal')
+        None, source = folder, coders = 'code_outcome, code_scdb', label = 'outcome_reversal')
     assert list(dataset.data['scdb_caseName']) == ['D.C. v. HELLER', 'MCCARTHY v. HERNANDEZ']
     assert list(dataset.data['scdb_majVotes']) == [5, 6]
     record = dataset.history[-1]

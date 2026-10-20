@@ -108,7 +108,7 @@ class CodePolitics(amos.mergers.MergeKeys):
 
     """
 
-    def implement(
+    def apply(
         self,
         item: amos.Dataset,
         *,
@@ -144,7 +144,7 @@ class CodePolitics(amos.mergers.MergeKeys):
             The dataset, with the new columns.
 
         """
-        return super().implement(
+        return super().apply(
             item,
             source = presidents() if source is None else source,
             columns = None if columns is None else utilities.listify(columns),

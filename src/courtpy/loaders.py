@@ -90,7 +90,7 @@ class CaseLoader(amos.Loader, abc.ABC):
 
     A subclass writes `load`, which collects and parses the cases at a source
     (a folder or file, already found with the clerk) and returns a table of
-    them, one row for each case. `implement` then codes the table with the
+    them, one row for each case. `apply` then codes the table with the
     loader's "coders", saves it if "save" is set, and makes it the dataset
     that the rest of the workflow works on, with the label, task, and groups
     from the loader's parameters (which default to the "general" section of
@@ -125,7 +125,7 @@ class CaseLoader(amos.Loader, abc.ABC):
 
     """ Public Methods """
 
-    def implement(self, item: amos.Dataset, **kwargs: Any) -> amos.Dataset:
+    def apply(self, item: amos.Dataset, **kwargs: Any) -> amos.Dataset:
         """Loads, codes, and saves the cases, as a dataset that continues `item`.
 
         Args:

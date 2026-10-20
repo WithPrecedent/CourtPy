@@ -307,7 +307,7 @@ class DropText(amos.Cleaner):
             if c not in kept and _is_text(data[c])]
         return data.drop(columns = dropped)
 
-    def implement(self, item: amos.Dataset, **kwargs: Any) -> amos.Dataset:
+    def apply(self, item: amos.Dataset, **kwargs: Any) -> amos.Dataset:
         """Removes the columns of text and lists of `item`.
 
         Args:
@@ -318,7 +318,7 @@ class DropText(amos.Cleaner):
             The cleaned dataset.
 
         """
-        return super().implement(
+        return super().apply(
             item, **{'label': item.label, 'groups': item.groups, **kwargs})
 
 

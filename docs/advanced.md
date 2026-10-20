@@ -494,12 +494,12 @@ where downloads save their cases, and "save" is in the clerk's interim folder
 column that a coder makes (such as `outcome_reversal`), and the dataset's
 history records the loader and then each coder.
 
-A loader can also be used without a project. `apply` returns an
-`amos.Dataset`:
+A loader can also be used without a project. `apply` takes the dataset so far,
+or `None` to start a new one, and returns an `amos.Dataset`:
 
 ```python
 dataset = courtpy.loaders.LoadCourtListener().apply(
-    source = "court_listener", label = "outcome_reversal")
+    None, source = "court_listener", label = "outcome_reversal")
 ```
 
 ## The CourtListener API

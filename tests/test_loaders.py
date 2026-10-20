@@ -22,7 +22,7 @@ def test_loaders_are_in_the_library() -> None:
 
 def test_load_court_listener(court_listener_folder: pathlib.Path) -> None:
     dataset = loaders.LoadCourtListener().apply(
-        source = court_listener_folder, label = 'outcome_reversal')
+        None, source = court_listener_folder, label = 'outcome_reversal')
     assert dataset.label == 'outcome_reversal'
     assert dataset.task == 'classify'
     assert len(dataset.data) == 3
@@ -33,22 +33,22 @@ def test_load_court_listener(court_listener_folder: pathlib.Path) -> None:
 
 def test_coders_none(court_listener_folder: pathlib.Path) -> None:
     dataset = loaders.LoadCourtListener().apply(
-        source = court_listener_folder, coders = 'none')
+        None, source = court_listener_folder, coders = 'none')
     assert 'outcome_reversal' not in dataset.data.columns
     with pytest.raises(KeyError, match = 'label'):
         loaders.LoadCourtListener().apply(
-            source = court_listener_folder, coders = 'none',
+            None, source = court_listener_folder, coders = 'none',
             label = 'outcome_reversal')
 
 
 def test_save_and_reuse(court_listener_folder: pathlib.Path, tmp_path: pathlib.Path) -> None:
     clerk = nagata.FileManager(root_folder = tmp_path, interim_folder = 'interim')
     loader = loaders.LoadCourtListener(clerk = clerk)
-    loader.apply(source = court_listener_folder, save = 'cases.csv')
+    loader.apply(None, source = court_listener_folder, save = 'cases.csv')
     saved = pathlib.Path(clerk.interim_folder) / 'cases.csv'
     assert saved.is_file()
     reused = loader.apply(
-        source = tmp_path / 'missing', save = 'cases.csv', reuse = 'true',
+        None, source = tmp_path / 'missing', save = 'cases.csv', reuse = 'true',
         label = 'outcome_reversal')
     assert reused.history[0]['reused'] == str(saved)
     assert len(reused.history) == 1
@@ -110,7 +110,7 @@ def test_amos_mungers_search_kept_text(court_listener_folder: pathlib.Path, tmp_
 
 def test_no_cases(tmp_path: pathlib.Path) -> None:
     with pytest.raises(ValueError, match = 'no court_listener cases were found'):
-        loaders.LoadCourtListener().apply(source = tmp_path)
+        loaders.LoadCourtListener().apply(None, source = tmp_path)
 
 
 def test_download(
@@ -121,7 +121,7 @@ def test_download(
         courtpy.bulk.BulkData, 'extract',
         lambda self, **kwargs: calls.append((self.date, kwargs)) or [])
     loaders.LoadCourtListener().apply(
-        source = court_listener_folder, download = 'bulk', courts = 'ca1, ca2',
+        None, source = court_listener_folder, download = 'bulk', courts = 'ca1, ca2',
         start_date = '2020-01-01', bulk_date = '2026-09-30', max_cases = '5')
     date, arguments = calls[0]
     assert date == '2026-09-30'
@@ -130,15 +130,15 @@ def test_download(
     assert arguments['folder'] == court_listener_folder
     with pytest.raises(ValueError, match = 'download must be'):
         loaders.LoadCourtListener().apply(
-            source = court_listener_folder, download = 'ftp', courts = 'ca1')
+            None, source = court_listener_folder, download = 'ftp', courts = 'ca1')
     with pytest.raises(courtpy.secrets.MissingAPIKeyError):
         loaders.LoadCourtListener().apply(
-            source = court_listener_folder, download = 'api', courts = 'ca1')
+            None, source = court_listener_folder, download = 'api', courts = 'ca1')
 
 
 def test_load_lexis_nexis(tmp_path: pathlib.Path) -> None:
     dataset = loaders.LoadLexisNexis().apply(
-        source = tmp_path / 'lexis', batches = str(FIXTURES))
+        None, source = tmp_path / 'lexis', batches = str(FIXTURES))
     assert len(dataset.data) == 2
     assert len(list((tmp_path / 'lexis').glob('*.txt'))) == 2
     assert dataset.data.loc['lexis_batch_00001', 'outcome_reversal']
@@ -147,10 +147,10 @@ def test_load_lexis_nexis(tmp_path: pathlib.Path) -> None:
 def test_load_cases(court_listener_folder: pathlib.Path, tmp_path: pathlib.Path) -> None:
     table = courtpy.code(courtpy.parse(court_listener_folder)).data
     path = courtpy.save_cases(table, tmp_path / 'cases.csv')
-    dataset = loaders.LoadCases().apply(source = path, label = 'outcome_reversal')
+    dataset = loaders.LoadCases().apply(None, source = path, label = 'outcome_reversal')
     assert [e['technique'] for e in dataset.history] == ['load_cases']
     assert dataset.data.loc['1', 'panel_judges'] == ['LYNCH', 'HOWARD', 'THOMPSON']
     with pytest.raises(ValueError, match = 'has nothing to load'):
-        loaders.LoadCases().apply()
+        loaders.LoadCases().apply(None)
     with pytest.raises(FileNotFoundError, match = 'no table of cases'):
-        loaders.LoadCases().apply(source = tmp_path / 'missing.csv')
+        loaders.LoadCases().apply(None, source = tmp_path / 'missing.csv')
