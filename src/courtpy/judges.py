@@ -309,7 +309,7 @@ class Roster:
             common_space.download(overwrite = update)
             found = common_space.judges(roster = cls(table))
             table = amos.mergers.MergeKeys().apply(
-                table,
+                amos.Dataset(table),
                 source = found.dropna(subset = ["nid"])[["nid", "jcs"]],
                 on = "nid",
                 duplicates = "first").data
@@ -968,7 +968,7 @@ def build_roster(
     # who is not in the file of demographics has blank ones.
     details = [column for column in _PERSONAL if column != 'nid']
     personal = merger.apply(
-        served[['nid']],
+        amos.Dataset(served[['nid']]),
         source = people.assign(nid = people['nid'].astype(int)),
         on = 'nid',
         columns = details).data[details].fillna('')
@@ -1012,7 +1012,7 @@ def build_roster(
     if career is not None:
         flags = _career_flags(_read(career), rulebook, roster['nid'])
         roster = merger.apply(
-            roster, source = flags.rename_axis('nid').reset_index(),
+            amos.Dataset(roster), source = flags.rename_axis('nid').reset_index(),
             on = 'nid').data
     if scores is not None:
         scored = (
@@ -1020,7 +1020,7 @@ def build_roster(
             else utilities.read_csv(scores))
         _require(scored, ['nid'], 'the table of scores')
         roster = merger.apply(
-            roster,
+            amos.Dataset(roster),
             source = scored.assign(
                 nid = pd.to_numeric(scored['nid'], errors = 'coerce')),
             on = 'nid',
@@ -1341,7 +1341,7 @@ def _named(
     listed = amos.shapers.ListsToRows().shape(
         names, column = _NAME, separator = cases._SEPARATOR.strip())
     merged = MergeJudges().apply(
-        listed,
+        amos.Dataset(listed),
         source = roster,
         name = _NAME,
         columns = ['nid', *columns],
